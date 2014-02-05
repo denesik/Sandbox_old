@@ -1,0 +1,2 @@
+WARNING: Bitmap. Невозможно открыть файл img.png.
+WARNING: Generate GLBitmap. Не поддерживаемый тип цвета.

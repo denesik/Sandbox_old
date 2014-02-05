@@ -1,7 +1,8 @@
 #ifndef Game_h__
 #define Game_h__
 
-//#define GLFW_INCLUDE_GLU
+#define GLFW_INCLUDE_GLU
+#pragma comment(lib, "glu32.lib") 
 #include <glfw3.h>
 
 class Game
@@ -16,6 +17,8 @@ protected:
 	bool fullscreen;
 
 	GLFWwindow* window;
+
+	unsigned int texture;
 
 public:
 	Game(void);

@@ -117,8 +117,39 @@ bool Game::Initialize()
 	Bitmap *b = new Bitmap();
 	
 
-	b->load("img.png");
+	//b->Load("img.png");
+	
+	unsigned int channel = 4;
+
+	byte *data = new byte[32*32*channel];
+
+	for(unsigned int i = 0; i < 32*32; i++)
+	{
+		if(i % 2 == 0)
+		{
+			data[i*channel] = 100;
+			data[i*channel + 1] = 50;
+			data[i*channel + 2] = 100;
+		}
+		else
+		{
+			data[i*channel] = 200;
+			data[i*channel + 1] = 100;
+			data[i*channel + 2] = 200;
+		}
+
+		data[i*channel + channel - 1] = 128;
+	}
+
+	b->Change(Bitmap::FORMAT_RGBA, 32, 32, data);
+	
+	b->ConvertFormat(Bitmap::FORMAT_LUMINANCE_ALPHA);
+
+	b->Save("img.png");
+	texture = 0;
 	texture = GenerateOpenglBitmap(*b, false);
+
+	b->Free();
 
 	return true;
 }
@@ -170,7 +201,7 @@ int Game::Run()
 		glDepthFunc(GL_LEQUAL);								
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-		//glEnable(GL_TEXTURE_2D);
+		glEnable(GL_TEXTURE_2D);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

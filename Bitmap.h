@@ -3,6 +3,8 @@
 
 #include <string>
 
+typedef unsigned char byte;
+
 class Bitmap
 {
 public:
@@ -18,7 +20,7 @@ public:
 	};
 
 private:
-	unsigned char *data;
+	byte *data;
 	unsigned int width;
 	unsigned int height;
 	unsigned int format;
@@ -27,7 +29,7 @@ public:
 	Bitmap(void);
 	~Bitmap(void);
 
-	unsigned char *GetData()
+	byte *GetData()
 	{
 		return data;
 	}
@@ -44,10 +46,14 @@ public:
 		return format;
 	}
 
-	void Change(unsigned int format, unsigned int width, unsigned int height, unsigned char *data);
+	void ConvertFormat(unsigned int format);
 
-	bool load(std::string fileName);
-	bool save(std::string fileName);
+	void Free();
+
+	void Change(unsigned int format, unsigned int width, unsigned int height, byte *data);
+
+	bool Load(std::string fileName);
+	bool Save(std::string fileName);
 };
 
 

@@ -5,7 +5,7 @@
 #include <png.h>
 
 
-static unsigned int get_channel_count(unsigned int format)
+static unsigned int GetChannelCount(unsigned int format)
 {
 	switch (format)
 	{
@@ -26,8 +26,23 @@ static unsigned int get_channel_count(unsigned int format)
 	return 0;
 }
 
+static bool IsAvailableAlpha(unsigned int format)
+{
+	switch (format)
+	{
+	case Bitmap::FORMAT_LUMINANCE_ALPHA:
+	case Bitmap::FORMAT_RGBA:
+	case Bitmap::FORMAT_ALPHA:
+		return true;
+
+	}
+
+	return false;
+}
+
 static bool LoadBMP(Bitmap &bitmap, FILE *file)
 {
+
 	png_struct* png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	
 	if (!png)
@@ -75,13 +90,6 @@ static bool LoadBMP(Bitmap &bitmap, FILE *file)
 			break;
 		}
 			
-			// RGB(A) to BGR(A)
-			/*case PNG_COLOR_TYPE_RGB:
-			 case PNG_COLOR_TYPE_RGB_ALPHA:
-			 {
-			 png_set_bgr(png);
-			 break;
-			 }*/
 	}
 	
 	// transparency to alpha channel
@@ -178,7 +186,7 @@ static bool SaveBMP(Bitmap &bitmap, FILE *file)
 	unsigned int format = bitmap.GetFormat();
 	unsigned int width = bitmap.GetWidth();
 	unsigned int height = bitmap.GetHeight();
-	unsigned int channel_count = get_channel_count(format);
+	unsigned int channel_count = GetChannelCount(format);
 	unsigned int color_type;
 
 	switch (format)
@@ -215,7 +223,7 @@ static bool SaveBMP(Bitmap &bitmap, FILE *file)
 		}
 	}
 
-	png_set_IHDR(png, info, width, height, 8, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+	png_set_IHDR(png, info, width, height, 8, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 	png_write_info(png, info);
 	unsigned int pass_count = 1;
 
@@ -245,18 +253,31 @@ static bool SaveBMP(Bitmap &bitmap, FILE *file)
 Bitmap::Bitmap(void)
 {
 	data = nullptr;
+	width = 0;
+	height = 0;
+	format = FORMAT_NULL;
 }
 
 Bitmap::~Bitmap(void)
+{
+	Free();
+}
+
+
+void Bitmap::Free()
 {
 	if(data)
 	{
 		delete[] data;
 		data = nullptr;
 	}
+	width = 0;
+	height = 0;
+	format = FORMAT_NULL;
 }
 
-void Bitmap::Change(unsigned int format_, unsigned int width_, unsigned int height_, unsigned char *data_)
+
+void Bitmap::Change(unsigned int format_, unsigned int width_, unsigned int height_, byte *data_)
 {
 	data = data_;
 	width = width_;
@@ -267,10 +288,9 @@ void Bitmap::Change(unsigned int format_, unsigned int width_, unsigned int heig
 #pragma warning(push)
 #pragma warning (disable: 4996)
 
-bool Bitmap::load( std::string fileName )
+bool Bitmap::Load( std::string fileName )
 {
-	//FILE *file = fopen(fileName.c_str(), "rb");
-	FILE *file = fopen("img.png", "rb");
+	FILE *file = fopen(fileName.c_str(), "rb");
 	if (file == NULL) 
 	{
 		LOG(LOG_WARNING, "Bitmap. Невозможно открыть файл " + fileName + ".");
@@ -288,7 +308,7 @@ bool Bitmap::load( std::string fileName )
 	return false;
 }
 
-bool Bitmap::save( std::string fileName )
+bool Bitmap::Save( std::string fileName )
 {
 	FILE *file = fopen(fileName.c_str(), "wb");
 	if (!file) 
@@ -306,6 +326,108 @@ bool Bitmap::save( std::string fileName )
 	fclose(file);
 	LOG(LOG_WARNING, "Bitmap. Файл " + fileName + " не загружен.");
 	return false;
+}
+
+static byte *FormatLuminanceToAny(unsigned int formatOld, unsigned int formatNew, unsigned int width, unsigned int height, byte *data)
+{
+	unsigned int channelCount = GetChannelCount(formatNew);
+
+	byte *dataNew = new byte[width * height * channelCount];
+
+	unsigned int channelAlpha = (IsAvailableAlpha(formatNew)) ? 1 : 0;
+
+	bool isAlphaOld = IsAvailableAlpha(formatOld);
+
+	for(unsigned int i = 0; i < height * width; i++)
+	{
+		for (unsigned int k = 0; k < channelCount - channelAlpha; k++)
+		{
+			dataNew[i * channelCount + k] = (isAlphaOld) ? data[i * 2] : data[i];
+		}
+		if(channelAlpha > 0)
+			dataNew[i * channelCount + channelCount - 1] = (isAlphaOld) ? data[i * 2 + 1] : 255;
+	}
+
+	return dataNew;
+}
+
+static byte *FormatRGBToAny(unsigned int formatOld, unsigned int formatNew, unsigned int width, unsigned int height, byte *data)
+{
+	unsigned int channelCountNew = GetChannelCount(formatNew);
+	unsigned int channelAlphaNew = (IsAvailableAlpha(formatNew)) ? 1 : 0;
+
+	bool isAlphaOld = IsAvailableAlpha(formatOld);
+	unsigned int offsetOld = (isAlphaOld) ? 4 : 3;
+
+
+	byte *dataNew = new byte[width * height * channelCountNew];
+
+	for(unsigned int i = 0; i < height * width; i++)
+	{
+		for (unsigned int k = 0; k < channelCountNew - channelAlphaNew; k++)
+		{
+			if(channelCountNew - channelAlphaNew > 1)
+			{
+				dataNew[i * channelCountNew + k] = data[i * offsetOld + k];
+			}
+			else
+			{
+				dataNew[i * channelCountNew + k] = (data[i * offsetOld] + data[i * offsetOld + 1] + data[i * offsetOld + 2]) / 3;
+			}
+
+		}
+		if(channelAlphaNew > 0)
+			dataNew[i * channelCountNew + channelCountNew - 1] = (isAlphaOld) ? data[i * offsetOld + offsetOld - 1] : 255;
+	}
+
+	return dataNew;
+}
+
+
+
+void Bitmap::ConvertFormat( unsigned int formatNew )
+{
+	if(formatNew == format)
+		return;
+
+	if(formatNew == Bitmap::FORMAT_NULL)
+		return;
+
+	byte *dataNew = nullptr;
+
+	switch (format)
+	{
+	case Bitmap::FORMAT_LUMINANCE:
+	case Bitmap::FORMAT_LUMINANCE_ALPHA:
+		{
+			dataNew = FormatLuminanceToAny(format, formatNew, width, height, data);
+			if(data)
+			{
+				delete[] data;
+			}
+			data = dataNew;
+			break;
+		}
+
+	case Bitmap::FORMAT_RGB:
+	case Bitmap::FORMAT_RGBA:
+		{
+			dataNew = FormatRGBToAny(format, formatNew, width, height, data);
+			if(data)
+			{
+				delete[] data;
+			}
+			data = dataNew;
+			break;
+		}
+
+	default:
+		{
+			return;
+		}
+	}
+
+	format = formatNew;
 }
 
 #pragma warning (pop)

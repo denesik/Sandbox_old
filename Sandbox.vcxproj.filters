@@ -27,10 +27,13 @@
     <ClInclude Include="Bitmap.h">
       <Filter>Рендер</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
+    <ClInclude Include="GameMath.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
       <Filter>Рендер</Filter>
     </ClInclude>
-    <ClInclude Include="GameMath.h">
+    <ClInclude Include="ImageAtlas.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,8 +50,11 @@
     <ClCompile Include="Bitmap.cpp">
       <Filter>Рендер</Filter>
     </ClCompile>
-    <ClCompile Include="Texture.cpp">
+    <ClCompile Include="TextureManager.cpp">
       <Filter>Рендер</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageAtlas.cpp">
+      <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -10,7 +10,6 @@ static unsigned int GetChannelCount(unsigned int format)
 	switch (format)
 	{
 	case Bitmap::FORMAT_LUMINANCE:
-	case Bitmap::FORMAT_ALPHA:
 		return 1;
 
 	case Bitmap::FORMAT_LUMINANCE_ALPHA:
@@ -32,7 +31,6 @@ static bool IsAvailableAlpha(unsigned int format)
 	{
 	case Bitmap::FORMAT_LUMINANCE_ALPHA:
 	case Bitmap::FORMAT_RGBA:
-	case Bitmap::FORMAT_ALPHA:
 		return true;
 
 	}
@@ -484,8 +482,8 @@ bool Bitmap::Blit( i32vec2 *point, iRect *srcrect, Bitmap *bitmap )
 
 	unsigned int srcWidth = bitmap->GetWidth();
 
-	for (unsigned int yy = 0; yy < dstBitmapRect.h; yy++)
-		for (unsigned int xx = 0; xx < dstBitmapRect.w; xx++)
+	for (unsigned int yy = 0; yy < unsigned int(dstBitmapRect.h); yy++)
+		for (unsigned int xx = 0; xx < unsigned int(dstBitmapRect.w); xx++)
 		{
 			for(unsigned int k = 0; k < channelCount; k++)
 			{
@@ -501,5 +499,47 @@ bool Bitmap::Blit( i32vec2 *point, iRect *srcrect, Bitmap *bitmap )
 			}
 		}
 	
+	*srcrect = dstBitmapRect;
+
 	return true;
+}
+
+void Bitmap::Generate( unsigned int format_, unsigned int width_, unsigned int height_, unsigned int color)
+{
+	format = format_;
+	width = width_;
+	height = height_;
+
+	unsigned char colorRBG[3];
+	colorRBG[0] = 0x000000FF & (color >> 24);
+	colorRBG[1] = 0x000000FF & (color >> 16);
+	colorRBG[2] = 0x000000FF & (color >> 8);
+	unsigned char colorA = 0x000000FF & color;
+
+	unsigned char colorL = (colorRBG[0] + colorRBG[1] + colorRBG[2]) / 3;
+
+	unsigned int alpha = (IsAvailableAlpha(format)) ? 1 : 0;
+
+	unsigned int channelCount = GetChannelCount(format);
+
+	data = new byte[width * height * channelCount];
+
+
+	for(unsigned int i = 0; i < width * height; i++)
+	{
+		if( (channelCount - alpha) < 3 )
+		{
+			data[i * channelCount] = colorL;
+		}
+		else
+		{
+			for(unsigned int k = 0; k < channelCount - alpha; k++)
+			{
+				data[i * channelCount + k] = colorRBG[k];
+			}
+		}
+		if( alpha == 1)
+			data[i * channelCount + channelCount - 1] = colorA;
+	}
+
 }

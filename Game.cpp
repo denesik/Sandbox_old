@@ -1,61 +1,7 @@
 #include "Game.h"
 #include "Logger.h"
 #include "Bitmap.h"
-
-
-static unsigned int GenerateOpenglBitmap(Bitmap &bitmap, bool smoothing)
-{
-	unsigned int glBitmap = 0;
-	glGenTextures(1, &glBitmap);
-	glBindTexture(GL_TEXTURE_2D, glBitmap);
-
-	GLint param = GL_LINEAR;
-	if(!smoothing) param = GL_NEAREST;
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param);
-
-	unsigned int format = bitmap.GetFormat();
-	unsigned int colorType = GL_RGB;
-	switch (format)
-	{
-	case Bitmap::FORMAT_LUMINANCE:
-		{
-			colorType = GL_LUMINANCE;
-			break;
-		}
-
-	case Bitmap::FORMAT_LUMINANCE_ALPHA:
-		{
-			colorType = GL_LUMINANCE_ALPHA;
-			break;
-		}
-
-	case Bitmap::FORMAT_RGB:
-		{
-			colorType = GL_RGB;
-			break;
-		}
-
-	case Bitmap::FORMAT_RGBA:
-		{
-			colorType = GL_RGBA;
-			break;
-		}
-
-	default:
-		{
-			LOG(LOG_WARNING, "Generate GLBitmap. Не поддерживаемый тип цвета.");
-			break;
-		}
-	}
-
-	//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, colorType, bitmap.GetWidth(), bitmap.GetHeight(), 0, colorType, GL_UNSIGNED_BYTE, bitmap.GetData());
-
-	return glBitmap;
-}
+#include "TextureManager.h"
 
 
 void errorCallbackGLFW3(int error, const char* description)
@@ -116,6 +62,12 @@ bool Game::Initialize()
 
 	Bitmap *b = new Bitmap();
 	Bitmap *b1 = new Bitmap();
+
+	b->Generate(Bitmap::FORMAT_RGBA, 50, 30, 0xFF00FFFF);
+
+	b->Save("test.png");
+
+	b->Free();
 
 	//b->Load("img.png");
 	

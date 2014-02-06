@@ -14,7 +14,6 @@ public:
 	{
 		FORMAT_NULL,
 		FORMAT_LUMINANCE,
-		FORMAT_ALPHA,
 		FORMAT_LUMINANCE_ALPHA,
 		FORMAT_RGB,
 		FORMAT_RGBA,
@@ -54,6 +53,8 @@ public:
 	void Free();
 
 	void Change(unsigned int format, unsigned int width, unsigned int height, byte *data);
+
+	void Generate(unsigned int format, unsigned int width, unsigned int height, unsigned int color);
 
 	bool Load(std::string fileName);
 	bool Save(std::string fileName);

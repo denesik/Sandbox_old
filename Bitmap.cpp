@@ -383,7 +383,7 @@ static byte *FormatRGBToAny(unsigned int formatOld, unsigned int formatNew, unsi
 	return dataNew;
 }
 
-
+#pragma warning (pop)
 
 void Bitmap::ConvertFormat( unsigned int formatNew )
 {
@@ -430,4 +430,76 @@ void Bitmap::ConvertFormat( unsigned int formatNew )
 	format = formatNew;
 }
 
-#pragma warning (pop)
+
+bool Bitmap::Blit( i32vec2 *point, iRect *srcrect, Bitmap *bitmap )
+{
+
+	unsigned int channelCount = GetChannelCount(format);
+
+	if( channelCount != GetChannelCount(bitmap->GetFormat()))
+		return false;
+
+	iRect srcBitmapRect;
+	iRect dstBitmapRect;
+	if(srcrect == nullptr)
+	{
+		srcBitmapRect.h = bitmap->GetHeight();
+		srcBitmapRect.w = bitmap->GetWidth();
+	}
+	else
+	{
+		srcBitmapRect = *srcrect;
+		int offsetX = srcBitmapRect.x + srcBitmapRect.w - bitmap->GetWidth();
+		int offsetY = srcBitmapRect.y + srcBitmapRect.h - bitmap->GetHeight();
+		if( offsetX > 0)
+			srcBitmapRect.w -= offsetX;
+		if( offsetY > 0)
+			srcBitmapRect.h -= offsetY;
+
+	}
+
+	if(point != nullptr)
+	{
+		dstBitmapRect.x = point->x;
+		dstBitmapRect.y = point->y;
+	}
+
+	dstBitmapRect.w = srcBitmapRect.w;
+	dstBitmapRect.h = srcBitmapRect.h;
+
+	int offsetX = dstBitmapRect.x + dstBitmapRect.w - width;
+	int offsetY = dstBitmapRect.y + dstBitmapRect.h - height;
+	if( offsetX > 0)
+	{
+		dstBitmapRect.w -= offsetX;
+		srcBitmapRect.w -= offsetX;
+	}
+	if( offsetY > 0)
+	{
+		dstBitmapRect.h -= offsetY;
+		srcBitmapRect.h -= offsetY;
+	}
+
+	byte *srcData = bitmap->GetData();
+
+	unsigned int srcWidth = bitmap->GetWidth();
+
+	for (unsigned int yy = 0; yy < dstBitmapRect.h; yy++)
+		for (unsigned int xx = 0; xx < dstBitmapRect.w; xx++)
+		{
+			for(unsigned int k = 0; k < channelCount; k++)
+			{
+
+				//yy + dstBitmapRect.y	// номер строки
+
+				//(yy + dstBitmapRect.y) * width * channelCount // первый бит в yy строке
+				//(xx + dstBitmapRect.x) * channelCount + k // номер бита в строке
+
+				data[((yy + dstBitmapRect.y) * width + (xx + dstBitmapRect.x)) * channelCount + k]
+					= srcData[((yy + srcBitmapRect.y) * srcWidth + (xx + srcBitmapRect.x)) * channelCount + k];
+
+			}
+		}
+	
+	return true;
+}

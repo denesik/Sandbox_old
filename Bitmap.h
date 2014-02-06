@@ -2,6 +2,7 @@
 #define Bitmap_h__
 
 #include <string>
+#include "GameMath.h"
 
 typedef unsigned char byte;
 
@@ -47,6 +48,8 @@ public:
 	}
 
 	void ConvertFormat(unsigned int format);
+
+	bool Blit(i32vec2 *point, iRect *srcrect, Bitmap *bitmap);
 
 	void Free();
 

@@ -115,7 +115,7 @@ bool Game::Initialize()
 	*/
 
 	Bitmap *b = new Bitmap();
-	
+	Bitmap *b1 = new Bitmap();
 
 	//b->Load("img.png");
 	
@@ -138,14 +138,29 @@ bool Game::Initialize()
 			data[i*channel + 2] = 200;
 		}
 
+		if(i < 64)
+		{
+			data[i*channel] = 0;
+			data[i*channel + 1] = 255;
+			data[i*channel + 2] = 0;
+		}
+
 		data[i*channel + channel - 1] = 128;
 	}
 
 	b->Change(Bitmap::FORMAT_RGBA, 32, 32, data);
 	
-	b->ConvertFormat(Bitmap::FORMAT_LUMINANCE_ALPHA);
+	//b->ConvertFormat(Bitmap::FORMAT_LUMINANCE_ALPHA);
 
-	b->Save("img.png");
+	b1->Load("img_t.png");
+
+	b->Save("img1.png");
+	b1->Save("img2.png");
+
+	b->Blit(new i32vec2(5, 20), new iRect(0, 0, 14, 14), b1);
+
+	b->Save("img12.png");
+
 	texture = 0;
 	texture = GenerateOpenglBitmap(*b, false);
 

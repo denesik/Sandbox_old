@@ -2,6 +2,7 @@
 #include "Logger.h"
 #include "Bitmap.h"
 #include "TextureManager.h"
+#include "ImageAtlas.h"
 
 
 void errorCallbackGLFW3(int error, const char* description)
@@ -63,7 +64,19 @@ bool Game::Initialize()
 	Bitmap *b = new Bitmap();
 	Bitmap *b1 = new Bitmap();
 
-	b->Generate(Bitmap::FORMAT_RGBA, 50, 30, 0xFF00FFFF);
+	b->Generate(Bitmap::FORMAT_RGBA, 80, 40, 0xFF00FFFF);
+
+	ImageAtlas *atlas = new ImageAtlas();
+
+	atlas->Create(Bitmap::FORMAT_RGBA, 256, 256);
+	unsigned int xx = 0;
+	unsigned int yy = 0;
+	atlas->InsertImage(b, xx, yy);
+
+	b->Generate(Bitmap::FORMAT_RGBA, 10, 40, 0x00FF00FF);
+	atlas->InsertImage(b, xx, yy);
+
+	atlas->GetAtlas()->Save("img.png");
 
 	b->Save("test.png");
 

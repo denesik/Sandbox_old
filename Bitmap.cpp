@@ -499,7 +499,8 @@ bool Bitmap::Blit( i32vec2 *point, iRect *srcrect, Bitmap *bitmap )
 			}
 		}
 	
-	*srcrect = dstBitmapRect;
+	if(srcrect != nullptr)
+		*srcrect = dstBitmapRect;
 
 	return true;
 }

@@ -5,7 +5,7 @@
 #include <png.h>
 
 
-static unsigned int GetChannelCount(unsigned int format)
+unsigned int GetChannelCount(unsigned int format)
 {
 	switch (format)
 	{
@@ -25,17 +25,17 @@ static unsigned int GetChannelCount(unsigned int format)
 	return 0;
 }
 
-static bool IsAvailableAlpha(unsigned int format)
+unsigned int IsAvailableAlpha(unsigned int format)
 {
 	switch (format)
 	{
 	case Bitmap::FORMAT_LUMINANCE_ALPHA:
 	case Bitmap::FORMAT_RGBA:
-		return true;
+		return 1;
 
 	}
 
-	return false;
+	return 0;
 }
 
 static bool LoadBMP(Bitmap &bitmap, FILE *file)
@@ -334,16 +334,16 @@ static byte *FormatLuminanceToAny(unsigned int formatOld, unsigned int formatNew
 
 	unsigned int channelAlpha = (IsAvailableAlpha(formatNew)) ? 1 : 0;
 
-	bool isAlphaOld = IsAvailableAlpha(formatOld);
+	unsigned int isAlphaOld = IsAvailableAlpha(formatOld);
 
 	for(unsigned int i = 0; i < height * width; i++)
 	{
 		for (unsigned int k = 0; k < channelCount - channelAlpha; k++)
 		{
-			dataNew[i * channelCount + k] = (isAlphaOld) ? data[i * 2] : data[i];
+			dataNew[i * channelCount + k] = (isAlphaOld == 1) ? data[i * 2] : data[i];
 		}
 		if(channelAlpha > 0)
-			dataNew[i * channelCount + channelCount - 1] = (isAlphaOld) ? data[i * 2 + 1] : 255;
+			dataNew[i * channelCount + channelCount - 1] = (isAlphaOld == 1) ? data[i * 2 + 1] : 255;
 	}
 
 	return dataNew;
@@ -354,8 +354,8 @@ static byte *FormatRGBToAny(unsigned int formatOld, unsigned int formatNew, unsi
 	unsigned int channelCountNew = GetChannelCount(formatNew);
 	unsigned int channelAlphaNew = (IsAvailableAlpha(formatNew)) ? 1 : 0;
 
-	bool isAlphaOld = IsAvailableAlpha(formatOld);
-	unsigned int offsetOld = (isAlphaOld) ? 4 : 3;
+	unsigned int isAlphaOld = IsAvailableAlpha(formatOld);
+	unsigned int offsetOld = (isAlphaOld == 1) ? 4 : 3;
 
 
 	byte *dataNew = new byte[width * height * channelCountNew];
@@ -375,7 +375,7 @@ static byte *FormatRGBToAny(unsigned int formatOld, unsigned int formatNew, unsi
 
 		}
 		if(channelAlphaNew > 0)
-			dataNew[i * channelCountNew + channelCountNew - 1] = (isAlphaOld) ? data[i * offsetOld + offsetOld - 1] : 255;
+			dataNew[i * channelCountNew + channelCountNew - 1] = (isAlphaOld == 1) ? data[i * offsetOld + offsetOld - 1] : 255;
 	}
 
 	return dataNew;

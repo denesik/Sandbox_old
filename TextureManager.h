@@ -17,7 +17,6 @@ unsigned int GenerateOpenglBitmap(Bitmap &bitmap, bool smoothing);
 
 void GenerateTextCoord(Bitmap *bitmap, iRect *rect, Texture &texture);
 
-
 class TextureManager
 {
 public:

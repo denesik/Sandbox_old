@@ -29,7 +29,7 @@ public:
 	ImageAtlas(void);
 	~ImageAtlas(void);
 
-	bool InsertImage(Bitmap *image, unsigned int &x, unsigned int &y);
+	bool InsertImage(Bitmap *image, iRect &rect);
 
 	bool Create(unsigned int format, unsigned int width, unsigned int height);
 

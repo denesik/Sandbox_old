@@ -3,6 +3,7 @@
 #include "Bitmap.h"
 #include "TextureManager.h"
 #include "ImageAtlas.h"
+#include "FontTTF.h"
 
 
 void errorCallbackGLFW3(int error, const char* description)
@@ -62,74 +63,18 @@ bool Game::Initialize()
 	*/
 
 	Bitmap *b = new Bitmap();
-	Bitmap *b1 = new Bitmap();
 
-	b->Generate(Bitmap::FORMAT_RGBA, 80, 40, 0xFF00FFFF);
-
-	ImageAtlas *atlas = new ImageAtlas();
-
-	atlas->Create(Bitmap::FORMAT_RGBA, 256, 256);
-	unsigned int xx = 0;
-	unsigned int yy = 0;
-	atlas->InsertImage(b, xx, yy);
-
-	b->Generate(Bitmap::FORMAT_RGBA, 10, 40, 0x00FF00FF);
-	atlas->InsertImage(b, xx, yy);
-
-	atlas->GetAtlas()->Save("img.png");
-
-	b->Save("test.png");
-
-	b->Free();
-
-	//b->Load("img.png");
-	
-	unsigned int channel = 4;
-
-	byte *data = new byte[32*32*channel];
-
-	for(unsigned int i = 0; i < 32*32; i++)
-	{
-		if(i % 2 == 0)
-		{
-			data[i*channel] = 100;
-			data[i*channel + 1] = 50;
-			data[i*channel + 2] = 100;
-		}
-		else
-		{
-			data[i*channel] = 200;
-			data[i*channel + 1] = 100;
-			data[i*channel + 2] = 200;
-		}
-
-		if(i < 64)
-		{
-			data[i*channel] = 0;
-			data[i*channel + 1] = 255;
-			data[i*channel + 2] = 0;
-		}
-
-		data[i*channel + channel - 1] = 128;
-	}
-
-	b->Change(Bitmap::FORMAT_RGBA, 32, 32, data);
-	
-	//b->ConvertFormat(Bitmap::FORMAT_LUMINANCE_ALPHA);
-
-	b1->Load("img_t.png");
-
-	b->Save("img1.png");
-	b1->Save("img2.png");
-
-	b->Blit(new i32vec2(5, 20), new iRect(0, 0, 14, 14), b1);
-
-	b->Save("img12.png");
+	b->Load("img.png");
 
 	texture = 0;
 	texture = GenerateOpenglBitmap(*b, false);
 
 	b->Free();
+
+
+	FontTTF font("fonts/ACADEROM.TTF", 12);
+	font.Generate();
+
 
 	return true;
 }
@@ -175,7 +120,7 @@ int Game::Run()
 		glLoadIdentity();
 
 		glShadeModel(GL_SMOOTH);							
-		glClearColor(0.0f, 0.0f, 0.0f, 0.5f);				
+		glClearColor(1.0f, 1.0f, 1.0f, 0.5f);				
 		glClearDepth(1.0f);									
 		glEnable(GL_DEPTH_TEST);							
 		glDepthFunc(GL_LEQUAL);								

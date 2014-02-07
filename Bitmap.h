@@ -4,6 +4,9 @@
 #include <string>
 #include "GameMath.h"
 
+extern unsigned int GetChannelCount(unsigned int format);
+extern unsigned int IsAvailableAlpha(unsigned int format);
+
 typedef unsigned char byte;
 
 class Bitmap

@@ -1,1 +1,1 @@
-WARNING: Bitmap. Файл img.png не загружен.
+ERROR:   TextureAtlas. Image не добавлена.

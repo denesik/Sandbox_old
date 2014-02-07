@@ -20,14 +20,16 @@ ImageAtlas::~ImageAtlas(void)
 	}
 }
 
-bool ImageAtlas::InsertImage( Bitmap *_image, unsigned int &x, unsigned int &y )
+bool ImageAtlas::InsertImage( Bitmap *_image, iRect &rect )
 {
 	boxTmp = box;
 	imageTmp = _image;
 	bool result = InsertImage();
 
-	x = xTmp;
-	y = yTmp;
+	rect.x = xTmp;
+	rect.y = yTmp;
+	rect.w = _image->GetWidth();
+	rect.h = _image->GetHeight();
 
 	return result;
 }

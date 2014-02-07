@@ -34,7 +34,10 @@
       <Filter>Рендер</Filter>
     </ClInclude>
     <ClInclude Include="ImageAtlas.h">
-      <Filter>Заголовочные файлы</Filter>
+      <Filter>Рендер</Filter>
+    </ClInclude>
+    <ClInclude Include="FontTTF.h">
+      <Filter>Рендер</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -54,7 +57,10 @@
       <Filter>Рендер</Filter>
     </ClCompile>
     <ClCompile Include="ImageAtlas.cpp">
-      <Filter>Файлы исходного кода</Filter>
+      <Filter>Рендер</Filter>
+    </ClCompile>
+    <ClCompile Include="FontTTF.cpp">
+      <Filter>Рендер</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

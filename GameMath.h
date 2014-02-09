@@ -5,6 +5,20 @@
 
 using namespace glm;
 
+inline int next_p2( int a )
+{
+	int rval = 1;
+	while( rval < a ) rval <<= 1;
+	return rval;
+}
+
+inline unsigned int next_p2( unsigned int a )
+{
+	unsigned int rval = 1;
+	while( rval < a ) rval <<= 1;
+	return rval;
+}
+
 struct iRect
 {
 	int x;

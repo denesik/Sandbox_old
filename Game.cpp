@@ -3,7 +3,7 @@
 #include "Bitmap.h"
 #include "TextureManager.h"
 #include "ImageAtlas.h"
-#include "FontTTF.h"
+#include "Font.h"
 
 
 void errorCallbackGLFW3(int error, const char* description)
@@ -72,8 +72,8 @@ bool Game::Initialize()
 	b->Free();
 
 
-	FontTTF font("fonts/ACADEROM.TTF", 12);
-	font.Generate();
+	Font font("font.json");
+	
 
 
 	return true;

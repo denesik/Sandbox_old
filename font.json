@@ -1,0 +1,15 @@
+{
+	"FontList" :
+	[
+		{
+			"FileName" : "fonts/ACADEITA.TTF",
+			"Size" : 14,
+			"Glyphs" : 
+			[
+				"1234567890",
+				"abcdefghijklmnopqrstuvwxyz"
+				"абвгдеё"
+			]
+		}
+	]
+}

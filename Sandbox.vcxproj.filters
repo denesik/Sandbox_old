@@ -36,7 +36,7 @@
     <ClInclude Include="ImageAtlas.h">
       <Filter>Рендер</Filter>
     </ClInclude>
-    <ClInclude Include="FontTTF.h">
+    <ClInclude Include="Font.h">
       <Filter>Рендер</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,7 +59,7 @@
     <ClCompile Include="ImageAtlas.cpp">
       <Filter>Рендер</Filter>
     </ClCompile>
-    <ClCompile Include="FontTTF.cpp">
+    <ClCompile Include="Font.cpp">
       <Filter>Рендер</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,1 +1,3 @@
-ERROR:   TextureAtlas. Image не добавлена.
+ERROR:   Шрифты. Ошибка в структуре конфигурационного файла font.json. * Line 12, Column 4
+  Syntax error: value, object or array expected.
+

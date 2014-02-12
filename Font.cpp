@@ -97,6 +97,7 @@ bool Font::LoadConfig( std::string configFileName )
 		return 0;
 	}
 
+
 	Json::Value root;
 	Json::Reader reader;
 
@@ -197,7 +198,7 @@ bool Font::GenerateOpenglGlyphs()
 	sideAtlas = next_p2( sideAtlas );
 
 	float diff = float(sideAtlas * sideAtlas) / float(area);
-	if( diff < 1.5f )
+	if( diff < 1.8f )
 		sideAtlas <<= 1;
 
 	glyphAtlas.Create(Bitmap::FORMAT_LUMINANCE_ALPHA, sideAtlas, sideAtlas);
@@ -208,8 +209,10 @@ bool Font::GenerateOpenglGlyphs()
 	iRect rect;
 	for (auto i = glyphsBitmapList.begin(); i != glyphsBitmapList.end(); i++)
 	{
-		glyphAtlas.InsertImage( (*i).bitmap, rect );
-		
+		if( !glyphAtlas.InsertImage( (*i).bitmap, rect ) ) 
+		{
+			LOG(LOG_WARNING, "Font. Символ не загружен.");
+		}
 		delete (*i).bitmap;
 		(*i).bitmap = nullptr;
 	}

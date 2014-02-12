@@ -2,13 +2,13 @@
 	"FontList" :
 	[
 		{
-			"FileName" : "fonts/ACADEITA.TTF",
+			"FileName" : "fonts/times.ttf",
 			"Size" : 14,
 			"Glyphs" : 
 			[
 				"1234567890",
-				"abcdefghijklmnopqrstuvwxyz"
-				"абвгдеё"
+				"abcdefghijklmnopqrstuvwxyz",
+				"абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
 			]
 		}
 	]

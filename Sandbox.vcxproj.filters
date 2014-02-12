@@ -39,6 +39,15 @@
     <ClInclude Include="Font.h">
       <Filter>Рендер</Filter>
     </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Рендер</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Рендер</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -61,6 +70,15 @@
     </ClCompile>
     <ClCompile Include="Font.cpp">
       <Filter>Рендер</Filter>
+    </ClCompile>
+    <ClCompile Include="Render.cpp">
+      <Filter>Рендер</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Рендер</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

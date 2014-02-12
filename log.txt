@@ -1,3 +1,9 @@
-ERROR:   Шрифты. Ошибка в структуре конфигурационного файла font.json. * Line 12, Column 4
-  Syntax error: value, object or array expected.
+INFO:    Compiling shader: "shaders/t2.vs".
+INFO:    Vertex shader was successfully compiled to run on hardware.
+
+INFO:    Compiling shader: "shaders/t2.fs".
+INFO:    Fragment shader was successfully compiled to run on hardware.
+
+INFO:    Linking program
+INFO:    Vertex shader(s) linked, fragment shader(s) linked.
 

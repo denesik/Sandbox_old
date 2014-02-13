@@ -3,6 +3,7 @@
 
 #include <glew.h>
 #include <glfw3.h>
+#include "GameMath.h"
 
 enum BufferType
 {
@@ -22,26 +23,38 @@ struct BufferArray
 
 class Render
 {
+private:
+	mat4 orthoProjection;
+
+	unsigned int width;
+	unsigned int height;
+
 public:
 	Render(void);
 	~Render(void);
 
 	bool Init();
 
+	void SetWindowSize(unsigned int width, unsigned int height);
+
 	unsigned int CreateBufferVertex(const BufferArray &bufferArray);
 	unsigned int CreateBufferColor(const BufferArray &bufferArray);
 	unsigned int CreateBufferTextCoord(const BufferArray &bufferArray);
 	unsigned int CreateBufferIndex(const BufferArray &bufferArray);
-
-	unsigned int CreateVertexArrayObject();
 
 	void DeleteBufferVertex(unsigned int buffer);
 	void DeleteBufferColor(unsigned int buffer);
 	void DeleteBufferTextCoord(unsigned int buffer);
 	void DeleteBufferIndex(unsigned int buffer);
 
+	unsigned int CreateVertexArrayObject();
 	void DeleteVertexArrayObject(unsigned int vao);
 	void UseVertexArrayObject(unsigned int vao);
+
+	void DrawBufferIndex(const BufferArray &bufferArray);
+
+	mat4 GetOrthoProjection();
+
 };
 
 

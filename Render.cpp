@@ -1,9 +1,12 @@
 #include "Render.h"
 #include "Logger.h"
 
+#define GLM_FORCE_RADIANS
+#include <gtc/matrix_transform.hpp>
 
 Render::Render(void)
 {
+	orthoProjection = glm::ortho(0.0f, (float)width, (float)height, 0.0f);
 }
 
 
@@ -141,4 +144,21 @@ void Render::DeleteVertexArrayObject( unsigned int vao )
 void Render::UseVertexArrayObject( unsigned int vao )
 {
 	glBindVertexArray(vao);
+}
+
+void Render::SetWindowSize( unsigned int _width, unsigned int _height )
+{
+	width = _width;
+	height = _width;
+}
+
+glm::mat4 Render::GetOrthoProjection()
+{
+	return orthoProjection;
+}
+
+void Render::DrawBufferIndex( const BufferArray &bufferArray )
+{
+	size_t size = bufferArray.sizeElement * bufferArray.lenght;
+	glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, NULL);
 }

@@ -14,17 +14,30 @@ private:
 	static double dxpos;
 	static double dypos;
 
-	static double xposCentral;
-	static double yposCentral;
+	static unsigned int windowWidth;
+	static unsigned int windowHeight;
+
+	static bool stateFixedMousePos;
+	static bool isCursorClientArea;
+	static bool isWindowFocused;
 
 public:
 
-	static void Init( GLFWwindow *win );
-
+	static void CursorClientArea(int entered);
 	static void SetButton(int button);
 	static void SetCursorPos(double xpos, double ypos);
+	static void WindowFocus(int focused);
 
-	static void SetCursorPosCentral(double xpos, double ypos);
+	static void Init( GLFWwindow *win );
+
+	static void SetFixedPosState( bool state);
+
+	static bool GetFixedPosState()
+	{
+		return stateFixedMousePos;
+	}
+
+	static void SetWindowSize(unsigned int width, unsigned int height);
 
 	static void GetCursorPos(double &xpos, double &ypos);
 

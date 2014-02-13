@@ -16,7 +16,7 @@ private:
 
 	float rotx;
 	float roty;
-	mat4 projection;
+	mat4 perspectiveProjection;
 	mat4 view;
 
 	mat4 rotatex;

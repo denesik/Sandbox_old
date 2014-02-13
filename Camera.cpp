@@ -12,11 +12,11 @@ Camera::Camera(void)
 	zNear = 0.1f;
 	zFar = 100.f;
 
-	projection = glm::perspective(fov, aspect, zNear, zFar);
+	perspectiveProjection = glm::perspective(fov, aspect, zNear, zFar);
 	view = glm::lookAt
 	(
-		glm::vec3(0,0,2), // ѕозици€ камеры
-		glm::vec3(0,0,1), // направление взгл€да
+		glm::vec3(0,0,1), // ѕозици€ камеры
+		glm::vec3(0,0,0), // направление взгл€да
 		glm::vec3(0,1,0)  // вектор Up
 	);
 	rotx = 0;
@@ -36,7 +36,7 @@ void Camera::SetWindowSize( unsigned int width, unsigned int height )
 	windowHeight = height;
 	aspect = float(windowWidth) / float(windowHeight);
 
-	projection = glm::perspective(fov, aspect, zNear, zFar);
+	perspectiveProjection = glm::perspective(fov, aspect, zNear, zFar);
 }
 
 void Camera::RotateX( float angle )
@@ -68,8 +68,8 @@ void Camera::MoveZ( float dist )
 	view = translate * view;
 }
 
-glm::mat4 Camera::CalculateMatrix()
+mat4 Camera::CalculateMatrix()
 {
 	mat4 rotatey = glm::rotate(mat4(1.0f), roty, vec3(1.0f, 0.0f, 0.0f));
-	return projection * rotatey * view;
+	return perspectiveProjection * rotatey * view;
 }

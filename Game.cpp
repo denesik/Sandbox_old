@@ -100,6 +100,16 @@ void CursorPosCallbackGLFW3(GLFWwindow *window, double xpos, double ypos)
 	Mouse::SetCursorPos(xpos, ypos);
 }
 
+void CursorClientAreaCallbackGLFW3(GLFWwindow *window, int entered)
+{
+	Mouse::CursorClientArea(entered);
+}
+
+void WindowFocusCallbackGLFW3(GLFWwindow *window, int focused)
+{
+	Mouse::WindowFocus(focused);
+}
+
 void errorCallbackGLFW3(int error, const char* description)
 {
 	
@@ -159,9 +169,11 @@ bool Game::Initialize()
 	glfwSetKeyCallback(window, KeyCallbackGLFW3);
 
 	Mouse::Init(window);
-	Mouse::SetCursorPosCentral(width / 2, height / 2);
-	glfwSetCursorPos(window, width / 2, height / 2);
+	Mouse::SetWindowSize(width, height);
+	Mouse::SetFixedPosState(true);
 	glfwSetCursorPosCallback(window, CursorPosCallbackGLFW3);
+	glfwSetCursorEnterCallback(window, CursorClientAreaCallbackGLFW3);	
+	glfwSetWindowFocusCallback(window, WindowFocusCallbackGLFW3);
 
 	render = new Render;
 	render->Init();
@@ -231,7 +243,6 @@ int Game::Run()
 	GLuint indexbuffer;
 	indexbuffer = render->CreateBufferIndex(cube.GetVertexIndex());
 
-	size_t cubeIndices = cube.GetVertexIndex().sizeElement * cube.GetVertexIndex().lenght;
 
 	// делаем активным текстурный юнит 0
 	glActiveTexture(GL_TEXTURE1);
@@ -295,7 +306,7 @@ int Game::Run()
 		glUniform1i(textureLocation, 1);
 
 		render->UseVertexArrayObject(VertexArrayID);
-		glDrawElements(GL_TRIANGLES, cubeIndices, GL_UNSIGNED_INT, NULL);
+		render->DrawBufferIndex(cube.GetVertexIndex());
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

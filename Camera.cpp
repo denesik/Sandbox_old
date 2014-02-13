@@ -19,6 +19,10 @@ Camera::Camera(void)
 		glm::vec3(0,0,1), // направление взгляда
 		glm::vec3(0,1,0)  // вектор Up
 	);
+	rotx = 0;
+	roty = 0;
+	rotatex = mat4(1.0f);
+	
 }
 
 
@@ -37,25 +41,35 @@ void Camera::SetWindowSize( unsigned int width, unsigned int height )
 
 void Camera::RotateX( float angle )
 {
-	view = glm::rotate( view, angle, vec3(-1.0f, 0.0f, 0.0f));
+	float ax = radians(angle);
+	rotx += ax;
+	rotatex = glm::rotate(mat4(1.0f), ax, vec3(0.0f, 1.0f, 0.0f));
+	view = rotatex * view;
 }
 
 void Camera::RotateY( float angle )
 {
-	view = glm::rotate( view, angle, vec3(0.0f, -1.0f, 0.0f));
+
+	roty += radians(angle);
+
 }
 
 void Camera::MoveX( float dist )
 {
-	view = glm::translate(view, vec3(-dist, 0.0f, 0.0f));
+	mat4 translate;
+	translate = glm::translate(mat4(1.0f), vec3(-dist, 0.0f, 0.0f));
+	view = translate * view;
 }
 
-void Camera::MoveY( float dist )
+void Camera::MoveZ( float dist )
 {
-	view = glm::translate(view, vec3(0.0f, 0.0f, dist));
+	mat4 translate;
+	translate = glm::translate(mat4(1.0f), vec3(0.0f, 0.0f, dist));
+	view = translate * view;
 }
 
 glm::mat4 Camera::CalculateMatrix()
 {
-	return projection * view;
+	mat4 rotatey = glm::rotate(mat4(1.0f), roty, vec3(1.0f, 0.0f, 0.0f));
+	return projection * rotatey * view;
 }

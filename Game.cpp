@@ -12,6 +12,7 @@
 #define GLM_FORCE_RADIANS
 #include <gtc/matrix_transform.hpp>
 #include "Keyboard.h"
+#include "Mouse.h"
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
 
@@ -89,9 +90,14 @@ GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 	return ProgramID;
 }
 
-void gKeyCallbackGLFW3(GLFWwindow *win, int key, int scancode, int action, int mods)
+void KeyCallbackGLFW3(GLFWwindow *win, int key, int scancode, int action, int mods)
 {
 	Keyboard::SetKey(key, scancode, action, mods);
+}
+
+void CursorPosCallbackGLFW3(GLFWwindow *window, double xpos, double ypos)
+{
+	Mouse::SetCursorPos(xpos, ypos);
 }
 
 void errorCallbackGLFW3(int error, const char* description)
@@ -150,7 +156,12 @@ bool Game::Initialize()
 	glfwMakeContextCurrent(window);
 	
 	Keyboard::Init();
-	glfwSetKeyCallback(window, gKeyCallbackGLFW3);
+	glfwSetKeyCallback(window, KeyCallbackGLFW3);
+
+	Mouse::Init(window);
+	Mouse::SetCursorPosCentral(width / 2, height / 2);
+	glfwSetCursorPos(window, width / 2, height / 2);
+	glfwSetCursorPosCallback(window, CursorPosCallbackGLFW3);
 
 	render = new Render;
 	render->Init();
@@ -230,6 +241,7 @@ int Game::Run()
 	GLint textureLocation = -1;
 	textureLocation = glGetUniformLocation(programID, "colorTexture");
 
+
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		
@@ -238,13 +250,13 @@ int Game::Run()
 
 		if(Keyboard::isKeyDown(GLFW_KEY_W))
 		{
-			camera.MoveY(0.005f);
+			camera.MoveZ(0.005f);
 			MVP = camera.CalculateMatrix() * model;
 		}
 
 		if(Keyboard::isKeyDown(GLFW_KEY_S))
 		{
-			camera.MoveY(-0.005f);
+			camera.MoveZ(-0.005f);
 			MVP = camera.CalculateMatrix() * model;
 		}
 
@@ -259,6 +271,23 @@ int Game::Run()
 			camera.MoveX(-0.005f);
 			MVP = camera.CalculateMatrix() * model;
 		}
+
+		float dx = float(Mouse::IsMoveCursorX());
+		if( dx != 0)
+		{
+
+			camera.RotateX( dx );
+			MVP = camera.CalculateMatrix() * model;
+		}
+
+		float dy = float(Mouse::IsMoveCursorY());
+		if( dy != 0)
+		{
+
+			camera.RotateY( dy );
+			MVP = camera.CalculateMatrix() * model;
+		}
+
 
 		// Use our shader
 		glUseProgram(programID);

@@ -13,8 +13,13 @@ private:
 	float zNear;
 	float zFar;
 
+
+	float rotx;
+	float roty;
 	mat4 projection;
 	mat4 view;
+
+	mat4 rotatex;
 
 public:
 	Camera(void);
@@ -28,7 +33,7 @@ public:
 	void RotateY(float angle);
 
 	void MoveX(float dist);
-	void MoveY(float dist);
+	void MoveZ(float dist);
 };
 
 

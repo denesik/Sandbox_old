@@ -89,36 +89,6 @@ GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 }
 
 
-const float cubePositions[24][3] = 
-{	// по часовой стрелке
-	{0, 0, 0}, {0, 1, 0}, {1, 1, 0}, {1, 0, 0}, // front
-	{1, 0,-1}, {1, 1,-1}, {0, 1,-1}, {0, 0,-1}, // back
-	{0, 1, 0}, {0, 1,-1}, {1, 1,-1}, {1, 1, 0}, // top
-	{0, 0,-1}, {0, 0, 0}, {1, 0, 0}, {1, 0,-1}, // bottom
-	{0, 0,-1}, {0, 1,-1}, {0, 1, 0}, {0, 0, 0}, // left
-	{1, 0, 0}, {1, 1, 0}, {1, 1,-1}, {1, 0,-1}  // right
-};
-
-const float cubeTexcoords[24][2] = 
-{
-	{0.0f,0.0f}, {0.0f,1.0f}, {1.0f,1.0f}, {1.0f,0.0f}, // front
-	{0.0f,0.0f}, {0.0f,1.0f}, {1.0f,1.0f}, {1.0f,0.0f}, // back
-	{0.0f,0.0f}, {0.0f,1.0f}, {1.0f,1.0f}, {1.0f,0.0f}, // top
-	{0.0f,0.0f}, {0.0f,1.0f}, {1.0f,1.0f}, {1.0f,0.0f}, // bottom
-	{0.0f,0.0f}, {0.0f,1.0f}, {1.0f,1.0f}, {1.0f,0.0f}, // left
-	{0.0f,0.0f}, {0.0f,1.0f}, {1.0f,1.0f}, {1.0f,0.0f}  // right
-};
-
-const uint32_t cubeIndices[36] = 
-{
-	0, 3, 2,  2, 1, 0,  // front
-	4, 7, 6,  6, 5, 4,  // back
-	8,11, 10, 10,9, 8,  // top
-	12,15,14, 14,13,12, // bottom
-	16,19,18, 18,17,16, // left
-	20,23,22, 22,21,20  // right
-};
-
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -224,19 +194,10 @@ int Game::Run()
 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
-	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-	// Camera matrix
-	glm::mat4 View = glm::lookAt(
-		glm::vec3(0,0,5), // Camera is at (4,3,-3), in World Space
-		glm::vec3(0,0,0), // and looks at the origin
-		glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
-		);
-	// Model matrix : an identity matrix (model will be at the origin)
-	glm::mat4 Model = glm::mat4(1.0f);
-
-	// Our ModelViewProjection : multiplication of our 3 matrices
-	glm::mat4 MVP        = Projection * View * Model; // Remember, matrix multiplication is the other way around
+	Camera camera;
+	camera.SetWindowSize(width, height);
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 MVP = camera.CalculateMatrix() * model;
 
 
 	Cube cube;
@@ -252,6 +213,8 @@ int Game::Run()
 
 	GLuint indexbuffer;
 	indexbuffer = render->CreateBufferIndex(cube.GetVertexIndex());
+
+	size_t cubeIndices = cube.GetVertexIndex().sizeElement * cube.GetVertexIndex().lenght;
 
 	// делаем активным текстурный юнит 0
 	glActiveTexture(GL_TEXTURE1);
@@ -273,7 +236,7 @@ int Game::Run()
 		glUniform1i(textureLocation, 1);
 
 		render->UseVertexArrayObject(VertexArrayID);
-		glDrawElements(GL_TRIANGLES, sizeof(cubeIndices), GL_UNSIGNED_INT, NULL);
+		glDrawElements(GL_TRIANGLES, cubeIndices, GL_UNSIGNED_INT, NULL);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -20,10 +20,10 @@ static const uint32_t __vertexIndex[36] =
 	20,23,22, 22,21,20  // right
 };
 
-Cube::Cube(void)
+Cube::Cube(void) : vertexPositionsSize(72), vertexTexcoordsSize(48), vertexIndexSize(36)
 {
-	vertexTexcoords = new float[48];
-	for(unsigned int i = 0; i < 6; i++)
+	vertexTexcoords = new float[vertexTexcoordsSize];
+	for(unsigned int i = 0; i < vertexTexcoordsSize / 8; i++)
 	{
 		vertexTexcoords[i * 8 + 0] = 0;
 		vertexTexcoords[i * 8 + 1] = 0;
@@ -38,8 +38,8 @@ Cube::Cube(void)
 		vertexTexcoords[i * 8 + 7] = 0;
 	}
 
-	vertexPositions = new float[72];
-	for(unsigned int i = 0; i < 24; i++)
+	vertexPositions = new float[vertexPositionsSize];
+	for(unsigned int i = 0; i < vertexPositionsSize / 3; i++)
 	{
 		vertexPositions[i * 3] = __vertexPositions[i][0];
 		vertexPositions[i * 3 + 1] = __vertexPositions[i][1];
@@ -47,8 +47,8 @@ Cube::Cube(void)
 	}
 
 
-	vertexIndex = new uint32_t[36];
-	for(unsigned int i = 0; i < 36; i++)
+	vertexIndex = new uint32_t[vertexIndexSize];
+	for(unsigned int i = 0; i < vertexIndexSize; i++)
 	{
 		vertexIndex[i] = __vertexIndex[i];
 	}
@@ -58,18 +58,24 @@ Cube::Cube(void)
 
 Cube::~Cube(void)
 {
+	delete[] vertexTexcoords;
+	vertexTexcoords = nullptr;
+	delete[] vertexPositions;
+	vertexPositions = nullptr;
+	delete[] vertexIndex;
+	vertexIndex = nullptr;
 }
 
 BufferArray Cube::GetVertexPosition(const vec3 &pos)
 {
-	for(unsigned int i = 0; i < 24; i++)
+	for(unsigned int i = 0; i < vertexPositionsSize / 3; i++)
 	{
 		vertexPositions[i * 3] =     __vertexPositions[i][0] + pos[0];
 		vertexPositions[i * 3 + 1] = __vertexPositions[i][1] + pos[1];
 		vertexPositions[i * 3 + 2] = __vertexPositions[i][2] + pos[2];
 	}
 	BufferArray vpa;
-	vpa.lenght = 72;
+	vpa.lenght = vertexPositionsSize;
 	vpa.sizeElement = sizeof(float);
 	vpa.data = vertexPositions;
 
@@ -78,7 +84,7 @@ BufferArray Cube::GetVertexPosition(const vec3 &pos)
 
 void Cube::SetTextureAllSide(const Texture &_texture)
 {
-	for(unsigned int i = 0; i < 6; i++)
+	for(unsigned int i = 0; i < vertexTexcoordsSize / 8; i++)
 	{
 		vertexTexcoords[i * 4 + 0] = _texture.u1;
 		vertexTexcoords[i * 4 + 1] = _texture.v1;

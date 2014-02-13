@@ -11,6 +11,7 @@
 #include "Camera.h"
 #define GLM_FORCE_RADIANS
 #include <gtc/matrix_transform.hpp>
+#include "Keyboard.h"
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
 
@@ -88,7 +89,10 @@ GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 	return ProgramID;
 }
 
-
+void gKeyCallbackGLFW3(GLFWwindow *win, int key, int scancode, int action, int mods)
+{
+	Keyboard::SetKey(key, scancode, action, mods);
+}
 
 void errorCallbackGLFW3(int error, const char* description)
 {
@@ -145,6 +149,8 @@ bool Game::Initialize()
 	}
 	glfwMakeContextCurrent(window);
 	
+	Keyboard::Init();
+	glfwSetKeyCallback(window, gKeyCallbackGLFW3);
 
 	render = new Render;
 	render->Init();
@@ -229,6 +235,30 @@ int Game::Run()
 		
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		if(Keyboard::isKeyDown(GLFW_KEY_W))
+		{
+			camera.MoveY(0.005f);
+			MVP = camera.CalculateMatrix() * model;
+		}
+
+		if(Keyboard::isKeyDown(GLFW_KEY_S))
+		{
+			camera.MoveY(-0.005f);
+			MVP = camera.CalculateMatrix() * model;
+		}
+
+		if(Keyboard::isKeyDown(GLFW_KEY_D))
+		{
+			camera.MoveX(0.005f);
+			MVP = camera.CalculateMatrix() * model;
+		}
+
+		if(Keyboard::isKeyDown(GLFW_KEY_A))
+		{
+			camera.MoveX(-0.005f);
+			MVP = camera.CalculateMatrix() * model;
+		}
 
 		// Use our shader
 		glUseProgram(programID);

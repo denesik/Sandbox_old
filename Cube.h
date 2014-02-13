@@ -3,28 +3,46 @@
 
 #include "GameMath.h"
 #include "Render.h"
+#include "TextureManager.h"
 
 
 class Cube
 {
 private:
-	static const float cubePositions[24][3];
-	static const float cubeTexcoords[24][2];
+	float *vertexPositions; // [24][3]
+	float *vertexTexcoords; // [24][2]
+	// индексы вершин куба в порядке поротив часовой стрелки
+	uint32_t *vertexIndex;// [36]
+
+	Texture texture[6];
 
 public:
 	Cube(void);
 	~Cube(void);
 
-	void GenerateVertexPosition(const vec3 &pos, unsigned int size, float *data);
+	BufferArray GetVertexPosition(const vec3 &pos);
 
-	float *GetVertexPosition()
+	BufferArray GetTextureCoord()
 	{
-		return cubePositions;
+		BufferArray ba;
+		ba.lenght = 48;
+		ba.sizeElement = sizeof(float);
+		ba.data = vertexTexcoords;
+
+		return ba;
 	}
-	float *GetTextureCoord()
+
+	BufferArray GetVertexIndex()
 	{
-		return cubeTexcoords;
+		BufferArray ba;
+		ba.lenght = 36;
+		ba.sizeElement = sizeof(uint32_t);
+		ba.data = vertexIndex;
+
+		return ba;
 	}
+
+	void SetTextureAllSide(const Texture &texture);
 
 };
 

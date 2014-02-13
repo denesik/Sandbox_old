@@ -11,6 +11,15 @@ enum BufferType
 	BUFFER_TEXTURE_COORD,
 };
 
+struct BufferArray
+{
+	unsigned int lenght;
+	size_t sizeElement;
+	const void *data;
+};
+
+
+
 class Render
 {
 public:
@@ -19,20 +28,20 @@ public:
 
 	bool Init();
 
-	unsigned int CreateBufferVertex(size_t size, const void* data);
-	unsigned int CreateBufferColor(size_t size, const void* data);
-	unsigned int CreateBufferTextCoord(size_t size, const void* data);
-	unsigned int CreateBufferIndex(size_t size, const void* data);
+	unsigned int CreateBufferVertex(const BufferArray &bufferArray);
+	unsigned int CreateBufferColor(const BufferArray &bufferArray);
+	unsigned int CreateBufferTextCoord(const BufferArray &bufferArray);
+	unsigned int CreateBufferIndex(const BufferArray &bufferArray);
 
-	unsigned int CreateVertexArray();
+	unsigned int CreateVertexArrayObject();
 
 	void DeleteBufferVertex(unsigned int buffer);
 	void DeleteBufferColor(unsigned int buffer);
 	void DeleteBufferTextCoord(unsigned int buffer);
 	void DeleteBufferIndex(unsigned int buffer);
 
-	void DeleteVertexArray(unsigned int vao);
-	void UseVertexArray(unsigned int vao);
+	void DeleteVertexArrayObject(unsigned int vao);
+	void UseVertexArrayObject(unsigned int vao);
 };
 
 

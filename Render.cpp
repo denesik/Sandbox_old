@@ -24,13 +24,13 @@ bool Render::Init()
 	return true;
 }
 
-unsigned int Render::CreateBufferVertex(size_t size, const void* data)
+unsigned int Render::CreateBufferVertex(const BufferArray &bufferArray)
 {
-
+	size_t size = bufferArray.lenght * bufferArray.sizeElement;
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size, bufferArray.data, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(BUFFER_VERTEX);
 	glVertexAttribPointer
@@ -52,12 +52,13 @@ void Render::DeleteBufferVertex( unsigned int buffer )
 	glDeleteBuffers(1, &buffer);
 }
 
-unsigned int Render::CreateBufferColor( size_t size, const void* data )
+unsigned int Render::CreateBufferColor(const BufferArray &bufferArray)
 {
+	size_t size = bufferArray.lenght * bufferArray.sizeElement;
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size, bufferArray.data, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(BUFFER_COLOR);
 	glVertexAttribPointer
@@ -79,12 +80,13 @@ void Render::DeleteBufferColor( unsigned int buffer )
 	glDeleteBuffers(1, &buffer);
 }
 
-unsigned int Render::CreateBufferTextCoord( size_t size, const void* data )
+unsigned int Render::CreateBufferTextCoord(const BufferArray &bufferArray)
 {
+	size_t size = bufferArray.lenght * bufferArray.sizeElement;
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, BUFFER_TEXTURE_COORD);
-	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size, bufferArray.data, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(BUFFER_TEXTURE_COORD);
 	glVertexAttribPointer
@@ -100,12 +102,13 @@ unsigned int Render::CreateBufferTextCoord( size_t size, const void* data )
 	return buffer;
 }
 
-unsigned int Render::CreateBufferIndex( size_t size, const void* data )
+unsigned int Render::CreateBufferIndex(const BufferArray &bufferArray)
 {
+	size_t size = bufferArray.lenght * bufferArray.sizeElement;
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, bufferArray.data, GL_STATIC_DRAW);
 
 	return buffer;
 }
@@ -121,7 +124,7 @@ void Render::DeleteBufferIndex( unsigned int buffer )
 	glDeleteBuffers(1, &buffer);
 }
 
-unsigned int Render::CreateVertexArray()
+unsigned int Render::CreateVertexArrayObject()
 {
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -130,12 +133,12 @@ unsigned int Render::CreateVertexArray()
 	return VertexArrayID;
 }
 
-void Render::DeleteVertexArray( unsigned int vao )
+void Render::DeleteVertexArrayObject( unsigned int vao )
 {
 	glDeleteVertexArrays(1, &vao);
 }
 
-void Render::UseVertexArray( unsigned int vao )
+void Render::UseVertexArrayObject( unsigned int vao )
 {
 	glBindVertexArray(vao);
 }

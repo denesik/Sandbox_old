@@ -6,10 +6,10 @@
 struct Texture
 {
 	unsigned int textureId;
-	double u1;
-	double v1;
-	double u2;
-	double v2;
+	float u1;
+	float v1;
+	float u2;
+	float v2;
 };
 
 

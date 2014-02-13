@@ -71,13 +71,13 @@ void GenerateTextCoord( Bitmap *bitmap, iRect *rect, Texture &texture )
 		return;
 	}
 
-	double kx = 1.0 / double(width);
-	double ky = 1.0 / double(height);
+	float kx = 1.0f / float(width);
+	float ky = 1.0f / float(height);
 
-	texture.u1 = kx * double(rect->x);
-	texture.v1 = ky * double(rect->y);
-	texture.u2 = kx * double(rect->x + rect->w);
-	texture.v2 = ky * double(rect->y + rect->h);
+	texture.u1 = kx * float(rect->x);
+	texture.v1 = ky * float(rect->y);
+	texture.u2 = kx * float(rect->x + rect->w);
+	texture.v2 = ky * float(rect->y + rect->h);
 
 }
 

@@ -46,7 +46,7 @@ void Font::Finalize()
 	}
 }
 
-bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap glyphBitmap)
+bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap &glyphBitmap)
 {
 
 	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, glyphNumber ), FT_LOAD_DEFAULT ))
@@ -68,8 +68,8 @@ bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap glyphBitmap)
 	FT_Bitmap &bitmap=bitmap_glyph->bitmap;
 
 
-	glyphBitmap.bitmap->Generate(Bitmap::FORMAT_LUMINANCE_ALPHA, bitmap.width, bitmap.rows, 0x00000000);
-	unsigned int channelCount = GetChannelCount(Bitmap::FORMAT_LUMINANCE_ALPHA);
+	glyphBitmap.bitmap->Generate(Bitmap::FORMAT_RGBA, bitmap.width, bitmap.rows, 0x00000000);
+	unsigned int channelCount = GetChannelCount(Bitmap::FORMAT_RGBA);
 
 	byte *glyphImageData = glyphBitmap.bitmap->GetData();
 
@@ -201,26 +201,54 @@ bool Font::GenerateOpenglGlyphs()
 	if( diff < 1.8f )
 		sideAtlas <<= 1;
 
-	glyphAtlas.Create(Bitmap::FORMAT_LUMINANCE_ALPHA, sideAtlas, sideAtlas);
+	glyphAtlas.Create(Bitmap::FORMAT_RGBA, sideAtlas, sideAtlas);
 
 	// Сортируем по убыванию площадей
 	glyphsBitmapList.sort();
 
 	iRect rect;
+	Bitmap *atlasBitmap = glyphAtlas.GetAtlas();
+
 	for (auto i = glyphsBitmapList.begin(); i != glyphsBitmapList.end(); i++)
 	{
 		if( !glyphAtlas.InsertImage( (*i).bitmap, rect ) ) 
 		{
 			LOG(LOG_WARNING, "Font. Символ не загружен.");
+			delete (*i).bitmap;
+			(*i).bitmap = nullptr;
+			continue;
 		}
+
+		FontTexture fontTexture;
+
+		fontTexture.width = (*i).bitmap->GetWidth();
+		fontTexture.height = (*i).bitmap->GetHeight();
+		fontTexture.offsetDown = (*i).offsetDown;
+
+		GenerateTextCoord(atlasBitmap, &rect, fontTexture.texture);
+
+		glyphsTextureMap[(*i).key] = fontTexture;
+
 		delete (*i).bitmap;
 		(*i).bitmap = nullptr;
+	}
+
+	// CreateAtlasOpenglTexture
+	unsigned int ogltexture = GenerateOpenglBitmap(*atlasBitmap, false);
+	for (auto i = glyphsTextureMap.begin(); i != glyphsTextureMap.end(); i++)
+	{
+		(*i).second.texture.textureId = ogltexture;
 	}
 
 	glyphsBitmapList.clear();
 	glyphAtlas.GetAtlas()->Save("atlas.png");
 
-
 	glyphAtlas.Remove();
 	return true;
+}
+
+
+void Font::Print( float x, float y, std::vector<unsigned int> text )
+{
+	//glyphsTextureMap[]
 }

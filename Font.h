@@ -13,6 +13,7 @@
 #include "TextureManager.h"
 #include <map>
 #include <list>
+#include <vector>
 
 class Font
 {
@@ -44,8 +45,10 @@ private:
 		}
 	};
 
-	//std::map<unsigned int, GlyphBitmap> glyphsBitmapList;
+	
 	std::list<GlyphBitmap> glyphsBitmapList;
+
+	std::map<unsigned int, FontTexture> glyphsTextureMap;
 
 public:
 	Font( std::string configFileName );
@@ -58,8 +61,11 @@ private:
 	bool LoadConfig( std::string configFileName );
 
 	bool GenerateGlyphsList( std::string glyphList );
-	bool GenerateGlyph(unsigned int gliphNumber, GlyphBitmap glyphBitmap);
+	bool GenerateGlyph(unsigned int gliphNumber, GlyphBitmap &glyphBitmap);
 	bool GenerateOpenglGlyphs();
+
+
+	void Print( float x, float y, std::vector<unsigned int> text );
 
 };
 

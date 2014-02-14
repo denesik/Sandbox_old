@@ -26,25 +26,9 @@ public:
 
 	BufferArray GetVertexPosition(const vec3 &pos);
 
-	BufferArray GetTextureCoord()
-	{
-		BufferArray ba;
-		ba.lenght = vertexTexcoordsSize;
-		ba.sizeElement = sizeof(float);
-		ba.data = vertexTexcoords;
+	BufferArray GetTextureCoord();
 
-		return ba;
-	}
-
-	BufferArray GetVertexIndex()
-	{
-		BufferArray ba;
-		ba.lenght = vertexIndexSize;
-		ba.sizeElement = sizeof(uint32_t);
-		ba.data = vertexIndex;
-
-		return ba;
-	}
+	BufferArray GetVertexIndex();
 
 	void SetTextureAllSide(const Texture &texture);
 

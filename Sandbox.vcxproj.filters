@@ -45,13 +45,16 @@
     <ClInclude Include="Camera.h">
       <Filter>Рендер</Filter>
     </ClInclude>
-    <ClInclude Include="Cube.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="Keyboard.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Mouse.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Рендер</Filter>
+    </ClInclude>
+    <ClInclude Include="Rectangle2D.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
@@ -83,13 +86,16 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Рендер</Filter>
     </ClCompile>
-    <ClCompile Include="Cube.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="Keyboard.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="Mouse.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Рендер</Filter>
+    </ClCompile>
+    <ClCompile Include="Rectangle2D.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>

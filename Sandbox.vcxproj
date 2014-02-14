@@ -90,6 +90,7 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Mouse.h" />
+    <ClInclude Include="Rectangle2D.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="TextureManager.h" />
   </ItemGroup>
@@ -104,6 +105,7 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="Rectangle2D.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>

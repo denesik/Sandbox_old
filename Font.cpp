@@ -7,6 +7,7 @@
 #include <utf8.h>
 #include <math.h>
 #include <algorithm>
+#include "Render.h"
 
 Font::Font( std::string configFileName )
 {
@@ -251,4 +252,38 @@ bool Font::GenerateOpenglGlyphs()
 void Font::Print( float x, float y, std::vector<unsigned int> text )
 {
 	//glyphsTextureMap[]
+	unsigned int textLenght = text.size();
+
+	BufferArray vertexBuffer;
+
+	// Количество символов * количество вершин в прямоугольнике * xyz
+	vertexBuffer.lenght = textLenght * 4 * 3;
+	vertexBuffer.data = new float[vertexBuffer.lenght];
+	vertexBuffer.sizeElement = sizeof(float);
+
+	BufferArray textcoordBuffer;
+
+	textcoordBuffer.lenght = textLenght * 4 * 2;
+	textcoordBuffer.data = new float[textcoordBuffer.lenght];
+	textcoordBuffer.sizeElement = sizeof(float);
+
+	BufferArray indexBuffer;
+
+	indexBuffer.lenght = textLenght * 6;
+	indexBuffer.data = new uint32_t[indexBuffer.lenght];
+	indexBuffer.sizeElement = sizeof(uint32_t);
+
+	float glyphX = x;
+	float glyphY = y;
+	float glyphZ = 0;
+
+	for(unsigned int i = 0; i < textLenght; i++)
+	{
+		unsigned int glyphNumber = text[i];
+
+
+		
+	}
+	
+
 }

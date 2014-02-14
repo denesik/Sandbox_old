@@ -101,3 +101,23 @@ void Cube::SetTextureAllSide(const Texture &_texture)
 		texture[i] = _texture;
 	}
 }
+
+BufferArray Cube::GetVertexIndex()
+{
+	BufferArray ba;
+	ba.lenght = vertexIndexSize;
+	ba.sizeElement = sizeof(uint32_t);
+	ba.data = vertexIndex;
+
+	return ba;
+}
+
+BufferArray Cube::GetTextureCoord()
+{
+	BufferArray ba;
+	ba.lenght = vertexTexcoordsSize;
+	ba.sizeElement = sizeof(float);
+	ba.data = vertexTexcoords;
+
+	return ba;
+}

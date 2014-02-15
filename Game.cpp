@@ -13,6 +13,7 @@
 #include <gtc/matrix_transform.hpp>
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Rectangle.h"
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
 
@@ -170,14 +171,14 @@ bool Game::Initialize()
 
 	Mouse::Init(window);
 	Mouse::SetWindowSize(width, height);
-	Mouse::SetFixedPosState(true);
+//	Mouse::SetFixedPosState(true);
 	glfwSetCursorPosCallback(window, CursorPosCallbackGLFW3);
 	glfwSetCursorEnterCallback(window, CursorClientAreaCallbackGLFW3);	
 	glfwSetWindowFocusCallback(window, WindowFocusCallbackGLFW3);
 
 	render = new Render;
 	render->Init();
-
+	render->SetWindowSize(width, height);
 
 	//*******************************
 
@@ -186,11 +187,11 @@ bool Game::Initialize()
 	b->Load("img.png");
 
 	texture = 0;
-	texture = GenerateOpenglBitmap(*b, true);
+	texture = GenerateOpenglBitmap(*b, false);
 
 	b->Free();
 
-	Font font("font.json");
+	//Font font("font.json");
 
 	return true;
 }
@@ -229,19 +230,35 @@ int Game::Run()
 	glm::mat4 MVP = camera.CalculateMatrix() * model;
 
 
+
 	Cube cube;
 
 	GLuint VertexArrayID;
 	VertexArrayID = render->CreateVertexArrayObject();
 
-	GLuint vertexbuffer;
-	vertexbuffer = render->CreateBufferVertex(cube.GetVertexPosition( vec3(0.0f, 0.0f, 0.0f) ));
+	render->CreateBufferVertex(cube.GetVertexPosition( vec3(0.0f, 0.0f, 0.0f) ));
+	render->CreateBufferTextCoord(cube.GetTextureCoord());
+	render->CreateBufferIndex(cube.GetVertexIndex());
 
-	GLuint texturebuffer;
-	texturebuffer = render->CreateBufferTextCoord(cube.GetTextureCoord());
 
-	GLuint indexbuffer;
-	indexbuffer = render->CreateBufferIndex(cube.GetVertexIndex());
+
+	Rectangle geometryRectangle;
+	geometryRectangle.SetPos(vec3(0, 0, -1));
+	geometryRectangle.SetSize(100, 100);
+	Texture tex;
+	tex.u1 = 0.0f;
+	tex.v1 = 0.0f;
+	tex.u2 = 1.0f;
+	tex.v2 = 1.0f;
+	geometryRectangle.SetTexture(tex);
+
+	GLuint VertexArrayID1;
+	VertexArrayID1 = render->CreateVertexArrayObject();
+
+	render->CreateBufferVertex(geometryRectangle.GetVertexPosition());
+	render->CreateBufferTextCoord(geometryRectangle.GetTextureCoord());
+	render->CreateBufferIndex(geometryRectangle.GetVertexIndex());
+
 
 
 	// делаем активным текстурный юнит 0
@@ -252,7 +269,7 @@ int Game::Run()
 	GLint textureLocation = -1;
 	textureLocation = glGetUniformLocation(programID, "colorTexture");
 
-
+	
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		
@@ -262,44 +279,37 @@ int Game::Run()
 		if(Keyboard::isKeyDown(GLFW_KEY_W))
 		{
 			camera.MoveZ(0.005f);
-			MVP = camera.CalculateMatrix() * model;
 		}
 
 		if(Keyboard::isKeyDown(GLFW_KEY_S))
 		{
 			camera.MoveZ(-0.005f);
-			MVP = camera.CalculateMatrix() * model;
 		}
 
 		if(Keyboard::isKeyDown(GLFW_KEY_D))
 		{
 			camera.MoveX(0.005f);
-			MVP = camera.CalculateMatrix() * model;
 		}
 
 		if(Keyboard::isKeyDown(GLFW_KEY_A))
 		{
 			camera.MoveX(-0.005f);
-			MVP = camera.CalculateMatrix() * model;
 		}
 
 		float dx = float(Mouse::IsMoveCursorX());
 		if( dx != 0)
 		{
-
 			camera.RotateX( dx );
-			MVP = camera.CalculateMatrix() * model;
 		}
 
 		float dy = float(Mouse::IsMoveCursorY());
 		if( dy != 0)
 		{
-
 			camera.RotateY( dy );
-			MVP = camera.CalculateMatrix() * model;
 		}
+		
 
-
+		MVP = camera.CalculateMatrix() * model;
 		// Use our shader
 		glUseProgram(programID);
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
@@ -308,17 +318,23 @@ int Game::Run()
 		render->UseVertexArrayObject(VertexArrayID);
 		render->DrawBufferIndex(cube.GetVertexIndex());
 
+
+		MVP = render->GetOrthoProjection();
+
+		// Use our shader
+		glUseProgram(programID);
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+		glUniform1i(textureLocation, 1);
+
+		render->UseVertexArrayObject(VertexArrayID1);
+		render->DrawBufferIndex(geometryRectangle.GetVertexIndex());
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
 	}
 
-	// Cleanup VBO and shader
-	render->DeleteBufferVertex(vertexbuffer);
-//	render->DeleteBufferColor(colorbuffer);
-
 	glDeleteProgram(programID);
-	render->DeleteVertexArrayObject(VertexArrayID);
 
 	UnloadContent();
 

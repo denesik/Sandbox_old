@@ -13,10 +13,9 @@ private:
 	const unsigned int vertexTexcoordsSize;
 	const unsigned int vertexIndexSize;
 
-	float *vertexPositions; // [24][3]
-	float *vertexTexcoords; // [24][2]
-	// индексы вершин куба в порядке поротив часовой стрелки
-	uint32_t *vertexIndex;// [36]
+	ArrayVertex arrayVertex;
+	ArrayTextureCoord arrayTextureCoord;
+	ArrayIndex arrayIndex;
 
 	Texture texture[6];
 
@@ -24,11 +23,11 @@ public:
 	Cube(void);
 	~Cube(void);
 
-	BufferArray GetVertexPosition(const vec3 &pos);
+	ArrayVertex &GetVertexPosition(const vec3 &pos);
 
-	BufferArray GetTextureCoord();
+	ArrayTextureCoord &GetTextureCoord();
 
-	BufferArray GetVertexIndex();
+	ArrayIndex &GetVertexIndex();
 
 	void SetTextureAllSide(const Texture &texture);
 

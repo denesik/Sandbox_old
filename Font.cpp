@@ -8,6 +8,7 @@
 #include <math.h>
 #include <algorithm>
 #include "Render.h"
+#include "Rectangle.h"
 
 Font::Font( std::string configFileName )
 {
@@ -252,9 +253,10 @@ bool Font::GenerateOpenglGlyphs()
 void Font::Print( float x, float y, std::vector<unsigned int> text )
 {
 	//glyphsTextureMap[]
+
 	unsigned int textLenght = text.size();
 
-	BufferArray vertexBuffer;
+/*	BufferArray vertexBuffer;
 
 	// Количество символов * количество вершин в прямоугольнике * xyz
 	vertexBuffer.lenght = textLenght * 4 * 3;
@@ -277,13 +279,24 @@ void Font::Print( float x, float y, std::vector<unsigned int> text )
 	float glyphY = y;
 	float glyphZ = 0;
 
+	Rectangle geometryRectangle;
+	float stringHeight = 22.0f;
+
 	for(unsigned int i = 0; i < textLenght; i++)
 	{
+		FontTexture glyphTexture = glyphsTextureMap[text[i]];
+
+		geometryRectangle.SetPos(vec3(glyphX, glyphY + glyphTexture.offsetDown, 0));
+		geometryRectangle.SetSize((float)glyphTexture.width, (float)glyphTexture.height);
+		geometryRectangle.SetTexture(glyphTexture.texture);
+
+
+
 		unsigned int glyphNumber = text[i];
 
 
 		
 	}
-	
+	*/
 
 }

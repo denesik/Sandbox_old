@@ -5,7 +5,7 @@
 #include "TextureManager.h"
 #include "Render.h"
 
-class Rectangle2D
+class Rectangle
 {
 private:
 	Texture texture;
@@ -14,24 +14,23 @@ private:
 	float width;
 	float height;
 
-	float *vertexPositions; // [4][3]
-	float *vertexTexcoords; // [4][2]
-	// индексы вершин куба в порядке поротив часовой стрелки
-	uint32_t *vertexIndex;// [6]
+	ArrayVertex arrayVertex;
+	ArrayTextureCoord arrayTextureCoord;
+	ArrayIndex arrayIndex;
 
 public:
-	Rectangle2D(void);
-	~Rectangle2D(void);
+	Rectangle(void);
+	~Rectangle(void);
 
 	void SetSize(float width, float height);
-	void SetPos(const vec2 &pos);
+	void SetPos(const vec3 &pos);
 
 	void SetTexture(const Texture &texture);
 	Texture GetTexture();
 
-	BufferArray GetVertexPosition();
-	BufferArray GetTextureCoord();
-	BufferArray GetVertexIndex();
+	ArrayVertex &GetVertexPosition();
+	ArrayTextureCoord &GetTextureCoord();
+	ArrayIndex &GetVertexIndex();
 
 };
 

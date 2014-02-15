@@ -16,6 +16,9 @@
     <Filter Include="Рендер">
       <UniqueIdentifier>{18942d0f-3c4f-4f07-a845-461e1deda16d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Рендер\Геометрия">
+      <UniqueIdentifier>{4d3e6b30-268f-4569-943f-72e9f38e1395}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -52,10 +55,10 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Cube.h">
-      <Filter>Рендер</Filter>
+      <Filter>Рендер\Геометрия</Filter>
     </ClInclude>
-    <ClInclude Include="Rectangle2D.h">
-      <Filter>Заголовочные файлы</Filter>
+    <ClInclude Include="Rectangle.h">
+      <Filter>Рендер\Геометрия</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -93,10 +96,10 @@
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="Cube.cpp">
-      <Filter>Рендер</Filter>
+      <Filter>Рендер\Геометрия</Filter>
     </ClCompile>
-    <ClCompile Include="Rectangle2D.cpp">
-      <Filter>Файлы исходного кода</Filter>
+    <ClCompile Include="Rectangle.cpp">
+      <Filter>Рендер\Геометрия</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

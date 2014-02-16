@@ -10,7 +10,8 @@ static const char *const TAG[] =
 {
 	"INFO.    ",
 	"WARNING. ",
-	"ERROR.   "
+	"ERROR.   ",
+	"FATAL.   "
 };
 
 
@@ -78,11 +79,11 @@ void Logger::LogMessage( const char* fileName, const int numberString, const cha
 #endif // LOG_TIME_INFO
 
 		// Выводим имя файла и номер строки
-		<< std::endl << "File name: " << fileName << ". Number string: " << std::setw(3) << numberString << std::endl
+		<< std::endl << "File name: " << fileName << ". Number string: " << std::setw(3) << std::setfill(' ') << numberString << std::endl
 		// Выводим сообщение
 		<< mess << std::endl;
 	fileLog.flush();
-	if(logType == LOG_TYPE_ERROR)
+	if(logType == LOG_TYPE_FATAL)
 	{
 		exit(0);
 	}
@@ -126,7 +127,7 @@ void Logger::LogMessage( const char *mess, LOG_TYPE logType )
 		<< mess << std::endl;
 	fileLog.flush();
 
-	if(logType == LOG_TYPE_ERROR)
+	if(logType == LOG_TYPE_FATAL)
 	{
 		exit(0);
 	}

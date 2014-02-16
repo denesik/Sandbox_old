@@ -2,13 +2,11 @@
 #define Logger_h__
 
 #include <fstream>
-#include <string>
-#include <iostream>
-#include <sstream>
 
 //#define LOG_DEBUG_INFO
 //#define LOG_DEBUG_WARNING
 #define LOG_DEBUG_ERROR
+#define LOG_DEBUG_FATAL
 
 #define LOG_TIME_INFO
 
@@ -24,11 +22,16 @@
 #define LOG_DEBUG__	
 #endif
 
+#ifdef LOG_DEBUG_FATAL
+#define LOG_DEBUG__	
+#endif
+
 enum LOG_TYPE
 { 
 	LOG_TYPE_INFO = 0, 
 	LOG_TYPE_WARNING = 1, 
-	LOG_TYPE_ERROR = 2 
+	LOG_TYPE_ERROR = 2,
+	LOG_TYPE_FATAL = 3
 };
 
 #ifdef LOG_DEBUG_INFO
@@ -48,6 +51,20 @@ enum LOG_TYPE
 #else
 #define LOG_ERROR(...)		Logger::getInstance().LogMessage(LOG_TYPE_ERROR, ## __VA_ARGS__)
 #endif
+
+#ifdef LOG_DEBUG_FATAL
+#define LOG_FATAL(...)		Logger::getInstance().LogMessage(__FILE__, __LINE__, LOG_TYPE_FATAL, ## __VA_ARGS__)
+#else
+#define LOG_FATAL(...)		Logger::getInstance().LogMessage(LOG_TYPE_FATAL, ## __VA_ARGS__)
+#endif
+
+
+#define OPENGL_CHECK_ERRORS								\
+	while( unsigned int openGLError = glGetError() )	\
+	{													\
+		LOG_ERROR("OpenGL Error 0x%X", openGLError);	\
+	};
+
 
 class Logger;
 

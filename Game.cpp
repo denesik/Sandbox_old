@@ -217,6 +217,9 @@ int Game::Run()
 		return -1;
 	}
 
+	OPENGL_CHECK_ERRORS;
+	OPENGL_CHECK_ERRORS;
+
 	LoadContent();
 
 	// Enable depth test

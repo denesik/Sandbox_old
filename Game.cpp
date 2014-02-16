@@ -14,6 +14,10 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Rectangle.h"
+
+#include "Logger.h"
+
+
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
 
@@ -46,7 +50,7 @@ GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 	int InfoLogLength;
 
 	// Compile Vertex Shader
-	LOG(LOG_INFO, "Compiling shader: \"" + vertex_file_path + "\".");
+	//LOG(LOG_INFO, "Compiling shader: \"" + vertex_file_path + "\".");
 	char const * VertexSourcePointer = VertexShaderCode.c_str();
 	glShaderSource(VertexShaderID, 1, &VertexSourcePointer , NULL);
 	glCompileShader(VertexShaderID);
@@ -56,10 +60,10 @@ GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 	glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	std::vector<char> VertexShaderErrorMessage(InfoLogLength);
 	glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-	LOG(LOG_INFO, &VertexShaderErrorMessage[0]);
+	//LOG(LOG_INFO, &VertexShaderErrorMessage[0]);
 
 	// Compile Fragment Shader
-	LOG(LOG_INFO, "Compiling shader: \"" + fragment_file_path + "\".");
+	//LOG(LOG_INFO, "Compiling shader: \"" + fragment_file_path + "\".");
 	char const * FragmentSourcePointer = FragmentShaderCode.c_str();
 	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer , NULL);
 	glCompileShader(FragmentShaderID);
@@ -69,10 +73,10 @@ GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 	glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	std::vector<char> FragmentShaderErrorMessage(InfoLogLength);
 	glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
-	LOG(LOG_INFO, &FragmentShaderErrorMessage[0]);
+	//LOG(LOG_INFO, &FragmentShaderErrorMessage[0]);
 
 	// Link the program
-	LOG(LOG_INFO, "Linking program");
+	//LOG(LOG_INFO, "Linking program");
 	GLuint ProgramID = glCreateProgram();
 	glAttachShader(ProgramID, VertexShaderID);
 	glAttachShader(ProgramID, FragmentShaderID);
@@ -83,7 +87,7 @@ GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 	glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	std::vector<char> ProgramErrorMessage( max(InfoLogLength, int(1)) );
 	glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
-	LOG(LOG_INFO, &ProgramErrorMessage[0]);
+	//LOG(LOG_INFO, &ProgramErrorMessage[0]);
 
 	glDeleteShader(VertexShaderID);
 	glDeleteShader(FragmentShaderID);
@@ -141,7 +145,7 @@ bool Game::Initialize()
 
 	if (!glfwInit())
 	{
-		LOG(LOG_ERROR, "Ошибка инициализации GLFW.");
+		//LOG(LOG_ERROR, "Ошибка инициализации GLFW.");
 		return false;
 	}
 	
@@ -161,11 +165,15 @@ bool Game::Initialize()
 	if (!window)
 	{
 		glfwTerminate();
-		LOG(LOG_ERROR, "Ошибка создания окна GLFW.");
+		//LOG(LOG_ERROR, "Ошибка создания окна GLFW.");
 		return false;
 	}
 	glfwMakeContextCurrent(window);
 	
+	render = new Render;
+	render->Init();
+	render->SetWindowSize(width, height);
+
 	Keyboard::Init();
 	glfwSetKeyCallback(window, KeyCallbackGLFW3);
 
@@ -176,9 +184,6 @@ bool Game::Initialize()
 	glfwSetCursorEnterCallback(window, CursorClientAreaCallbackGLFW3);	
 	glfwSetWindowFocusCallback(window, WindowFocusCallbackGLFW3);
 
-	render = new Render;
-	render->Init();
-	render->SetWindowSize(width, height);
 
 	//*******************************
 
@@ -202,10 +207,13 @@ void Game::LoadContent()
 
 int Game::Run()
 {
-	
+
+	LOG_INFO("test1 %d", 20);
+	LOG_ERROR("test2 %d", 40);
+
 	if(!Initialize()) 
 	{
-		LOG(LOG_ERROR, "Инициализация завершилась с ошибками.");
+		//LOG(LOG_ERROR, "Инициализация завершилась с ошибками.");
 		return -1;
 	}
 
@@ -213,10 +221,9 @@ int Game::Run()
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
+
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS); 
-
-	glEnable(GL_TEXTURE_2D);
 
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "shaders/t2.vs", "shaders/t2.fs" );
@@ -234,12 +241,12 @@ int Game::Run()
 	Cube cube;
 
 	GLuint VertexArrayID;
+
 	VertexArrayID = render->CreateVertexArrayObject();
 
-	render->CreateBufferVertex(cube.GetVertexPosition( vec3(0.0f, 0.0f, 0.0f) ));
 	render->CreateBufferTextCoord(cube.GetTextureCoord());
+	render->CreateBufferVertex(cube.GetVertexPosition( vec3(0.0f, 0.0f, 0.0f) ));
 	render->CreateBufferIndex(cube.GetVertexIndex());
-
 
 
 	Rectangle geometryRectangle;
@@ -255,11 +262,9 @@ int Game::Run()
 	GLuint VertexArrayID1;
 	VertexArrayID1 = render->CreateVertexArrayObject();
 
-	render->CreateBufferVertex(geometryRectangle.GetVertexPosition());
 	render->CreateBufferTextCoord(geometryRectangle.GetTextureCoord());
+	render->CreateBufferVertex(geometryRectangle.GetVertexPosition());
 	render->CreateBufferIndex(geometryRectangle.GetVertexIndex());
-
-
 
 	// делаем активным текстурный юнит 0
 	glActiveTexture(GL_TEXTURE1);
@@ -269,7 +274,6 @@ int Game::Run()
 	GLint textureLocation = -1;
 	textureLocation = glGetUniformLocation(programID, "colorTexture");
 
-	
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		
@@ -317,7 +321,6 @@ int Game::Run()
 
 		render->UseVertexArrayObject(VertexArrayID);
 		render->DrawBufferIndex(cube.GetVertexIndex());
-
 
 		MVP = render->GetOrthoProjection();
 

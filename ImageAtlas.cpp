@@ -49,7 +49,7 @@ bool ImageAtlas::InsertImage()
 		bool blitResult = image->Blit(&dstPoint, nullptr, imageTmp);
 		if(!blitResult)
 		{
-			LOG(LOG_ERROR, "TextureAtlas. Image не добавлена.");
+			//LOG(LOG_ERROR, "TextureAtlas. Image не добавлена.");
 			return false;
 		}
 

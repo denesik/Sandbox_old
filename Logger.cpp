@@ -1,8 +1,18 @@
 #include "Logger.h"
-
+#include <stdarg.h>
+#include <time.h>
+#include <iomanip>
 
 Logger * Logger::p_instance = 0;
 LoggerDestroyer Logger::destroyer;
+
+static const char *const TAG[] = 
+{
+	"INFO.    ",
+	"WARNING. ",
+	"ERROR.   "
+};
+
 
 LoggerDestroyer::~LoggerDestroyer() 
 {   
@@ -25,30 +35,100 @@ Logger& Logger::getInstance()
 	return *p_instance;
 }
 
-const char *const Logger::TAG[] = 
-{
-	"INFO:    ",
-	"WARNING: ",
-	"ERROR:   "
-};
-
 Logger::Logger()
 {
-	fileName = "log.txt";
-	file.open(fileName.c_str());
+	fileLog.open("log.txt");
 }
 
 Logger::~Logger()
 {
-	file.close();
+	fileLog.close();
 }
 
-void Logger::Log( LOG_TYPE logType, std::string str)
+#ifdef LOG_DEBUG__
+void Logger::LogMessage(const char* fileName, const int numberString, LOG_TYPE logType, const char* mess, ... )
 {
-	file << TAG[logType] << str << "\n";
+	static char buffer[4096];
+	va_list list;
 
-	if(logType == LOG_ERROR)
+	va_start(list, mess);
+	vsnprintf_s(buffer, 4096, mess, list);
+	va_end(list);
+
+	LogMessage(fileName, numberString, buffer, logType);
+}
+
+void Logger::LogMessage( const char* fileName, const int numberString, const char *mess, LOG_TYPE logType )
+{
+#ifdef LOG_TIME_INFO
+	struct tm newtime;
+	time_t time_current;
+	time(&time_current);
+	localtime_s(&newtime, &time_current);
+#endif
+
+	fileLog	<< TAG[logType] 
+
+#ifdef LOG_TIME_INFO
+		// Выводим время
+		<< "Time: "
+		<< std::setw(2) << std::setfill('0') << newtime.tm_hour << ":" 
+		<< std::setw(2) << std::setfill('0') << newtime.tm_min << ":"
+		<< std::setw(2) << std::setfill('0') << newtime.tm_sec << " "
+#endif // LOG_TIME_INFO
+
+		// Выводим имя файла и номер строки
+		<< std::endl << "File name: " << fileName << ". Number string: " << std::setw(3) << numberString << std::endl
+		// Выводим сообщение
+		<< mess << std::endl;
+	fileLog.flush();
+	if(logType == LOG_TYPE_ERROR)
 	{
 		exit(0);
 	}
 }
+#endif
+
+
+
+void Logger::LogMessage( LOG_TYPE logType, const char* mess, ... )
+{
+	static char buffer[4096];
+	va_list list;
+
+	va_start(list, mess);
+	vsnprintf_s(buffer, 4096, mess, list);
+	va_end(list);
+
+	LogMessage(buffer, logType);
+}
+
+void Logger::LogMessage( const char *mess, LOG_TYPE logType )
+{
+#ifdef LOG_TIME_INFO
+	struct tm newtime;
+	time_t time_current;
+	time(&time_current);
+	localtime_s(&newtime, &time_current);
+#endif
+
+	fileLog	<< TAG[logType] 
+
+#ifdef LOG_TIME_INFO 
+		// Выводим время
+		<< "Time: "
+		<< std::setw(2) << std::setfill('0') << newtime.tm_hour << ":" 
+		<< std::setw(2) << std::setfill('0') << newtime.tm_min << ":"
+		<< std::setw(2) << std::setfill('0') << newtime.tm_sec << " "
+#endif // LOG_TIME_INFO
+
+		// Выводим сообщение
+		<< mess << std::endl;
+	fileLog.flush();
+
+	if(logType == LOG_TYPE_ERROR)
+	{
+		exit(0);
+	}
+}
+

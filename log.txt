@@ -1,9 +1,4 @@
-INFO:    Compiling shader: "shaders/t2.vs".
-INFO:    Vertex shader was successfully compiled to run on hardware.
-
-INFO:    Compiling shader: "shaders/t2.fs".
-INFO:    Fragment shader was successfully compiled to run on hardware.
-
-INFO:    Linking program
-INFO:    Vertex shader(s) linked, fragment shader(s) linked.
-
+INFO.    Time: 20:06:47 test1 20
+ERROR.   Time: 20:06:47 
+File name: e:\book\visual studio projects\projects\sandbox\sandbox\game.cpp. Number string: 212
+test2 40

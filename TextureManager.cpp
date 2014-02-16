@@ -45,7 +45,7 @@ unsigned int GenerateOpenglBitmap(Bitmap &bitmap, bool smoothing)
 
 	default:
 		{
-			LOG(LOG_WARNING, "Generate GLBitmap. Не поддерживаемый тип цвета.");
+			//LOG(LOG_WARNING, "Generate GLBitmap. Не поддерживаемый тип цвета.");
 			break;
 		}
 	}

@@ -6,9 +6,48 @@
 #include <iostream>
 #include <sstream>
 
-enum LOG_TYPE{ LOG_INFO = 0, LOG_WARNING = 1, LOG_ERROR = 2 };
+//#define LOG_DEBUG_INFO
+//#define LOG_DEBUG_WARNING
+#define LOG_DEBUG_ERROR
 
-#define LOG(a, s) Logger::getInstance().Log(a, s)
+#define LOG_TIME_INFO
+
+#ifdef LOG_DEBUG_INFO
+	#define LOG_DEBUG__	
+#endif
+
+#ifdef LOG_DEBUG_WARNING
+#define LOG_DEBUG__	
+#endif
+
+#ifdef LOG_DEBUG_ERROR
+#define LOG_DEBUG__	
+#endif
+
+enum LOG_TYPE
+{ 
+	LOG_TYPE_INFO = 0, 
+	LOG_TYPE_WARNING = 1, 
+	LOG_TYPE_ERROR = 2 
+};
+
+#ifdef LOG_DEBUG_INFO
+#define LOG_INFO(...)		Logger::getInstance().LogMessage(__FILE__, __LINE__, LOG_TYPE_INFO, ## __VA_ARGS__)
+#else
+#define LOG_INFO(...)		Logger::getInstance().LogMessage(LOG_TYPE_INFO, ## __VA_ARGS__)
+#endif
+
+#ifdef LOG_DEBUG_WARNING
+#define LOG_WARNING(...)	Logger::getInstance().LogMessage(__FILE__, __LINE__, LOG_TYPE_WARNING, ## __VA_ARGS__)
+#else
+#define LOG_WARNING(...)	Logger::getInstance().LogMessage(LOG_TYPE_WARNING, ## __VA_ARGS__)
+#endif
+
+#ifdef LOG_DEBUG_ERROR
+#define LOG_ERROR(...)		Logger::getInstance().LogMessage(__FILE__, __LINE__, LOG_TYPE_ERROR, ## __VA_ARGS__)
+#else
+#define LOG_ERROR(...)		Logger::getInstance().LogMessage(LOG_TYPE_ERROR, ## __VA_ARGS__)
+#endif
 
 class Logger;
 
@@ -27,10 +66,7 @@ private:
 	static Logger* p_instance;
 	static LoggerDestroyer destroyer;
 
-	std::ofstream file;
-	std::string fileName;
-
-	static const char *const TAG[3];
+	std::ofstream fileLog;
 
 protected: 
 	Logger();
@@ -43,8 +79,17 @@ protected:
 public:
 	static Logger &getInstance();  
 
+#ifdef LOG_DEBUG__
+public:
+	void LogMessage(const char* fileName, const int numberString, LOG_TYPE logType, const char* mess, ...);
+private:
+	void LogMessage(const char* fileName, const int numberString, const char *mess, LOG_TYPE logType);
+#endif
 
-	void Log(LOG_TYPE logType, std::string);
+public:
+	void LogMessage(LOG_TYPE logType, const char* mess, ...);
+private:
+	void LogMessage(const char *mess, LOG_TYPE logType);
 
 };
 

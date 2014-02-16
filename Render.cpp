@@ -21,11 +21,13 @@ bool Render::Init()
 {
 
 	glewExperimental=true; // Needed in core profile
+
 	if (glewInit() != GLEW_OK) 
 	{
-		LOG(LOG_ERROR, "GLEW не инициализирован.");
+		//LOG(LOG_ERROR, "GLEW не инициализирован.");
 		return false;
 	}
+	glGetError();
 
 	return true;
 }
@@ -87,7 +89,10 @@ unsigned int Render::CreateBufferTextCoord(const ArrayTextureCoord &array)
 {
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, BUFFER_TEXTURE_COORD);
+	unsigned int error = glGetError();
+
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+
 	glBufferData(GL_ARRAY_BUFFER, sizeof(array[0]) * array.size(), &array[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(BUFFER_TEXTURE_COORD);

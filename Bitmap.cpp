@@ -45,7 +45,7 @@ static bool LoadBMP(Bitmap &bitmap, FILE *file)
 	
 	if (!png)
 	{
-		LOG(LOG_WARNING, "Libng. Невозможно создать png структуру.");
+		//LOG(LOG_WARNING, "Libng. Невозможно создать png структуру.");
 		return false;
 	}
 	
@@ -54,7 +54,7 @@ static bool LoadBMP(Bitmap &bitmap, FILE *file)
 	if (!info)
 	{
 		png_destroy_read_struct(&png, NULL, NULL);
-		LOG(LOG_WARNING, "Libng. Невозможно создать png info структуру.");
+		//LOG(LOG_WARNING, "Libng. Невозможно создать png info структуру.");
 		return false;
 	}
 	
@@ -161,7 +161,7 @@ static bool SaveBMP(Bitmap &bitmap, FILE *file)
 
 	if (!png)
 	{
-		LOG(LOG_WARNING, "Libng. Невозможно создать png структуру.");
+		//LOG(LOG_WARNING, "Libng. Невозможно создать png структуру.");
 		return false;
 	}
 
@@ -170,7 +170,7 @@ static bool SaveBMP(Bitmap &bitmap, FILE *file)
 	if (!info)
 	{
 		png_destroy_write_struct(&png, NULL);
-		LOG(LOG_WARNING, "Libng. Невозможно создать png info структуру.");
+		//LOG(LOG_WARNING, "Libng. Невозможно создать png info структуру.");
 		return false;
 	}
 
@@ -215,7 +215,7 @@ static bool SaveBMP(Bitmap &bitmap, FILE *file)
 
 	default:
 		{
-			LOG(LOG_WARNING, "Libng. неподдерживаемый тип цвета.");
+			//LOG(LOG_WARNING, "Libng. неподдерживаемый тип цвета.");
 			longjmp(png_jmpbuf(png), 1);
 			break;
 		}
@@ -291,7 +291,7 @@ bool Bitmap::Load( std::string fileName )
 	FILE *file = fopen(fileName.c_str(), "rb");
 	if (file == NULL) 
 	{
-		LOG(LOG_WARNING, "Bitmap. Невозможно открыть файл " + fileName + ".");
+		//LOG(LOG_WARNING, "Bitmap. Невозможно открыть файл " + fileName + ".");
 		return false;
 	}
 
@@ -302,7 +302,7 @@ bool Bitmap::Load( std::string fileName )
 	}
 
 	fclose(file);
-	LOG(LOG_WARNING, "Bitmap. Файл " + fileName + " не загружен.");
+	//LOG(LOG_WARNING, "Bitmap. Файл " + fileName + " не загружен.");
 	return false;
 }
 
@@ -311,7 +311,7 @@ bool Bitmap::Save( std::string fileName )
 	FILE *file = fopen(fileName.c_str(), "wb");
 	if (!file) 
 	{
-		LOG(LOG_WARNING, "Bitmap. Невозможно открыть файл " + fileName + ".");
+		//LOG(LOG_WARNING, "Bitmap. Невозможно открыть файл " + fileName + ".");
 		return false;
 	}
 
@@ -322,7 +322,7 @@ bool Bitmap::Save( std::string fileName )
 	}
 
 	fclose(file);
-	LOG(LOG_WARNING, "Bitmap. Файл " + fileName + " не загружен.");
+	//LOG(LOG_WARNING, "Bitmap. Файл " + fileName + " не загружен.");
 	return false;
 }
 

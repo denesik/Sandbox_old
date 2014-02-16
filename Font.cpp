@@ -31,7 +31,7 @@ bool Font::Init()
 {
 	if (FT_Init_FreeType( &library )) 
 	{
-		LOG(LOG_ERROR, "FreeType не инициализирвоан.");
+		//LOG(LOG_ERROR, "FreeType не инициализирвоан.");
 		return false;
 	}
 	return true;
@@ -53,14 +53,14 @@ bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap &glyphBitmap)
 
 	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, glyphNumber ), FT_LOAD_DEFAULT ))
 	{
-		LOG(LOG_WARNING, "FreeType. Невозможно загрузить глиф.");
+		//LOG(LOG_WARNING, "FreeType. Невозможно загрузить глиф.");
 		return false;
 	}
 
 	FT_Glyph glyph;
 	if(FT_Get_Glyph( face->glyph, &glyph ))
 	{
-		LOG(LOG_WARNING, "FreeType. Невозможно загрузить глиф.");
+		//LOG(LOG_WARNING, "FreeType. Невозможно загрузить глиф.");
 		return false;
 	}
 
@@ -95,7 +95,7 @@ bool Font::LoadConfig( std::string configFileName )
 
 	if (!configFile.is_open()) 
 	{
-		LOG(LOG_ERROR, "Шрифты. Невозможно открыть конфигурационный файл шрифтов " + configFileName + ".");
+		//LOG(LOG_ERROR, "Шрифты. Невозможно открыть конфигурационный файл шрифтов " + configFileName + ".");
 		return 0;
 	}
 
@@ -106,7 +106,7 @@ bool Font::LoadConfig( std::string configFileName )
 	bool parsingSuccessful = reader.parse( configFile, root );
 	if ( !parsingSuccessful )
 	{
-		LOG(LOG_ERROR, "Шрифты. Ошибка в структуре конфигурационного файла " + configFileName + ". " + reader.getFormatedErrorMessages());
+		//LOG(LOG_ERROR, "Шрифты. Ошибка в структуре конфигурационного файла " + configFileName + ". " + reader.getFormatedErrorMessages());
 		return false;
 	}
 
@@ -119,7 +119,7 @@ bool Font::LoadConfig( std::string configFileName )
 
 		if (FT_New_Face( library, fontFileName.c_str(), 0, &face )) 
 		{
-			LOG(LOG_WARNING, "FreeType. Файл шрифтов " + fontFileName + " не загружен.");
+			//LOG(LOG_WARNING, "FreeType. Файл шрифтов " + fontFileName + " не загружен.");
 			return false;
 		}
 		// По некоторым причинам FreeType измеряет размер шрифта в терминах 1/64 пикселя.
@@ -215,7 +215,7 @@ bool Font::GenerateOpenglGlyphs()
 	{
 		if( !glyphAtlas.InsertImage( (*i).bitmap, rect ) ) 
 		{
-			LOG(LOG_WARNING, "Font. Символ не загружен.");
+			//LOG(LOG_WARNING, "Font. Символ не загружен.");
 			delete (*i).bitmap;
 			(*i).bitmap = nullptr;
 			continue;

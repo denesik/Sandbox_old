@@ -19,6 +19,7 @@ Font::Font( std::string configFileName )
 	LoadConfig( configFileName );
 
 	Finalize();
+
 }
 
 
@@ -250,53 +251,50 @@ bool Font::GenerateOpenglGlyphs()
 }
 
 
-void Font::Print( float x, float y, std::vector<unsigned int> text )
+ArrayIndex &Font::Print( float x, float y, std::vector<unsigned int> text, Render *render)
 {
-	//glyphsTextureMap[]
+	Rectangle geometryRectangle;
+	FontTexture fontTexture = glyphsTextureMap[97];
 
 	unsigned int textLenght = text.size();
 
-/*	BufferArray vertexBuffer;
-
-	// Количество символов * количество вершин в прямоугольнике * xyz
-	vertexBuffer.lenght = textLenght * 4 * 3;
-	vertexBuffer.data = new float[vertexBuffer.lenght];
-	vertexBuffer.sizeElement = sizeof(float);
-
-	BufferArray textcoordBuffer;
-
-	textcoordBuffer.lenght = textLenght * 4 * 2;
-	textcoordBuffer.data = new float[textcoordBuffer.lenght];
-	textcoordBuffer.sizeElement = sizeof(float);
-
-	BufferArray indexBuffer;
-
-	indexBuffer.lenght = textLenght * 6;
-	indexBuffer.data = new uint32_t[indexBuffer.lenght];
-	indexBuffer.sizeElement = sizeof(uint32_t);
-
 	float glyphX = x;
 	float glyphY = y;
-	float glyphZ = 0;
-
-	Rectangle geometryRectangle;
 	float stringHeight = 22.0f;
 
 	for(unsigned int i = 0; i < textLenght; i++)
 	{
-		FontTexture glyphTexture = glyphsTextureMap[text[i]];
+		fontTexture = glyphsTextureMap[text[i]];
 
-		geometryRectangle.SetPos(vec3(glyphX, glyphY + glyphTexture.offsetDown, 0));
-		geometryRectangle.SetSize((float)glyphTexture.width, (float)glyphTexture.height);
-		geometryRectangle.SetTexture(glyphTexture.texture);
+		geometryRectangle.SetPos(vec3(glyphX, glyphY + stringHeight - fontTexture.height - fontTexture.offsetDown, -1));
+		geometryRectangle.SetSize((float)fontTexture.width, (float)fontTexture.height);
+		geometryRectangle.SetTexture(fontTexture.texture);
 
+		glyphX += fontTexture.width;
 
+		ArrayVertex &glyphArrayVertex = geometryRectangle.GetVertexPosition();
+		arrayVertex.insert(arrayVertex.end(), glyphArrayVertex.begin(), glyphArrayVertex.end());
 
-		unsigned int glyphNumber = text[i];
+		ArrayTextureCoord &glyphArrayTextureCoord = geometryRectangle.GetTextureCoord();
+		arrayTextureCoord.insert(arrayTextureCoord.end(), glyphArrayTextureCoord.begin(), glyphArrayTextureCoord.end());
 
+		ArrayIndex &glyphArrayIndex = geometryRectangle.GetVertexIndex();
 
-		
+		unsigned int vertexCount = glyphArrayVertex.size();
+		for(unsigned int j = 0; j < glyphArrayIndex.size(); j++)
+		{
+			glyphArrayIndex[j] += 4 * i;
+		}
+		arrayIndex.insert(arrayIndex.end(), glyphArrayIndex.begin(), glyphArrayIndex.end());
+
 	}
-	*/
+
+	render->CreateBufferVertex(arrayVertex);
+	render->CreateBufferTextCoord(arrayTextureCoord);
+	render->CreateBufferIndex(arrayIndex);
+
+	glBindTexture(GL_TEXTURE_2D, fontTexture.texture.textureId);
+
+	return arrayIndex;
 
 }

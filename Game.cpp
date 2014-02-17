@@ -16,7 +16,7 @@
 #include "Rectangle.h"
 
 #include "Logger.h"
-
+#include "utf8.h"
 
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
@@ -196,7 +196,7 @@ bool Game::Initialize()
 
 	b->Free();
 
-	//Font font("font.json");
+	glActiveTexture(GL_TEXTURE1);
 
 	return true;
 }
@@ -208,17 +208,11 @@ void Game::LoadContent()
 int Game::Run()
 {
 
-	LOG_INFO("test1 %d", 20);
-	LOG_ERROR("test2 %d", 40);
-
 	if(!Initialize()) 
 	{
 		//LOG(LOG_ERROR, "Инициализация завершилась с ошибками.");
 		return -1;
 	}
-
-	OPENGL_CHECK_ERRORS;
-	OPENGL_CHECK_ERRORS;
 
 	LoadContent();
 
@@ -252,27 +246,39 @@ int Game::Run()
 	render->CreateBufferIndex(cube.GetVertexIndex());
 
 
-	Rectangle geometryRectangle;
-	geometryRectangle.SetPos(vec3(0, 0, -1));
-	geometryRectangle.SetSize(100, 100);
-	Texture tex;
-	tex.u1 = 0.0f;
-	tex.v1 = 0.0f;
-	tex.u2 = 1.0f;
-	tex.v2 = 1.0f;
-	geometryRectangle.SetTexture(tex);
+// 	Rectangle geometryRectangle;
+// 	geometryRectangle.SetPos(vec3(0, 0, -1));
+// 	geometryRectangle.SetSize(100, 100);
+// 	Texture tex;
+// 	tex.u1 = 0.0f;
+// 	tex.v1 = 0.0f;
+// 	tex.u2 = 1.0f;
+// 	tex.v2 = 1.0f;
+// 	geometryRectangle.SetTexture(tex);
 
 	GLuint VertexArrayID1;
 	VertexArrayID1 = render->CreateVertexArrayObject();
 
-	render->CreateBufferTextCoord(geometryRectangle.GetTextureCoord());
-	render->CreateBufferVertex(geometryRectangle.GetVertexPosition());
-	render->CreateBufferIndex(geometryRectangle.GetVertexIndex());
+	char* twochars = "abggcde";
+	std::vector<uint32_t> utf32result;
+	utf8::utf8to32(twochars, twochars + 7, std::back_inserter(utf32result));
 
+	Font font("font.json");
+
+	glActiveTexture(GL_TEXTURE1);
+	ArrayIndex &fontArray = font.Print(10.0f, 20.0f, utf32result, render);
+
+// 	render->CreateBufferTextCoord(geometryRectangle.GetTextureCoord());
+// 	render->CreateBufferVertex(geometryRectangle.GetVertexPosition());
+// 	render->CreateBufferIndex(geometryRectangle.GetVertexIndex());
+
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// делаем активным текстурный юнит 0
 	glActiveTexture(GL_TEXTURE1);
 	// назначаем текстуру на активный текстурный юнит
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(GL_TEXTURE_2D, 2);
 
 	GLint textureLocation = -1;
 	textureLocation = glGetUniformLocation(programID, "colorTexture");
@@ -282,6 +288,7 @@ int Game::Run()
 		
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		if(Keyboard::isKeyDown(GLFW_KEY_W))
 		{
@@ -333,7 +340,7 @@ int Game::Run()
 		glUniform1i(textureLocation, 1);
 
 		render->UseVertexArrayObject(VertexArrayID1);
-		render->DrawBufferIndex(geometryRectangle.GetVertexIndex());
+		render->DrawBufferIndex(fontArray);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

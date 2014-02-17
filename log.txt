@@ -1,7 +1,4 @@
-INFO.    Time: 20:58:10 test1 20
-ERROR.   Time: 20:58:10 
-File name: e:\book\visual studio projects\projects\sandbox\sandbox\game.cpp. Number string: 212
+INFO.    Time: 00:11:05 test1 20
+ERROR.   Time: 00:11:05 
+File name: e:\book\visual studio projects\projects\sandbox\sandbox\game.cpp. Number string: 210
 test2 40
-ERROR.   Time: 20:58:12 
-File name: e:\book\visual studio projects\projects\sandbox\sandbox\render.cpp. Number string:  30
-OpenGL Error 0x500

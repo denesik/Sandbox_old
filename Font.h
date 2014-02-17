@@ -14,6 +14,7 @@
 #include <map>
 #include <list>
 #include <vector>
+#include "Render.h"
 
 class Font
 {
@@ -50,6 +51,13 @@ private:
 
 	std::map<unsigned int, FontTexture> glyphsTextureMap;
 
+
+
+	ArrayVertex arrayVertex;
+	ArrayTextureCoord arrayTextureCoord;
+	ArrayIndex arrayIndex;
+
+
 public:
 	Font( std::string configFileName );
 	~Font(void);
@@ -64,8 +72,8 @@ private:
 	bool GenerateGlyph(unsigned int gliphNumber, GlyphBitmap &glyphBitmap);
 	bool GenerateOpenglGlyphs();
 
-
-	void Print( float x, float y, std::vector<unsigned int> text );
+public:
+	ArrayIndex &Print( float x, float y, std::vector<unsigned int> text, Render *render);
 
 };
 

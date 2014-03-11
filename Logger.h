@@ -59,7 +59,7 @@ enum LOG_TYPE
 #endif
 
 
-#define OPENGL_CHECK_ERRORS								\
+#define OPENGL_CHECK_ERRORS()							\
 	while( unsigned int openGLError = glGetError() )	\
 	{													\
 		LOG_ERROR("OpenGL Error 0x%X", openGLError);	\

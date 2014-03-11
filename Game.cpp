@@ -244,7 +244,14 @@ int Game::Run()
  	tex.u2 = 1.0f;
  	tex.v2 = 1.0f;
  	geometryRectangle.SetTexture(tex);
-	geometryRectangle.GetBufferArray().CreateVideoBuffer();
+
+	BufferArray ba(false, true, false);
+	ba.PushBack(geometryRectangle.GetBufferArray());
+	ba.CreateVideoBuffer();
+
+	Cube geometryCube;
+	geometryCube.SetTextureAllSide(tex);
+	geometryCube.GetBufferArray().CreateVideoBuffer();
 // 
 // 	char* twochars = "abggcde";
 // 	std::vector<uint32_t> utf32result;
@@ -302,14 +309,14 @@ int Game::Run()
 			camera.RotateY( dy );
 		}
 		
-/*
+
 		MVP = camera.CalculateMatrix() * model;
 		// Use our shader
 		glUseProgram(programID);
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
 
-*/
+		geometryCube.GetBufferArray().Draw();
 
 		MVP = render->GetOrthoProjection();
 
@@ -318,7 +325,7 @@ int Game::Run()
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
 
-		geometryRectangle.GetBufferArray().Draw();
+		ba.Draw();
 
 
 		glfwSwapBuffers(window);

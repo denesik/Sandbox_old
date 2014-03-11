@@ -37,6 +37,10 @@ public:
 	~BufferArray();
 
 	void CreateVideoBuffer();
+	void DeleteVideoBuffer();
+
+	void PushBack( BufferArray &bufferArray);
+
 	void Draw();
 };
 

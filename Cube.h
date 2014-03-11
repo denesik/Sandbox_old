@@ -5,33 +5,26 @@
 #include "Render.h"
 #include "TextureManager.h"
 
-/*
+
 class Cube
 {
 private:
-	const unsigned int vertexPositionsSize;
-	const unsigned int vertexTexcoordsSize;
-	const unsigned int vertexIndexSize;
+	BufferArray buffer;
 
-	ArrayVertex arrayVertex;
-	ArrayTextureCoord arrayTextureCoord;
-	ArrayIndex arrayIndex;
-
+	float x, y, z;
 	Texture texture[6];
 
 public:
 	Cube(void);
 	~Cube(void);
 
-	ArrayVertex &GetVertexPosition(const vec3 &pos);
+	void SetPos(const vec3 &pos);
 
-	ArrayTextureCoord &GetTextureCoord();
-
-	ArrayIndex &GetVertexIndex();
+	BufferArray &GetBufferArray();
 
 	void SetTextureAllSide(const Texture &texture);
 
 };
-*/
+
 
 #endif // Cube_h__

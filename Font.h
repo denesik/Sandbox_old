@@ -16,17 +16,17 @@
 #include <vector>
 #include "Render.h"
 
+struct FontTexture
+{
+	Texture texture;
+	unsigned int width;
+	unsigned int height;
+	int offsetDown;
+};
+
 class Font
 {
 private:
-
-	struct FontTexture
-	{
-		Texture texture;
-		unsigned int width;
-		unsigned int height;
-		int offsetDown;
-	};
 
 	FT_Library library;
 	FT_Face face;
@@ -51,29 +51,36 @@ private:
 
 	std::map<unsigned int, FontTexture> glyphsTextureMap;
 
-
-
 	ArrayVertex arrayVertex;
 	ArrayTextureCoord arrayTextureCoord;
 	ArrayIndex arrayIndex;
-
-
-public:
-	Font( std::string configFileName );
-	~Font(void);
+	BufferArrayVTI buffer;
 
 private:
-	bool Init();
-	void Finalize();
-
 	bool LoadConfig( std::string configFileName );
 
 	bool GenerateGlyphsList( std::string glyphList );
 	bool GenerateGlyph(unsigned int gliphNumber, GlyphBitmap &glyphBitmap);
 	bool GenerateOpenglGlyphs();
 
+private:
+	static Font* instance;
+
+	Font( std::string configFileName );
+	Font(const Font& root);
+	Font& operator=(const Font&);
+
 public:
+	~Font();
+
+	static bool Init( std::string configFileName );
+	static void Finalize();
+	
+	static Font* GetInstance();
+
 	ArrayIndex &Print( float x, float y, std::vector<unsigned int> text, Render *render);
+
+	FontTexture GetGlyphTexture(unsigned int utf32glyph);
 
 };
 

@@ -10,43 +10,54 @@
 #include "Render.h"
 #include "Rectangle.h"
 
+Font *Font::instance = nullptr;
+
 Font::Font( std::string configFileName )
 {
 	library = nullptr;
 	face = nullptr;
-	Init();
+
+	if (FT_Init_FreeType( &library )) 
+	{
+		//LOG(LOG_ERROR, "FreeType не инициализирвоан.");
+	}
 
 	LoadConfig( configFileName );
-
-	Finalize();
-
 }
 
 
 Font::~Font(void)
 {
-	
-}
-
-bool Font::Init()
-{
-	if (FT_Init_FreeType( &library )) 
-	{
-		//LOG(LOG_ERROR, "FreeType не инициализирвоан.");
-		return false;
-	}
-	return true;
-}
-
-void Font::Finalize()
-{
-	// delete ogl image atlas
-
 	if(library)
 	{
 		FT_Done_FreeType(library);
 		library = nullptr;
 	}
+}
+
+bool Font::Init( std::string configFileName )
+{
+	if(!instance)
+	{
+		instance = new Font(configFileName);
+	}
+	else
+	{
+		//LOG(LOG_WARNING, "FreeType уже был инициализирвоан.");
+	}
+
+	return true;
+}
+
+Font* Font::GetInstance()
+{
+
+	if(!instance)
+	{
+		//LOG(LOG_FATAL, "FreeType не инициализирвоан.");
+	}
+
+	return instance;
 }
 
 bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap &glyphBitmap)
@@ -261,7 +272,7 @@ ArrayIndex &Font::Print( float x, float y, std::vector<unsigned int> text, Rende
 	float glyphX = x;
 	float glyphY = y;
 	float stringHeight = 22.0f;
-
+	/*
 	for(unsigned int i = 0; i < textLenght; i++)
 	{
 		fontTexture = glyphsTextureMap[text[i]];
@@ -288,13 +299,33 @@ ArrayIndex &Font::Print( float x, float y, std::vector<unsigned int> text, Rende
 		arrayIndex.insert(arrayIndex.end(), glyphArrayIndex.begin(), glyphArrayIndex.end());
 
 	}
+	*/
 
-	render->CreateBufferVertex(arrayVertex);
+	for(unsigned int i = 0; i < textLenght; i++)
+	{
+		fontTexture = glyphsTextureMap[text[i]];
+
+		geometryRectangle.SetPos(vec3(glyphX, glyphY + stringHeight - fontTexture.height - fontTexture.offsetDown, -1));
+		geometryRectangle.SetSize((float)fontTexture.width, (float)fontTexture.height);
+		geometryRectangle.SetTexture(fontTexture.texture);
+
+		glyphX += fontTexture.width;
+
+		buffer.AddArray(geometryRectangle.GetBufferArrayVTI());
+	}
+
+/*	render->CreateBufferVertex(arrayVertex);
 	render->CreateBufferTextCoord(arrayTextureCoord);
 	render->CreateBufferIndex(arrayIndex);
-
+*/
+	render->CreateBufferArrayVTI(buffer);
 	glBindTexture(GL_TEXTURE_2D, fontTexture.texture.textureId);
 
-	return arrayIndex;
+	return buffer.arrayIndex;
 
+}
+
+FontTexture Font::GetGlyphTexture( unsigned int utf32glyph )
+{
+	return glyphsTextureMap[utf32glyph];
 }

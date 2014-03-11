@@ -60,6 +60,12 @@
     <ClInclude Include="Rectangle.h">
       <Filter>Рендер\Геометрия</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicText.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferArray.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -100,6 +106,12 @@
     </ClCompile>
     <ClCompile Include="Rectangle.cpp">
       <Filter>Рендер\Геометрия</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicText.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferArray.cpp">
+      <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

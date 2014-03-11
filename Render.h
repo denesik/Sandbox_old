@@ -5,13 +5,16 @@
 #include <glfw3.h>
 #include "GameMath.h"
 #include <vector>
-
-typedef std::vector<float>		ArrayVertex;
-typedef std::vector<float>		ArrayTextureCoord;
-typedef std::vector<float>		ArrayColor;
-typedef std::vector<uint32_t>	ArrayIndex;
+#include "BufferArray.h"
 
 //typedef GLuint BufferArray;
+
+struct GraphicBufferArrayVTI
+{
+	unsigned int	arrayVertex;
+	unsigned int	arrayTextureCoord;
+	unsigned int	arrayIndex;
+};
 
 enum BufferType
 {
@@ -46,6 +49,9 @@ public:
 	void DeleteBufferColor(unsigned int buffer);
 	void DeleteBufferTextCoord(unsigned int buffer);
 	void DeleteBufferIndex(unsigned int buffer);
+
+	GraphicBufferArrayVTI CreateBufferArrayVTI(const BufferArrayVTI &bufferArray);
+	void DeleteBufferArrayVTI(const GraphicBufferArrayVTI &graphicBufferArray);
 
 	unsigned int CreateVertexArrayObject();
 	void DeleteVertexArrayObject(unsigned int vao);

@@ -263,10 +263,10 @@ int Game::Run()
 	std::vector<uint32_t> utf32result;
 	utf8::utf8to32(twochars, twochars + 7, std::back_inserter(utf32result));
 
-	Font font("font.json");
+	Font::Init("font.json");
 
 	glActiveTexture(GL_TEXTURE1);
-	ArrayIndex &fontArray = font.Print(10.0f, 20.0f, utf32result, render);
+	ArrayIndex &fontArray = Font::GetInstance()->Print(10.0f, 20.0f, utf32result, render);
 
 // 	render->CreateBufferTextCoord(geometryRectangle.GetTextureCoord());
 // 	render->CreateBufferVertex(geometryRectangle.GetVertexPosition());

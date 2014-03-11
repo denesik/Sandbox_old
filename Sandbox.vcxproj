@@ -38,7 +38,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <IncludePath>e:\book\Visual Studio projects\Projects\Sandbox\libs\glew-1.10.0\include\GL\;e:\book\Visual Studio projects\Projects\Sandbox\libs\jsoncpp-src-0.5.0\include\;e:\book\Visual Studio projects\Projects\Sandbox\libs\utf8_v2_3_4\source\;e:\book\Visual Studio projects\Projects\Sandbox\libs\freetype-2.5.2\include\;e:\book\Visual Studio projects\Projects\Sandbox\libs\glm\glm\;e:\book\Visual Studio projects\Projects\Sandbox\libs\glfw-3.0.4\include\GLFW\;E:\book\Visual Studio projects\Projects\Sandbox\libs\libpng-1.6.8;$(IncludePath)</IncludePath>
     <LibraryPath>e:\book\Visual Studio projects\Projects\Sandbox\libs\glew-1.10.0\lib\Release\Win32\;e:\book\Visual Studio projects\Projects\Sandbox\libs\jsoncpp-src-0.5.0\build\vs71\release\lib_json\;e:\book\Visual Studio projects\Projects\Sandbox\libs\freetype-2.5.2\objs\win32\vc2010\;e:\book\Visual Studio projects\Projects\Sandbox\libs\libpng-1.6.8\projects\vstudio\Release Library\;e:\book\Visual Studio projects\Projects\Sandbox\libs\glfw-3.0.4\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -81,11 +81,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap.h" />
+    <ClInclude Include="BufferArray.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameMath.h" />
+    <ClInclude Include="GraphicText.h" />
     <ClInclude Include="ImageAtlas.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Logger.h" />
@@ -96,10 +98,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bitmap.cpp" />
+    <ClCompile Include="BufferArray.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GraphicText.cpp" />
     <ClCompile Include="ImageAtlas.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Logger.cpp" />

@@ -1,5 +1,5 @@
-#ifndef Rectangle2D_h__
-#define Rectangle2D_h__
+#ifndef Rectangle_h__
+#define Rectangle_h__
 
 #include "GameMath.h"
 #include "TextureManager.h"
@@ -14,9 +14,7 @@ private:
 	float width;
 	float height;
 
-	ArrayVertex arrayVertex;
-	ArrayTextureCoord arrayTextureCoord;
-	ArrayIndex arrayIndex;
+	BufferArrayVTI bufferArrayVTI;
 
 public:
 	Rectangle(void);
@@ -32,7 +30,9 @@ public:
 	ArrayTextureCoord &GetTextureCoord();
 	ArrayIndex &GetVertexIndex();
 
+	BufferArrayVTI &GetBufferArrayVTI();
+
 };
 
 
-#endif // Rectangle2D_h__
+#endif // Rectangle_h__

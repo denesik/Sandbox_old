@@ -169,3 +169,19 @@ void Render::DrawBufferIndex( const ArrayIndex &array )
 {
 	glDrawElements(GL_TRIANGLES, sizeof(array[0]) * array.size(), GL_UNSIGNED_INT, NULL);
 }
+
+GraphicBufferArrayVTI Render::CreateBufferArrayVTI( const BufferArrayVTI &bufferArray )
+{
+	GraphicBufferArrayVTI gba;
+	gba.arrayVertex = CreateBufferVertex(bufferArray.arrayVertex);
+	gba.arrayTextureCoord = CreateBufferTextCoord(bufferArray.arrayTextureCoord);
+	gba.arrayIndex = CreateBufferIndex(bufferArray.arrayIndex);
+	return gba;
+}
+
+void Render::DeleteBufferArrayVTI( const GraphicBufferArrayVTI &graphicBufferArray )
+{
+	DeleteBufferVertex(graphicBufferArray.arrayVertex);
+	DeleteBufferTextCoord(graphicBufferArray.arrayTextureCoord);
+	DeleteBufferIndex(graphicBufferArray.arrayIndex);
+}

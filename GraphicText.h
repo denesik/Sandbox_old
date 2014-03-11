@@ -10,10 +10,6 @@ class GraphicText
 private:
 	std::vector<uint32_t> utf32text;
 
-	ArrayVertex arrayVertex;
-	ArrayTextureCoord arrayTextureCoord;
-	ArrayIndex arrayIndex;
-
 	float constraintWidth;
 	float constraintHeight;
 

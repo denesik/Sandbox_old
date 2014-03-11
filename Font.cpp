@@ -261,7 +261,7 @@ bool Font::GenerateOpenglGlyphs()
 	return true;
 }
 
-
+/*
 ArrayIndex &Font::Print( float x, float y, std::vector<unsigned int> text, Render *render)
 {
 	Rectangle geometryRectangle;
@@ -272,34 +272,6 @@ ArrayIndex &Font::Print( float x, float y, std::vector<unsigned int> text, Rende
 	float glyphX = x;
 	float glyphY = y;
 	float stringHeight = 22.0f;
-	/*
-	for(unsigned int i = 0; i < textLenght; i++)
-	{
-		fontTexture = glyphsTextureMap[text[i]];
-
-		geometryRectangle.SetPos(vec3(glyphX, glyphY + stringHeight - fontTexture.height - fontTexture.offsetDown, -1));
-		geometryRectangle.SetSize((float)fontTexture.width, (float)fontTexture.height);
-		geometryRectangle.SetTexture(fontTexture.texture);
-
-		glyphX += fontTexture.width;
-
-		ArrayVertex &glyphArrayVertex = geometryRectangle.GetVertexPosition();
-		arrayVertex.insert(arrayVertex.end(), glyphArrayVertex.begin(), glyphArrayVertex.end());
-
-		ArrayTextureCoord &glyphArrayTextureCoord = geometryRectangle.GetTextureCoord();
-		arrayTextureCoord.insert(arrayTextureCoord.end(), glyphArrayTextureCoord.begin(), glyphArrayTextureCoord.end());
-
-		ArrayIndex &glyphArrayIndex = geometryRectangle.GetVertexIndex();
-
-		unsigned int vertexCount = glyphArrayVertex.size();
-		for(unsigned int j = 0; j < glyphArrayIndex.size(); j++)
-		{
-			glyphArrayIndex[j] += 4 * i;
-		}
-		arrayIndex.insert(arrayIndex.end(), glyphArrayIndex.begin(), glyphArrayIndex.end());
-
-	}
-	*/
 
 	for(unsigned int i = 0; i < textLenght; i++)
 	{
@@ -314,17 +286,13 @@ ArrayIndex &Font::Print( float x, float y, std::vector<unsigned int> text, Rende
 		buffer.AddArray(geometryRectangle.GetBufferArrayVTI());
 	}
 
-/*	render->CreateBufferVertex(arrayVertex);
-	render->CreateBufferTextCoord(arrayTextureCoord);
-	render->CreateBufferIndex(arrayIndex);
-*/
 	render->CreateBufferArrayVTI(buffer);
 	glBindTexture(GL_TEXTURE_2D, fontTexture.texture.textureId);
 
 	return buffer.arrayIndex;
 
 }
-
+*/
 FontTexture Font::GetGlyphTexture( unsigned int utf32glyph )
 {
 	return glyphsTextureMap[utf32glyph];

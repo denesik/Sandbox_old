@@ -3,26 +3,41 @@
 
 #include <vector>
 #include "GameMath.h"
+#include <bitset>
 
-typedef std::vector<float>		ArrayVertex;
-typedef std::vector<float>		ArrayTextureCoord;
-typedef std::vector<float>		ArrayColor;
-typedef std::vector<uint32_t>	ArrayIndex;
+typedef std::vector<float>		VertexBuffer;
+typedef std::vector<uint32_t>	IndexBuffer;
 
-
-class BufferArrayVTI
+enum BufferType
 {
-public:
-	ArrayVertex			arrayVertex;
-	ArrayTextureCoord	arrayTextureCoord;
-	ArrayIndex			arrayIndex;
+	BUFFER_TYPE_VERTEX,
+	BUFFER_TYPE_COLOR,
+	BUFFER_TYPE_TEXTCOORD,
+	BUFFER_TYPE_NORMALE,
+};
+
+class BufferArray
+{
+private:
+	std::bitset<4>	activeBuffers;
+
+	unsigned int stride;
+
+	unsigned int	VAO;
+	unsigned int	videoVertexBuffer;
+	unsigned int	videoindexBuffer;
 
 public:
-	BufferArrayVTI(void);
-	BufferArrayVTI(unsigned int sizeVertex, unsigned int sizeTextureCoord, unsigned int sizeIndex);
-	~BufferArrayVTI(void);
+	VertexBuffer	vertexBuffer;
+	IndexBuffer		indexBuffer;
 
-	void AddArray(BufferArrayVTI &bufferArray);
+public:
+	BufferArray();
+	BufferArray(bool color, bool textcoord, bool normale, unsigned int sizeVertex = 0, unsigned int sizeIndex = 0);
+	~BufferArray();
+
+	void CreateVideoBuffer();
+	void Draw();
 };
 
 

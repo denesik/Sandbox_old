@@ -14,7 +14,7 @@ private:
 	float width;
 	float height;
 
-	BufferArrayVTI bufferArrayVTI;
+	BufferArray buffer;
 
 public:
 	Rectangle(void);
@@ -26,11 +26,7 @@ public:
 	void SetTexture(const Texture &texture);
 	Texture GetTexture();
 
-	ArrayVertex &GetVertexPosition();
-	ArrayTextureCoord &GetTextureCoord();
-	ArrayIndex &GetVertexIndex();
-
-	BufferArrayVTI &GetBufferArrayVTI();
+	BufferArray &GetBufferArray();
 
 };
 

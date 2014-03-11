@@ -235,42 +235,22 @@ int Game::Run()
 
 
 
-	Cube cube;
-
-	GLuint VertexArrayID;
-
-	VertexArrayID = render->CreateVertexArrayObject();
-
-	render->CreateBufferTextCoord(cube.GetTextureCoord());
-	render->CreateBufferVertex(cube.GetVertexPosition( vec3(0.0f, 0.0f, 0.0f) ));
-	render->CreateBufferIndex(cube.GetVertexIndex());
-
-
-// 	Rectangle geometryRectangle;
-// 	geometryRectangle.SetPos(vec3(0, 0, -1));
-// 	geometryRectangle.SetSize(100, 100);
-// 	Texture tex;
-// 	tex.u1 = 0.0f;
-// 	tex.v1 = 0.0f;
-// 	tex.u2 = 1.0f;
-// 	tex.v2 = 1.0f;
-// 	geometryRectangle.SetTexture(tex);
-
-	GLuint VertexArrayID1;
-	VertexArrayID1 = render->CreateVertexArrayObject();
-
-	char* twochars = "abggcde";
-	std::vector<uint32_t> utf32result;
-	utf8::utf8to32(twochars, twochars + 7, std::back_inserter(utf32result));
-
-	Font::Init("font.json");
-
-	glActiveTexture(GL_TEXTURE1);
-	ArrayIndex &fontArray = Font::GetInstance()->Print(10.0f, 20.0f, utf32result, render);
-
-// 	render->CreateBufferTextCoord(geometryRectangle.GetTextureCoord());
-// 	render->CreateBufferVertex(geometryRectangle.GetVertexPosition());
-// 	render->CreateBufferIndex(geometryRectangle.GetVertexIndex());
+ 	Rectangle geometryRectangle;
+ 	geometryRectangle.SetPos(vec3(0, 0, -1));
+ 	geometryRectangle.SetSize(100, 100);
+ 	Texture tex;
+ 	tex.u1 = 0.0f;
+ 	tex.v1 = 0.0f;
+ 	tex.u2 = 1.0f;
+ 	tex.v2 = 1.0f;
+ 	geometryRectangle.SetTexture(tex);
+	geometryRectangle.GetBufferArray().CreateVideoBuffer();
+// 
+// 	char* twochars = "abggcde";
+// 	std::vector<uint32_t> utf32result;
+// 	utf8::utf8to32(twochars, twochars + 7, std::back_inserter(utf32result));
+// 
+// 	Font::Init("font.json");
 
 
 	glEnable(GL_BLEND);
@@ -278,7 +258,7 @@ int Game::Run()
 	// делаем активным текстурный юнит 0
 	glActiveTexture(GL_TEXTURE1);
 	// назначаем текстуру на активный текстурный юнит
-	glBindTexture(GL_TEXTURE_2D, 2);
+	glBindTexture(GL_TEXTURE_2D, 1);
 
 	GLint textureLocation = -1;
 	textureLocation = glGetUniformLocation(programID, "colorTexture");
@@ -322,15 +302,14 @@ int Game::Run()
 			camera.RotateY( dy );
 		}
 		
-
+/*
 		MVP = camera.CalculateMatrix() * model;
 		// Use our shader
 		glUseProgram(programID);
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
 
-		render->UseVertexArrayObject(VertexArrayID);
-		render->DrawBufferIndex(cube.GetVertexIndex());
+*/
 
 		MVP = render->GetOrthoProjection();
 
@@ -339,8 +318,8 @@ int Game::Run()
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
 
-		render->UseVertexArrayObject(VertexArrayID1);
-		render->DrawBufferIndex(fontArray);
+		geometryRectangle.GetBufferArray().Draw();
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

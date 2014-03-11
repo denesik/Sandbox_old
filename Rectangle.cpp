@@ -1,7 +1,7 @@
 #include "Rectangle.h"
 
 
-Rectangle::Rectangle(void)
+Rectangle::Rectangle(void) : buffer(false, true, false, 4, 6)
 {
 	x = 0.0f;
 	y = 0.0f;
@@ -9,22 +9,18 @@ Rectangle::Rectangle(void)
 	width = 1.0f;
 	height = 1.0f;
 
-	bufferArrayVTI.arrayVertex.reserve(4 * 3);
-	bufferArrayVTI.arrayTextureCoord.reserve(4 * 2);
-	bufferArrayVTI.arrayIndex.reserve(6);
+	for(unsigned int i = 0; i < 4 * 3 + 4 * 2; i++)
+	{
+		buffer.vertexBuffer.push_back(0); 
+	}
+	
+	buffer.indexBuffer.push_back(0);
+	buffer.indexBuffer.push_back(3);
+	buffer.indexBuffer.push_back(2);
 
-	for(unsigned int i = 0; i < 4 * 3; i++)
-	{
-		bufferArrayVTI.arrayVertex.push_back(0); 
-	}
-	for(unsigned int i = 0; i < 4 * 2; i++)
-	{
-		bufferArrayVTI.arrayTextureCoord.push_back(0); 
-	}
-	for(unsigned int i = 0; i < 6; i++)
-	{
-		bufferArrayVTI.arrayIndex.push_back(0); 
-	}
+	buffer.indexBuffer.push_back(2);
+	buffer.indexBuffer.push_back(1);
+	buffer.indexBuffer.push_back(0);
 }
 
 
@@ -51,73 +47,47 @@ void Rectangle::SetTexture( const Texture &_texture )
 	texture = _texture;
 }
 
-ArrayVertex &Rectangle::GetVertexPosition()
-{
-	// низ лево
-	bufferArrayVTI.arrayVertex[0] = x;
-	bufferArrayVTI.arrayVertex[1] = y;
-	bufferArrayVTI.arrayVertex[2] = z;
-
-	// верх лево
-	bufferArrayVTI.arrayVertex[3] = x;
-	bufferArrayVTI.arrayVertex[4] = y + height;
-	bufferArrayVTI.arrayVertex[5] = z;
-
-	//верх право
-	bufferArrayVTI.arrayVertex[6] = x + width;
-	bufferArrayVTI.arrayVertex[7] = y + height;
-	bufferArrayVTI.arrayVertex[8] = z;
-
-	//верх право
-	bufferArrayVTI.arrayVertex[9] = x + width;
-	bufferArrayVTI.arrayVertex[10] = y;
-	bufferArrayVTI.arrayVertex[11] = z;
-
-	return bufferArrayVTI.arrayVertex;
-}
-
-ArrayTextureCoord &Rectangle::GetTextureCoord()
-{
-	// в ортогональной проекции текстура будет перевернута по оси 0X
-	// текстурные координаты v1, v2 инвертированы
-	bufferArrayVTI.arrayTextureCoord[0] = texture.u1;
-	bufferArrayVTI.arrayTextureCoord[1] = texture.v2;
-
-	bufferArrayVTI.arrayTextureCoord[2] = texture.u1;
-	bufferArrayVTI.arrayTextureCoord[3] = texture.v1;
-
-	bufferArrayVTI.arrayTextureCoord[4] = texture.u2;
-	bufferArrayVTI.arrayTextureCoord[5] = texture.v1;
-
-	bufferArrayVTI.arrayTextureCoord[6] = texture.u2;
-	bufferArrayVTI.arrayTextureCoord[7] = texture.v2;
-
-	return bufferArrayVTI.arrayTextureCoord;
-}
-
-ArrayIndex &Rectangle::GetVertexIndex()
-{
-	bufferArrayVTI.arrayIndex[0] = 0;
-	bufferArrayVTI.arrayIndex[1] = 3;
-	bufferArrayVTI.arrayIndex[2] = 2;
-
-	bufferArrayVTI.arrayIndex[3] = 2;
-	bufferArrayVTI.arrayIndex[4] = 1;
-	bufferArrayVTI.arrayIndex[5] = 0;
-
-	return bufferArrayVTI.arrayIndex;
-}
-
 Texture Rectangle::GetTexture()
 {
 	return texture;
 }
 
-BufferArrayVTI &Rectangle::GetBufferArrayVTI()
+BufferArray &Rectangle::GetBufferArray()
 {
-	GetVertexPosition();
-	GetTextureCoord();
-	GetVertexIndex();
+	// в ортогональной проекции текстура будет перевернута по оси 0X
+	// текстурные координаты v1, v2 инвертированы
+	// 
+	// низ лево
+	buffer.vertexBuffer[0] = x;
+	buffer.vertexBuffer[1] = y;
+	buffer.vertexBuffer[2] = z;
 
-	return bufferArrayVTI;
+	buffer.vertexBuffer[3] = texture.u1;
+	buffer.vertexBuffer[4] = texture.v2;
+
+	// верх лево
+	buffer.vertexBuffer[5] = x;
+	buffer.vertexBuffer[6] = y + height;
+	buffer.vertexBuffer[7] = z;
+
+	buffer.vertexBuffer[8] = texture.u1;
+	buffer.vertexBuffer[9] = texture.v1;
+
+	//верх право
+	buffer.vertexBuffer[10] = x + width;
+	buffer.vertexBuffer[11] = y + height;
+	buffer.vertexBuffer[12] = z;
+
+	buffer.vertexBuffer[13] = texture.u2;
+	buffer.vertexBuffer[14] = texture.v1;
+
+	//верх право
+	buffer.vertexBuffer[15] = x + width;
+	buffer.vertexBuffer[16] = y;
+	buffer.vertexBuffer[17] = z;
+
+	buffer.vertexBuffer[18] = texture.u2;
+	buffer.vertexBuffer[19] = texture.v2;
+
+	return buffer;
 }

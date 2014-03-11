@@ -5,7 +5,7 @@
 #include "Render.h"
 #include "TextureManager.h"
 
-
+/*
 class Cube
 {
 private:
@@ -32,6 +32,6 @@ public:
 	void SetTextureAllSide(const Texture &texture);
 
 };
-
+*/
 
 #endif // Cube_h__

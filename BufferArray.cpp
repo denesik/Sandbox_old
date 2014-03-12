@@ -194,3 +194,9 @@ void BufferArray::PushBack( BufferArray &ba )
 	}
 
 }
+
+void BufferArray::Clear()
+{
+	vertexBuffer.clear();
+	indexBuffer.clear();
+}

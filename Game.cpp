@@ -21,6 +21,7 @@
 #include "FPSCounter.h"
 
 #include <sstream>
+#include "GraphicText.h"
 
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
@@ -158,8 +159,6 @@ bool Game::Initialize()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL
 
-	glfwSwapInterval(0);
-
 	GLFWmonitor *monitor = NULL;
 
 	if(fullscreen)
@@ -176,6 +175,8 @@ bool Game::Initialize()
 	}
 	glfwMakeContextCurrent(window);
 	
+	glfwSwapInterval(0);
+
 	render = new Render;
 	render->Init();
 	render->SetWindowSize(width, height);
@@ -250,7 +251,7 @@ int Game::Run()
 
 
  	Rectangle geometryRectangle;
- 	geometryRectangle.SetPos(vec3(0, 0, -1));
+ 	geometryRectangle.SetPos(vec3(0, 50, -1));
  	geometryRectangle.SetSize(100, 100);
  	Texture tex;
  	tex.u1 = 0.0f;
@@ -271,7 +272,7 @@ int Game::Run()
 // 	std::vector<uint32_t> utf32result;
 // 	utf8::utf8to32(twochars, twochars + 7, std::back_inserter(utf32result));
 // 
-// 	Font::Init("font.json");
+ 	Font::Init("font.json");
 
 
 	Map map;
@@ -292,11 +293,14 @@ int Game::Run()
 
 	FPSCounter fps;
 
+	GraphicText fpsText;
+	fpsText.SetPos(vec3(10, 10, -1));
 
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		fps.Update();
 		auto a = ToString(fps.GetCount());
+		fpsText.SetText(a);
 		glfwSetWindowTitle(window, a.c_str());
 
 		// Clear the screen
@@ -352,6 +356,7 @@ int Game::Run()
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
 
+		glBindTexture(GL_TEXTURE_2D, 1);
 		map.Draw();
 
 		MVP = render->GetOrthoProjection();
@@ -362,6 +367,7 @@ int Game::Run()
 		glUniform1i(textureLocation, 1);
 
 		ba.Draw();
+		fpsText.Draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

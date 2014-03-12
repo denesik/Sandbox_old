@@ -74,8 +74,6 @@ public:
 	
 	static Font* GetInstance();
 
-	//ArrayIndex &Print( float x, float y, std::vector<unsigned int> text, Render *render);
-
 	FontTexture GetGlyphTexture(unsigned int utf32glyph);
 
 };

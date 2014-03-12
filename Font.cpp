@@ -261,38 +261,6 @@ bool Font::GenerateOpenglGlyphs()
 	return true;
 }
 
-/*
-ArrayIndex &Font::Print( float x, float y, std::vector<unsigned int> text, Render *render)
-{
-	Rectangle geometryRectangle;
-	FontTexture fontTexture = glyphsTextureMap[97];
-
-	unsigned int textLenght = text.size();
-
-	float glyphX = x;
-	float glyphY = y;
-	float stringHeight = 22.0f;
-
-	for(unsigned int i = 0; i < textLenght; i++)
-	{
-		fontTexture = glyphsTextureMap[text[i]];
-
-		geometryRectangle.SetPos(vec3(glyphX, glyphY + stringHeight - fontTexture.height - fontTexture.offsetDown, -1));
-		geometryRectangle.SetSize((float)fontTexture.width, (float)fontTexture.height);
-		geometryRectangle.SetTexture(fontTexture.texture);
-
-		glyphX += fontTexture.width;
-
-		buffer.AddArray(geometryRectangle.GetBufferArrayVTI());
-	}
-
-	render->CreateBufferArrayVTI(buffer);
-	glBindTexture(GL_TEXTURE_2D, fontTexture.texture.textureId);
-
-	return buffer.arrayIndex;
-
-}
-*/
 FontTexture Font::GetGlyphTexture( unsigned int utf32glyph )
 {
 	return glyphsTextureMap[utf32glyph];

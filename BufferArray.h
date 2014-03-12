@@ -41,6 +41,8 @@ public:
 
 	void PushBack( BufferArray &bufferArray);
 
+	void Clear();
+
 	void Draw();
 };
 

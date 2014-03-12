@@ -29,6 +29,9 @@ bool Render::Init()
 	}
 	glGetError();
 
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
 	return true;
 }
 

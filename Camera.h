@@ -33,6 +33,7 @@ public:
 	void RotateY(float angle);
 
 	void MoveX(float dist);
+	void MoveY(float dist);
 	void MoveZ(float dist);
 };
 

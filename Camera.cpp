@@ -61,6 +61,13 @@ void Camera::MoveX( float dist )
 	view = translate * view;
 }
 
+void Camera::MoveY( float dist )
+{
+	mat4 translate;
+	translate = glm::translate(mat4(1.0f), vec3(0.0f, -dist, 0.0f));
+	view = translate * view;
+}
+
 void Camera::MoveZ( float dist )
 {
 	mat4 translate;
@@ -73,3 +80,5 @@ mat4 Camera::CalculateMatrix()
 	mat4 rotatey = glm::rotate(mat4(1.0f), roty, vec3(1.0f, 0.0f, 0.0f));
 	return perspectiveProjection * rotatey * view;
 }
+
+

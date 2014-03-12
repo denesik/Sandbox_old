@@ -1,4 +1,5 @@
 #include "TextureManager.h"
+#include <glew.h>
 #include <glfw3.h>
 #include "Logger.h"
 
@@ -9,11 +10,11 @@ unsigned int GenerateOpenglBitmap(Bitmap &bitmap, bool smoothing)
 	glGenTextures(1, &glBitmap);
 	glBindTexture(GL_TEXTURE_2D, glBitmap);
 
-	GLint param = GL_LINEAR;
-	if(!smoothing) param = GL_NEAREST;
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, param);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, param);
+	// Когда картинка будет увеличиваться(нет большей Мипмапы), используем LINEAR фильтрацию
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, smoothing ? GL_LINEAR : GL_NEAREST);
+	
+	// Когда минимизируем — берем две ближних мипмапы и лиейно смешиваем цвета
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, smoothing ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
 
 	unsigned int format = bitmap.GetFormat();
 	unsigned int colorType = GL_RGB;
@@ -53,6 +54,12 @@ unsigned int GenerateOpenglBitmap(Bitmap &bitmap, bool smoothing)
 	//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, colorType, bitmap.GetWidth(), bitmap.GetHeight(), 0, colorType, GL_UNSIGNED_BYTE, bitmap.GetData());
+	OPENGL_CHECK_ERRORS();
+
+	// Создаем сами мипмапы.
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	OPENGL_CHECK_ERRORS();
 
 	return glBitmap;
 }

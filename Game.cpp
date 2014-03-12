@@ -17,6 +17,7 @@
 
 #include "Logger.h"
 #include "utf8.h"
+#include "Map.h"
 
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
@@ -192,7 +193,7 @@ bool Game::Initialize()
 	b->Load("img.png");
 
 	texture = 0;
-	texture = GenerateOpenglBitmap(*b, false);
+	texture = GenerateOpenglBitmap(*b, true);
 
 	b->Free();
 
@@ -249,9 +250,9 @@ int Game::Run()
 	ba.PushBack(geometryRectangle.GetBufferArray());
 	ba.CreateVideoBuffer();
 
-	Cube geometryCube;
-	geometryCube.SetTextureAllSide(tex);
-	geometryCube.GetBufferArray().CreateVideoBuffer();
+//	Cube geometryCube;
+//	geometryCube.SetTextureAllSide(tex);
+//	geometryCube.GetBufferArray().CreateVideoBuffer();
 // 
 // 	char* twochars = "abggcde";
 // 	std::vector<uint32_t> utf32result;
@@ -259,6 +260,10 @@ int Game::Run()
 // 
 // 	Font::Init("font.json");
 
+
+	Map map;
+	map.CreateGeometry();
+	
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -270,6 +275,8 @@ int Game::Run()
 	GLint textureLocation = -1;
 	textureLocation = glGetUniformLocation(programID, "colorTexture");
 
+	float const speed = 0.05f;
+
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		
@@ -279,22 +286,32 @@ int Game::Run()
 
 		if(Keyboard::isKeyDown(GLFW_KEY_W))
 		{
-			camera.MoveZ(0.005f);
+			camera.MoveZ(speed);
 		}
 
 		if(Keyboard::isKeyDown(GLFW_KEY_S))
 		{
-			camera.MoveZ(-0.005f);
+			camera.MoveZ(-speed);
+		}
+
+		if(Keyboard::isKeyDown(GLFW_KEY_R))
+		{
+			camera.MoveY(speed);
+		}
+
+		if(Keyboard::isKeyDown(GLFW_KEY_F))
+		{
+			camera.MoveY(-speed);
 		}
 
 		if(Keyboard::isKeyDown(GLFW_KEY_D))
 		{
-			camera.MoveX(0.005f);
+			camera.MoveX(speed);
 		}
 
 		if(Keyboard::isKeyDown(GLFW_KEY_A))
 		{
-			camera.MoveX(-0.005f);
+			camera.MoveX(-speed);
 		}
 
 		float dx = float(Mouse::IsMoveCursorX());
@@ -316,7 +333,7 @@ int Game::Run()
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
 
-		geometryCube.GetBufferArray().Draw();
+		map.Draw();
 
 		MVP = render->GetOrthoProjection();
 

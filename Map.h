@@ -13,7 +13,7 @@ class Map
 {
 private:
 	BufferArray buffer;
-	B map[64][5][64];
+	B map[64][25][64];
 	
 	Cube geometryCube;
 

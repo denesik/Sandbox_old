@@ -248,7 +248,7 @@ bool Font::GenerateOpenglGlyphs()
 	}
 
 	// CreateAtlasOpenglTexture
-	unsigned int ogltexture = GenerateOpenglBitmap(*atlasBitmap, false);
+	unsigned int ogltexture = GenerateOpenglBitmap(*atlasBitmap, false, false);
 	for (auto i = glyphsTextureMap.begin(); i != glyphsTextureMap.end(); i++)
 	{
 		(*i).second.texture.textureId = ogltexture;

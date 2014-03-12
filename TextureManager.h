@@ -13,7 +13,7 @@ struct Texture
 };
 
 
-unsigned int GenerateOpenglBitmap(Bitmap &bitmap, bool smoothing);
+unsigned int GenerateOpenglBitmap(Bitmap &bitmap, bool smoothing, bool mipmap);
 
 void GenerateTextCoord(Bitmap *bitmap, iRect *rect, Texture &texture);
 

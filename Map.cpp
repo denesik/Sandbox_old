@@ -21,7 +21,7 @@ void Map::CreateGeometry()
 	
 	for(int x = 0; x < 64; x++)
 		for(int z = 0; z < 64; z++)
-			for(int y = 0; y < 5; y++)
+			for(int y = 0; y < 25; y++)
 			{
 				map[x][y][z].full = true;
 				map[x][y][z].visible = 0;
@@ -29,7 +29,7 @@ void Map::CreateGeometry()
 	
 	for(int x = 1; x < 63; x++)
 		for(int z = 1; z < 63; z++)
-			for(int y = 1; y < 4; y++)
+			for(int y = 1; y < 24; y++)
 			{
 				if( map[x - 1][y][z].full ) map[x][y][z].visible ++;
 				if( map[x + 1][y][z].full ) map[x][y][z].visible ++;
@@ -41,7 +41,7 @@ void Map::CreateGeometry()
 
 	for(int x = 0; x < 64; x++)
 		for(int z = 0; z < 64; z++)
-			for(int y = 0; y < 5; y++)
+			for(int y = 0; y < 25; y++)
 			{
 				if(map[x][y][z].visible < 6)
 				{

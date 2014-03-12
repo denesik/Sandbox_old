@@ -18,6 +18,9 @@
 #include "Logger.h"
 #include "utf8.h"
 #include "Map.h"
+#include "FPSCounter.h"
+
+#include <sstream>
 
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
@@ -155,6 +158,8 @@ bool Game::Initialize()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL
 
+	glfwSwapInterval(0);
+
 	GLFWmonitor *monitor = NULL;
 
 	if(fullscreen)
@@ -193,7 +198,7 @@ bool Game::Initialize()
 	b->Load("img.png");
 
 	texture = 0;
-	texture = GenerateOpenglBitmap(*b, true);
+	texture = GenerateOpenglBitmap(*b, true, true);
 
 	b->Free();
 
@@ -204,6 +209,14 @@ bool Game::Initialize()
 
 void Game::LoadContent()
 {
+}
+
+template< typename T >
+std::string ToString( const T& val )
+{
+	std::stringstream iss;
+	iss << val;
+	return iss.str();
 }
 
 int Game::Run()
@@ -277,9 +290,15 @@ int Game::Run()
 
 	float const speed = 0.05f;
 
+	FPSCounter fps;
+
+
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
-		
+		fps.Update();
+		auto a = ToString(fps.GetCount());
+		glfwSetWindowTitle(window, a.c_str());
+
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -294,12 +313,12 @@ int Game::Run()
 			camera.MoveZ(-speed);
 		}
 
-		if(Keyboard::isKeyDown(GLFW_KEY_R))
+		if(Keyboard::isKeyDown(GLFW_KEY_SPACE))
 		{
 			camera.MoveY(speed);
 		}
 
-		if(Keyboard::isKeyDown(GLFW_KEY_F))
+		if(Keyboard::isKeyDown(GLFW_KEY_LEFT_SHIFT))
 		{
 			camera.MoveY(-speed);
 		}
@@ -343,7 +362,6 @@ int Game::Run()
 		glUniform1i(textureLocation, 1);
 
 		ba.Draw();
-
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -29,42 +29,13 @@ bool Render::Init()
 	}
 	glGetError();
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
+	
 	return true;
 }
 
-// 
-// 
-// void Render::DeleteBufferVertex( unsigned int buffer )
-// {
-// 	glDisableVertexAttribArray(BUFFER_VERTEX);
-// 	glDeleteBuffers(1, &buffer);
-// }
-// 
-// void Render::DeleteBufferColor( unsigned int buffer )
-// {
-// 	glDisableVertexAttribArray(BUFFER_COLOR);
-// 	glDeleteBuffers(1, &buffer);
-// }
-// 
-// 
-// void Render::DeleteBufferTextCoord( unsigned int buffer )
-// {
-// 	glDisableVertexAttribArray(BUFFER_TEXTURE_COORD);
-// 	glDeleteBuffers(1, &buffer);
-// }
-// 
-// void Render::DeleteBufferIndex( unsigned int buffer )
-// {
-// 	glDeleteBuffers(1, &buffer);
-// }
-// 
-// void Render::DeleteVertexArrayObject( unsigned int vao )
-// {
-// 	glDeleteVertexArrays(1, &vao);
-// }
+
 
 
 void Render::SetWindowSize( unsigned int _width, unsigned int _height )

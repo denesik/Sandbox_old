@@ -53,26 +53,29 @@ private:
 
 
 private:
-	bool LoadConfig( std::string configFileName );
+	bool CreateFromConfig( std::string configFileName );
 
 	bool GenerateGlyphsList( std::string glyphList );
 	bool GenerateGlyph(unsigned int gliphNumber, GlyphBitmap &glyphBitmap);
 	bool GenerateOpenglGlyphs();
 
+	bool GenerateEmptyGlyph();
+
 private:
 	static Font* instance;
 
-	Font( std::string configFileName );
+	Font();
 	Font(const Font& root);
 	Font& operator=(const Font&);
 
 public:
 	~Font();
 
-	static bool Init( std::string configFileName );
-	static void Finalize();
-	
+	static bool Init();
 	static Font* GetInstance();
+
+	bool Create(std::string configFileName);
+	void Remove();
 
 	FontTexture GetGlyphTexture(unsigned int utf32glyph);
 

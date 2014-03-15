@@ -1,3 +1,4 @@
-ERROR.   Time: 18:12:18 
-File name: e:\book\visual studio projects\projects\sandbox\sandbox\texturemanager.cpp. Number string:  22
-OpenGL Error 0x500
+INFO.    Time: 23:54:43 Окно успешно создано.
+INFO.    Time: 23:54:43 Рендер инициализирован.
+INFO.    Time: 23:54:43 Шрифты инициализированы.
+INFO.    Time: 23:54:43 Инициализация прошла успешно.

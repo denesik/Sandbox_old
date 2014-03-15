@@ -12,39 +12,159 @@
 
 Font *Font::instance = nullptr;
 
-Font::Font( std::string configFileName )
+Font::Font()
 {
 	library = nullptr;
 	face = nullptr;
 
-	if (FT_Init_FreeType( &library )) 
-	{
-		//LOG(LOG_ERROR, "FreeType не инициализирвоан.");
-	}
-
-	LoadConfig( configFileName );
 }
 
 
-Font::~Font(void)
+Font::~Font()
 {
 	if(library)
 	{
 		FT_Done_FreeType(library);
 		library = nullptr;
 	}
+	instance = nullptr;
 }
 
-bool Font::Init( std::string configFileName )
+bool Font::Init()
 {
 	if(!instance)
 	{
-		instance = new Font(configFileName);
+		instance = new Font();
+		if (FT_Init_FreeType( &instance->library )) 
+		{
+			LOG_ERROR("FreeType не инициализирован.");
+			return false;
+		}
+		// Создаем глиф с кодом 0.
+		if(!instance->GenerateEmptyGlyph())
+		{
+			LOG_ERROR("Глиф с кодом 0 не создан.");
+			return false;
+		}
 	}
 	else
 	{
-		//LOG(LOG_WARNING, "FreeType уже был инициализирвоан.");
+		LOG_WARNING("Повторная инициализация. Freetype уже был инициализирован.");
 	}
+
+	return true;
+}
+
+bool Font::Create( std::string configFileName )
+{
+	bool processing = true;
+	if(!CreateFromConfig(configFileName))
+	{
+		processing = false;
+	}
+
+	if(!GenerateOpenglGlyphs())
+	{
+		processing = false;
+	}
+
+	return processing;
+}
+
+void Font::Remove()
+{
+	glyphsTextureMap.clear();
+	// удалить glyphsTextureMap[0].texture
+}
+
+bool Font::GenerateEmptyGlyph()
+{
+	unsigned int key = 0;
+	GlyphBitmap glyphBitmap;
+	glyphBitmap.bitmap = new Bitmap();
+	glyphBitmap.bitmap->Generate(Bitmap::FORMAT_RGBA, 6, 8, 0x00000000);
+	unsigned int channelCount = GetChannelCount(Bitmap::FORMAT_RGBA);
+
+	byte *glyphImageData = glyphBitmap.bitmap->GetData();
+
+	unsigned int w = glyphBitmap.bitmap->GetWidth();
+	unsigned int h = glyphBitmap.bitmap->GetHeight();
+
+	
+	for(unsigned int i = 0; i < w; i++)
+	{
+		glyphImageData[i * channelCount + channelCount - 1] = 255;
+		glyphImageData[(h - 1) * w * channelCount + i * channelCount + channelCount - 1] = 255;
+	}
+	for(unsigned int j = 0; j < h; j++)
+	{
+		glyphImageData[j * w * channelCount + channelCount - 1] = 255;
+		glyphImageData[j * w * channelCount + (w - 1) * channelCount + channelCount - 1] = 255;
+	}
+	glyphBitmap.offsetDown = 0;
+
+	glyphBitmap.key = key;
+	glyphsBitmapList.push_back(glyphBitmap);
+
+	return true;
+}
+
+
+bool Font::CreateFromConfig( std::string configFileName )
+{
+	std::ifstream configFile(configFileName);
+
+	if (!configFile.is_open()) 
+	{
+		LOG_WARNING("Шрифты. Невозможно открыть конфигурационный файл шрифтов %s.", configFileName);
+		return false;
+	}
+
+
+	Json::Value root;
+	Json::Reader reader;
+
+	bool parsingSuccessful = reader.parse( configFile, root );
+	if ( !parsingSuccessful )
+	{
+		LOG_WARNING("Шрифты. Ошибка в структуре конфигурационного файла %s. %s", configFileName, reader.getFormatedErrorMessages());
+		configFile.close();
+		return false;
+	}
+
+	const Json::Value fontList = root["FontList"];
+	for ( unsigned int i = 0; i < fontList.size(); i++ )
+	{
+		std::string fontFileName = fontList[i].get("FileName", "").asString();
+		unsigned int fontSize = fontList[i].get("Size", 14).asUInt();
+		const Json::Value glyphs = fontList[i]["Glyphs"];
+
+		if (FT_New_Face( library, fontFileName.c_str(), 0, &face )) 
+		{
+			LOG_WARNING("Файл шрифтов %s не загружен.", fontFileName);
+			configFile.close();
+			return false;
+		}
+		// По некоторым причинам FreeType измеряет размер шрифта в терминах 1/64 пикселя.
+		// Таким образом, для того чтобы сделать шрифт выстой size пикселей, мы запрашиваем размер size*64.
+		// (size << 6 тоже самое что и size*64)
+		FT_Set_Char_Size( face, fontSize << 6, fontSize << 6, 96, 96);
+
+		// Создаем глифы для заданных наборов символов.
+		for ( unsigned int j = 0; j < glyphs.size(); j++ )
+		{
+			std::string glyphList = glyphs[j].asString();
+			GenerateGlyphsList(glyphList);
+		}
+
+		if(face)
+		{
+			FT_Done_Face(face);
+			face = nullptr;
+		}
+	}
+
+	configFile.close();
 
 	return true;
 }
@@ -54,10 +174,49 @@ Font* Font::GetInstance()
 
 	if(!instance)
 	{
-		//LOG(LOG_FATAL, "FreeType не инициализирвоан.");
+		LOG_FATAL("Попытка обратиться к несуществеющему классу шрифтов. Инициализируйте класс шрифтов.");
 	}
 
 	return instance;
+}
+
+bool Font::GenerateGlyphsList( std::string glyphList )
+{
+	GlyphBitmap glyphBitmap;
+
+	std::vector<int> glyphsUTF32;
+	utf8::utf8to32(glyphList.c_str(), glyphList.c_str() + glyphList.length(), std::back_inserter(glyphsUTF32));
+
+	for(unsigned int i = 0; i < glyphsUTF32.size(); i++)
+	{	
+		// Проверяем есть ли такой символ в нашем списке.
+		int key = glyphsUTF32[i];
+		if( std::find_if( glyphsBitmapList.begin(), glyphsBitmapList.end(), 
+			[&key](GlyphBitmap n) { return n.key == key; } 
+		) != glyphsBitmapList.end() )
+		{
+			// Если уже есть то добавлять не нужно.
+			continue;
+		}
+
+		glyphBitmap.bitmap = new Bitmap();
+		if( GenerateGlyph(key, glyphBitmap) )
+		{
+			//glyphsBitmapList[glyphsUTF32[i]] = glyphBitmap;
+			glyphBitmap.key = key;
+			glyphsBitmapList.push_back(glyphBitmap);
+		}
+		else
+		{
+			LOG_WARNING("Невозможно загрузить глиф %i", key);
+			glyphBitmap.bitmap->Free();
+			delete glyphBitmap.bitmap;
+			glyphBitmap.bitmap = nullptr;
+		}
+
+	}
+
+	return true;
 }
 
 bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap &glyphBitmap)
@@ -65,14 +224,14 @@ bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap &glyphBitmap)
 
 	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, glyphNumber ), FT_LOAD_DEFAULT ))
 	{
-		//LOG(LOG_WARNING, "FreeType. Невозможно загрузить глиф.");
+		// Невозможно загрузить глиф.
 		return false;
 	}
 
 	FT_Glyph glyph;
 	if(FT_Get_Glyph( face->glyph, &glyph ))
 	{
-		//LOG(LOG_WARNING, "FreeType. Невозможно загрузить глиф.");
+		// Невозможно загрузить глиф.
 		return false;
 	}
 
@@ -101,101 +260,6 @@ bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap &glyphBitmap)
 	return true;
 }
 
-bool Font::LoadConfig( std::string configFileName )
-{
-	std::ifstream configFile(configFileName);
-
-	if (!configFile.is_open()) 
-	{
-		//LOG(LOG_ERROR, "Шрифты. Невозможно открыть конфигурационный файл шрифтов " + configFileName + ".");
-		return 0;
-	}
-
-
-	Json::Value root;
-	Json::Reader reader;
-
-	bool parsingSuccessful = reader.parse( configFile, root );
-	if ( !parsingSuccessful )
-	{
-		//LOG(LOG_ERROR, "Шрифты. Ошибка в структуре конфигурационного файла " + configFileName + ". " + reader.getFormatedErrorMessages());
-		return false;
-	}
-
-	const Json::Value fontList = root["FontList"];
-	for ( unsigned int i = 0; i < fontList.size(); i++ )
-	{
-		std::string fontFileName = fontList[i].get("FileName", "").asString();
-		unsigned int fontSize = fontList[i].get("Size", 14).asUInt();
-		const Json::Value glyphs = fontList[i]["Glyphs"];
-
-		if (FT_New_Face( library, fontFileName.c_str(), 0, &face )) 
-		{
-			//LOG(LOG_WARNING, "FreeType. Файл шрифтов " + fontFileName + " не загружен.");
-			return false;
-		}
-		// По некоторым причинам FreeType измеряет размер шрифта в терминах 1/64 пикселя.
-		// Таким образом, для того чтобы сделать шрифт выстой size пикселей, мы запрашиваем размер size*64.
-		// (size << 6 тоже самое что и size*64)
-		FT_Set_Char_Size( face, fontSize << 6, fontSize << 6, 96, 96);
-
-		for ( unsigned int j = 0; j < glyphs.size(); j++ )
-		{
-			std::string glyphList = glyphs[j].asString();
-			
-			GenerateGlyphsList(glyphList);
-
-		}
-
-		if(face)
-		{
-			FT_Done_Face(face);
-			face = nullptr;
-		}
-	}
-
-	GenerateOpenglGlyphs();
-
-	configFile.close();
-	return true;
-}
-
-bool Font::GenerateGlyphsList( std::string glyphList )
-{
-	GlyphBitmap glyphBitmap;
-
-	std::vector<int> glyphsUTF32;
-	utf8::utf8to32(glyphList.c_str(), glyphList.c_str() + glyphList.length(), std::back_inserter(glyphsUTF32));
-
-	for(unsigned int i = 0; i < glyphsUTF32.size(); i++)
-	{
-		int key = glyphsUTF32[i];
-		if( std::find_if( glyphsBitmapList.begin(), glyphsBitmapList.end(), 
-			[&key](GlyphBitmap n) { return n.key == key; } 
-			) != glyphsBitmapList.end() )
-		{
-			continue;
-		}
-
-		glyphBitmap.bitmap = new Bitmap();
-		if( GenerateGlyph(key, glyphBitmap) )
-		{
-			//glyphsBitmapList[glyphsUTF32[i]] = glyphBitmap;
-			glyphBitmap.key = key;
-			glyphsBitmapList.push_back(glyphBitmap);
-		}
-		else
-		{
-			glyphBitmap.bitmap->Free();
-			delete glyphBitmap.bitmap;
-			glyphBitmap.bitmap = nullptr;
-		}
-
-	}
-
-	return true;
-}
-
 bool Font::GenerateOpenglGlyphs()
 {
 	unsigned int area = 0;
@@ -215,7 +279,11 @@ bool Font::GenerateOpenglGlyphs()
 	if( diff < 1.8f )
 		sideAtlas <<= 1;
 
-	glyphAtlas.Create(Bitmap::FORMAT_RGBA, sideAtlas, sideAtlas);
+	if(!glyphAtlas.Create(Bitmap::FORMAT_RGBA, sideAtlas, sideAtlas))
+	{
+		LOG_ERROR("Шрифты. Текстурный атлас не создан.");
+		return false;
+	}
 
 	// Сортируем по убыванию площадей
 	glyphsBitmapList.sort();
@@ -227,7 +295,7 @@ bool Font::GenerateOpenglGlyphs()
 	{
 		if( !glyphAtlas.InsertImage( (*i).bitmap, rect ) ) 
 		{
-			//LOG(LOG_WARNING, "Font. Символ не загружен.");
+			LOG_WARNING("Не удалось загрузить глиф %i в атлас.", (*i).key);
 			delete (*i).bitmap;
 			(*i).bitmap = nullptr;
 			continue;
@@ -263,5 +331,10 @@ bool Font::GenerateOpenglGlyphs()
 
 FontTexture Font::GetGlyphTexture( unsigned int utf32glyph )
 {
+	if(glyphsTextureMap.count(utf32glyph) == 0)
+	{
+		return glyphsTextureMap[0];
+	}
 	return glyphsTextureMap[utf32glyph];
 }
+

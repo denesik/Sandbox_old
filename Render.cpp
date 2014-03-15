@@ -24,14 +24,22 @@ bool Render::Init()
 
 	if (glewInit() != GLEW_OK) 
 	{
-		//LOG(LOG_ERROR, "GLEW не инициализирован.");
+		LOG_ERROR("GLEW не инициализирован");
 		return false;
 	}
 	glGetError();
 
+	// Enable depth test
+	glEnable(GL_DEPTH_TEST);
+	// Accept fragment if it closer to the camera than the former one
+	glDepthFunc(GL_LESS); 
+
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_BACK);
-	
+
+
+	OPENGL_CHECK_ERRORS();
+
 	return true;
 }
 

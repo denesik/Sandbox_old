@@ -150,7 +150,7 @@ bool Game::Initialize()
 
 	if (!glfwInit())
 	{
-		//LOG(LOG_ERROR, "Ошибка инициализации GLFW.");
+		LOG_ERROR("GLFW не инициализирован.");
 		return false;
 	}
 	
@@ -170,29 +170,60 @@ bool Game::Initialize()
 	if (!window)
 	{
 		glfwTerminate();
-		//LOG(LOG_ERROR, "Ошибка создания окна GLFW.");
+		LOG_ERROR("Не удалось создать окно.");
 		return false;
 	}
+	// Создаем контекст
 	glfwMakeContextCurrent(window);
 	
-	glfwSwapInterval(0);
+	LOG_INFO("Окно успешно создано.");
 
-	render = new Render;
-	render->Init();
-	render->SetWindowSize(width, height);
+//============ "Окно создано" ========================
 
 	Keyboard::Init();
 	glfwSetKeyCallback(window, KeyCallbackGLFW3);
 
 	Mouse::Init(window);
 	Mouse::SetWindowSize(width, height);
-//	Mouse::SetFixedPosState(true);
+	//	Mouse::SetFixedPosState(true);
 	glfwSetCursorPosCallback(window, CursorPosCallbackGLFW3);
 	glfwSetCursorEnterCallback(window, CursorClientAreaCallbackGLFW3);	
 	glfwSetWindowFocusCallback(window, WindowFocusCallbackGLFW3);
 
+	// Отключаем вертикальную синхронизацию
+	glfwSwapInterval(0);
+
+
+	render = new Render;
+	if(!render->Init())
+	{
+		LOG_ERROR("Рендер не инициализирован.");
+
+		delete render;
+		render = nullptr;
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return false;
+	}
+	// настройки рендера.
+	render->SetWindowSize(width, height);
+
+	LOG_INFO("Рендер инициализирован.");
 
 	//*******************************
+
+	if(!Font::Init())
+	{
+		LOG_ERROR("Ошибка инициализации шрифтов.");
+		delete Font::GetInstance();
+		delete render;
+		render = nullptr;
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return false;
+	}
+	LOG_INFO("Шрифты инициализированы.");
+
 
 	Bitmap *b = new Bitmap();
 
@@ -210,6 +241,10 @@ bool Game::Initialize()
 
 void Game::LoadContent()
 {
+	if(Font::GetInstance()->Create("font.json"))
+	{
+		LOG_INFO("Шрифты Загружены.");
+	}
 }
 
 template< typename T >
@@ -225,17 +260,13 @@ int Game::Run()
 
 	if(!Initialize()) 
 	{
+		LOG_ERROR("Инициализация завершилась с ошибками.");
 		//LOG(LOG_ERROR, "Инициализация завершилась с ошибками.");
 		return -1;
 	}
+	LOG_INFO("Инициализация прошла успешно.");
 
 	LoadContent();
-
-	// Enable depth test
-	glEnable(GL_DEPTH_TEST);
-
-	// Accept fragment if it closer to the camera than the former one
-	glDepthFunc(GL_LESS); 
 
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "shaders/t2.vs", "shaders/t2.fs" );
@@ -264,16 +295,6 @@ int Game::Run()
 	ba.PushBack(geometryRectangle.GetBufferArray());
 	ba.CreateVideoBuffer();
 
-//	Cube geometryCube;
-//	geometryCube.SetTextureAllSide(tex);
-//	geometryCube.GetBufferArray().CreateVideoBuffer();
-// 
-// 	char* twochars = "abggcde";
-// 	std::vector<uint32_t> utf32result;
-// 	utf8::utf8to32(twochars, twochars + 7, std::back_inserter(utf32result));
-// 
- 	Font::Init("font.json");
-
 
 	Sector map;
 	map.CreateGeometry();
@@ -299,7 +320,7 @@ int Game::Run()
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		fps.Update();
-		auto a = ToString(fps.GetCount());
+		auto a = ToString(fps.GetCount()) + "=-+";
 		fpsText.SetText(a);
 		glfwSetWindowTitle(window, a.c_str());
 

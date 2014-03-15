@@ -17,7 +17,7 @@
 
 #include "Logger.h"
 #include "utf8.h"
-#include "Map.h"
+#include "Sector.h"
 #include "FPSCounter.h"
 
 #include <sstream>
@@ -275,7 +275,7 @@ int Game::Run()
  	Font::Init("font.json");
 
 
-	Map map;
+	Sector map;
 	map.CreateGeometry();
 	
 

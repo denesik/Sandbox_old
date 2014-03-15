@@ -9,7 +9,7 @@ struct B
 	unsigned char visible;
 };
 
-class Map
+class Sector
 {
 private:
 	BufferArray buffer;
@@ -18,8 +18,8 @@ private:
 	Cube geometryCube;
 
 public:
-	Map(void);
-	~Map(void);
+	Sector(void);
+	~Sector(void);
 
 	void CreateGeometry();
 

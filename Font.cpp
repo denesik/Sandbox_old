@@ -1,8 +1,8 @@
 #include "Font.h"
 #include "Logger.h"
 
-#include<json/writer.h>
-#include<json/reader.h>
+#include <writer.h>
+#include <reader.h>
 #include <fstream>
 #include <utf8.h>
 #include <math.h>

@@ -1,16 +1,16 @@
-#include "Map.h"
+#include "Sector.h"
 
 
-Map::Map(void) : buffer(false, true, false)
+Sector::Sector(void) : buffer(false, true, false)
 {
 }
 
 
-Map::~Map(void)
+Sector::~Sector(void)
 {
 }
 
-void Map::CreateGeometry()
+void Sector::CreateGeometry()
 {
 	Texture tex;
 	tex.u1 = 0.0f;
@@ -52,7 +52,7 @@ void Map::CreateGeometry()
 	buffer.CreateVideoBuffer();
 }
 
-void Map::Draw()
+void Sector::Draw()
 {
 	buffer.Draw();
 }

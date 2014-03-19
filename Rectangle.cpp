@@ -1,8 +1,9 @@
 #include "Rectangle.h"
 
 
-Rectangle::Rectangle(void) : buffer(false, true, false, 4, 6)
+Rectangle::Rectangle(void)
 {
+	buffer.Create(false, true, false, 4, 6);
 	x = 0.0f;
 	y = 0.0f;
 	z = 0.0f;
@@ -14,13 +15,16 @@ Rectangle::Rectangle(void) : buffer(false, true, false, 4, 6)
 		buffer.vertexBuffer.push_back(0); 
 	}
 	
-	buffer.indexBuffer.push_back(0);
+	buffer.indexBuffer.push_back(2);
 	buffer.indexBuffer.push_back(3);
+	buffer.indexBuffer.push_back(0);
+
+	buffer.indexBuffer.push_back(0);
+	buffer.indexBuffer.push_back(1);
 	buffer.indexBuffer.push_back(2);
 
-	buffer.indexBuffer.push_back(2);
-	buffer.indexBuffer.push_back(1);
-	buffer.indexBuffer.push_back(0);
+	buffer.vbSize = buffer.vertexBuffer.size();
+	buffer.ibSize = buffer.indexBuffer.size();
 }
 
 

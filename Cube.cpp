@@ -23,8 +23,9 @@ static const uint32_t __vertexIndex[INDEXCOUNT] =
 	20,23,22, 22,21,20  // right
 };
 
-Cube::Cube(void) : buffer(false, true, false, VERTEXCOUNT, INDEXCOUNT)
+Cube::Cube(void)
 {
+	buffer.Create(false, true, false, VERTEXCOUNT, INDEXCOUNT);
 	x = 0.0f;
 	y = 0.0f;
 	z = 0.0f;
@@ -38,7 +39,8 @@ Cube::Cube(void) : buffer(false, true, false, VERTEXCOUNT, INDEXCOUNT)
 	{
 		buffer.indexBuffer.push_back(__vertexIndex[i]);
 	}
-
+	buffer.vbSize = buffer.vertexBuffer.size();
+	buffer.ibSize = buffer.indexBuffer.size();
 }
 
 

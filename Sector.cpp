@@ -1,8 +1,9 @@
 #include "Sector.h"
 
 
-Sector::Sector(void) : buffer(false, true, false)
+Sector::Sector(void)
 {
+	buffer.Create(false, true, false);
 }
 
 

@@ -4,8 +4,9 @@
 #include <utf8.h>
 
 
-GraphicText::GraphicText(void) : buffer(false, true, false)
+GraphicText::GraphicText(void)
 {
+	buffer.Create(false, true, false);
 	x = 0;
 	y = 0;
 	z = 0;
@@ -20,9 +21,10 @@ GraphicText::~GraphicText(void)
 
 void GraphicText::SetText( std::string text )
 {
-	utf32text.clear();
+	utf32text.resize(0);
 	utf8::utf8to32(text.begin(), text.end(), std::back_inserter(utf32text));
-	buffer.Clear();
+
+	buffer.Reset();
 	buffer.DeleteVideoBuffer();
 	CreateBuffer();
 }
@@ -34,6 +36,9 @@ void GraphicText::CreateBuffer()
 	float glyphX = x;
 	float glyphY = y;
 	float stringHeight = 22.0f;
+
+	unsigned int c1 = buffer.vertexBuffer.capacity();
+	unsigned int c2 = buffer.indexBuffer.capacity();
 
 	for(unsigned int i = 0; i < utf32text.size(); i++)
 	{

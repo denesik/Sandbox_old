@@ -11,10 +11,17 @@ BufferArray::BufferArray()
 	VAO = 0;
 	videoVertexBuffer = 0;
 	videoindexBuffer = 0;
+
+	vbSize = 0;
+	ibSize = 0;
 }
 
-BufferArray::BufferArray( bool color, bool textcoord, bool normale, unsigned int sizeVertex, unsigned int sizeIndex)
+
+void BufferArray::Create( bool color, bool textcoord, bool normale, unsigned int sizeVertex /*= 0*/, unsigned int sizeIndex /*= 0*/ )
 {
+	vbSize = 0;
+	ibSize = 0;
+
 	activeBuffers.set(BUFFER_TYPE_VERTEX);
 	stride = 0;
 	VAO = 0;
@@ -49,6 +56,7 @@ BufferArray::BufferArray( bool color, bool textcoord, bool normale, unsigned int
 	}
 }
 
+
 BufferArray::~BufferArray()
 {
 }
@@ -62,7 +70,7 @@ void BufferArray::CreateVideoBuffer()
 	// Создаем буфер вершин
 	glGenBuffers(1, &videoVertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, videoVertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBuffer[0]) * vertexBuffer.size(), &vertexBuffer[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBuffer[0]) * vbSize, &vertexBuffer[0], GL_STATIC_DRAW);
 
 	unsigned int count = 0;
 	if( activeBuffers.test(BUFFER_TYPE_VERTEX) )
@@ -127,7 +135,7 @@ void BufferArray::CreateVideoBuffer()
 
 	glGenBuffers(1, &videoindexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, videoindexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexBuffer[0]) * indexBuffer.size(), &indexBuffer[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexBuffer[0]) * ibSize, &indexBuffer[0], GL_STATIC_DRAW);
 
 	OPENGL_CHECK_ERRORS();
 }
@@ -135,7 +143,7 @@ void BufferArray::CreateVideoBuffer()
 void BufferArray::Draw()
 {
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, sizeof(indexBuffer[0]) * indexBuffer.size(), GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_TRIANGLES, ibSize, GL_UNSIGNED_INT, NULL);
 }
 
 void BufferArray::DeleteVideoBuffer()
@@ -144,6 +152,8 @@ void BufferArray::DeleteVideoBuffer()
 	{
 		return;
 	}
+
+	glBindVertexArray(VAO);
 
 	if( activeBuffers.test(BUFFER_TYPE_VERTEX) )
 	{
@@ -184,19 +194,54 @@ void BufferArray::PushBack( BufferArray &ba )
 		return;
 	}
 
-	unsigned int vertexCount = vertexBuffer.size() / stride;
-
-	vertexBuffer.insert(vertexBuffer.end(), ba.vertexBuffer.begin(), ba.vertexBuffer.end());
-
-	for(unsigned int i = 0; i < ba.indexBuffer.size(); i++)
+	if(ba.vertexBuffer.size() < ba.vbSize ||
+	   ba.indexBuffer.size() < ba.ibSize)
 	{
-		indexBuffer.push_back( ba.indexBuffer[i] + vertexCount);
+		LOG_ERROR("Попытка вставить некорректный буфер.");
+		return;
 	}
 
+	unsigned int vertexCount = vbSize / stride;
+
+	for(unsigned int i = 0; i < ba.vbSize; i++)
+	{
+		if(vertexBuffer.size() > vbSize + i)
+		{
+			vertexBuffer[vbSize + i] = ba.vertexBuffer[i];
+		}
+		else
+		{
+			vertexBuffer.push_back(ba.vertexBuffer[i]);
+		}
+	}
+	vbSize += ba.vbSize;
+
+	for(unsigned int i = 0; i < ba.ibSize; i++)
+	{
+		if(indexBuffer.size() > ibSize + i)
+		{
+			indexBuffer[ibSize + i] = ba.indexBuffer[i] + vertexCount;
+		}
+		else
+		{
+			indexBuffer.push_back(ba.indexBuffer[i] + vertexCount);
+		}
+	}
+
+	ibSize += ba.ibSize;
+	
 }
 
 void BufferArray::Clear()
 {
 	vertexBuffer.clear();
 	indexBuffer.clear();
+	vbSize = 0;
+	ibSize = 0;
+}
+
+void BufferArray::Reset()
+{
+	vbSize = 0;
+	ibSize = 0;
 }

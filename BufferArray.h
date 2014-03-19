@@ -31,10 +31,17 @@ public:
 	VertexBuffer	vertexBuffer;
 	IndexBuffer		indexBuffer;
 
+	// Количество элементов в буфере
+	unsigned int vbSize;
+	unsigned int ibSize;
+
 public:
 	BufferArray();
-	BufferArray(bool color, bool textcoord, bool normale, unsigned int sizeVertex = 0, unsigned int sizeIndex = 0);
 	~BufferArray();
+
+	void Create(bool color, bool textcoord, bool normale, unsigned int sizeVertex = 0, unsigned int sizeIndex = 0);
+
+	void Reset();
 
 	void CreateVideoBuffer();
 	void DeleteVideoBuffer();

@@ -122,7 +122,7 @@ void WindowFocusCallbackGLFW3(GLFWwindow *window, int focused)
 
 void errorCallbackGLFW3(int error, const char* description)
 {
-	
+	LOG_ERROR("GLFW. %s", description);
 }
 
 Game::Game(void)
@@ -260,8 +260,7 @@ int Game::Run()
 
 	if(!Initialize()) 
 	{
-		LOG_ERROR("Инициализация завершилась с ошибками.");
-		//LOG(LOG_ERROR, "Инициализация завершилась с ошибками.");
+		LOG_INFO("Инициализация завершилась с ошибками.");
 		return -1;
 	}
 	LOG_INFO("Инициализация прошла успешно.");
@@ -279,7 +278,7 @@ int Game::Run()
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 MVP = camera.CalculateMatrix() * model;
 
-
+	LOG_INFO("1");
 
  	Rectangle geometryRectangle;
  	geometryRectangle.SetPos(vec3(0, 50, -1));
@@ -291,13 +290,15 @@ int Game::Run()
  	tex.v2 = 1.0f;
  	geometryRectangle.SetTexture(tex);
 
-	BufferArray ba(false, true, false);
+
+	BufferArray ba;
+	ba.Create(false, true, false);
 	ba.PushBack(geometryRectangle.GetBufferArray());
 	ba.CreateVideoBuffer();
 
 
 	Sector map;
-	map.CreateGeometry();
+//	map.CreateGeometry();
 	
 
 	glEnable(GL_BLEND);
@@ -310,6 +311,7 @@ int Game::Run()
 	GLint textureLocation = -1;
 	textureLocation = glGetUniformLocation(programID, "colorTexture");
 
+
 	float const speed = 0.05f;
 
 	FPSCounter fps;
@@ -317,11 +319,17 @@ int Game::Run()
 	GraphicText fpsText;
 	fpsText.SetPos(vec3(10, 10, -1));
 
+	GraphicText testText;
+	testText.SetPos(vec3(500, 500, -1));
+	testText.SetText("tessst1");
+
+
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
+		
 		fps.Update();
 		auto a = ToString(fps.GetCount()) + "=-+";
-		fpsText.SetText(a);
+//		fpsText.SetText(a);
 		glfwSetWindowTitle(window, a.c_str());
 
 		// Clear the screen
@@ -378,7 +386,7 @@ int Game::Run()
 		glUniform1i(textureLocation, 1);
 
 		glBindTexture(GL_TEXTURE_2D, 1);
-		map.Draw();
+//		map.Draw();
 
 		MVP = render->GetOrthoProjection();
 
@@ -388,7 +396,13 @@ int Game::Run()
 		glUniform1i(textureLocation, 1);
 
 		ba.Draw();
-		fpsText.Draw();
+//		fpsText.Draw();
+
+		for(unsigned int i = 0; i < 100; i++)
+		{
+			testText.SetText("tessst1");
+			testText.Draw();
+		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

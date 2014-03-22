@@ -2,8 +2,8 @@
 
 
 Sector::Sector(void)
+	: buffer(false, true, false)
 {
-	buffer.Create(false, true, false);
 }
 
 

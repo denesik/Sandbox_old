@@ -24,23 +24,19 @@ static const uint32_t __vertexIndex[INDEXCOUNT] =
 };
 
 Cube::Cube(void)
+	: buffer(false, true, false)
 {
-	buffer.Create(false, true, false, VERTEXCOUNT, INDEXCOUNT);
+	buffer.Reserve(VERTEXCOUNT, INDEXCOUNT);
 	x = 0.0f;
 	y = 0.0f;
 	z = 0.0f;
 
-	for(unsigned int i = 0; i < VERTEXCOUNT * 3 + VERTEXCOUNT * 2; i++)
-	{
-		buffer.vertexBuffer.push_back(0); 
-	}
-
 	for(unsigned int i = 0; i < INDEXCOUNT; i++)
 	{
-		buffer.indexBuffer.push_back(__vertexIndex[i]);
+
+		buffer.indexBuffer[i] = __vertexIndex[i];
 	}
-	buffer.vbSize = buffer.vertexBuffer.size();
-	buffer.ibSize = buffer.indexBuffer.size();
+	buffer.ibSize = INDEXCOUNT;
 }
 
 
@@ -89,6 +85,8 @@ BufferArray & Cube::GetBufferArray()
 
 		buffer.vertexBuffer[i * 20 + j++] = texture[i].u2;
 		buffer.vertexBuffer[i * 20 + j++] = texture[i].v1;
+
+		buffer.ibSize += 20;
 	}
 
 	return buffer;

@@ -5,8 +5,8 @@
 
 
 GraphicText::GraphicText(void)
+	: buffer(false, true, false)
 {
-	buffer.Create(false, true, false);
 	x = 0;
 	y = 0;
 	z = 0;
@@ -25,20 +25,14 @@ void GraphicText::SetText( std::string text )
 	utf8::utf8to32(text.begin(), text.end(), std::back_inserter(utf32text));
 
 	buffer.Reset();
-	buffer.DeleteVideoBuffer();
 	CreateBuffer();
 }
 
 void GraphicText::CreateBuffer()
 {
-	Rectangle geometryRectangle;
-	FontTexture fontTexture;
 	float glyphX = x;
 	float glyphY = y;
 	float stringHeight = 22.0f;
-
-	unsigned int c1 = buffer.vertexBuffer.capacity();
-	unsigned int c2 = buffer.indexBuffer.capacity();
 
 	for(unsigned int i = 0; i < utf32text.size(); i++)
 	{

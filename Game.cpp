@@ -291,13 +291,12 @@ int Game::Run()
  	geometryRectangle.SetTexture(tex);
 
 
-	BufferArray ba;
-	ba.Create(false, true, false);
+	BufferArray ba(false, true, false);
 	ba.PushBack(geometryRectangle.GetBufferArray());
 	ba.CreateVideoBuffer();
 
 
-	Sector map;
+//	Sector map;
 //	map.CreateGeometry();
 	
 
@@ -329,7 +328,7 @@ int Game::Run()
 		
 		fps.Update();
 		auto a = ToString(fps.GetCount()) + "=-+";
-//		fpsText.SetText(a);
+		fpsText.SetText(a);
 		glfwSetWindowTitle(window, a.c_str());
 
 		// Clear the screen
@@ -396,14 +395,16 @@ int Game::Run()
 		glUniform1i(textureLocation, 1);
 
 		ba.Draw();
-//		fpsText.Draw();
+		fpsText.Draw();
+		
+
 
 		for(unsigned int i = 0; i < 100; i++)
 		{
 			testText.SetText("tessst1");
 			testText.Draw();
 		}
-
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 

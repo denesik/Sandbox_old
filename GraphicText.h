@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include "BufferArray.h"
+#include "Rectangle.h"
+#include "Font.h"
 
 class GraphicText
 {
@@ -16,6 +18,9 @@ private:
 	float constraintHeight;
 
 	float x, y, z;
+
+	Rectangle geometryRectangle;
+	FontTexture fontTexture;
 
 public:
 	GraphicText(void);

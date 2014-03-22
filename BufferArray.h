@@ -5,9 +5,6 @@
 #include "GameMath.h"
 #include <bitset>
 
-typedef std::vector<float>		VertexBuffer;
-typedef std::vector<uint32_t>	IndexBuffer;
-
 enum BufferType
 {
 	BUFFER_TYPE_VERTEX,
@@ -19,38 +16,54 @@ enum BufferType
 class BufferArray
 {
 private:
+	// Коэффициент резервирования памяти = 1.5
+	const float kReserve;
+
 	std::bitset<4>	activeBuffers;
 
 	unsigned int stride;
+
+	bool vaoCreated;
 
 	unsigned int	VAO;
 	unsigned int	videoVertexBuffer;
 	unsigned int	videoindexBuffer;
 
+	// Количество допустимых элементов в буфере
+	unsigned int vbCapacity;
+	unsigned int ibCapacity;
+
 public:
-	VertexBuffer	vertexBuffer;
-	IndexBuffer		indexBuffer;
+	float*			vertexBuffer;
+	unsigned int*	indexBuffer;
 
 	// Количество элементов в буфере
 	unsigned int vbSize;
 	unsigned int ibSize;
 
 public:
-	BufferArray();
+	// Создаем буфер
+	BufferArray(bool color, bool textcoord, bool normale);
 	~BufferArray();
 
-	void Create(bool color, bool textcoord, bool normale, unsigned int sizeVertex = 0, unsigned int sizeIndex = 0);
+	// Зарезервировать память. Количество вершин, количество индексов.
+	void Reserve(unsigned int sizeVertex, unsigned int sizeIndex);
 
+	// Обнуляем буфер
 	void Reset();
 
+	// Создаем буфер в видеопамяти
 	void CreateVideoBuffer();
-	void DeleteVideoBuffer();
+	void RemoveVideoBuffer();
 
-	void PushBack( BufferArray &bufferArray);
-
-	void Clear();
+	// Добавляем буфер в конец
+	void PushBack(BufferArray &bufferArray);
 
 	void Draw();
+private:
+
+	void ReserveVertex(unsigned int count);
+	void ReserveIndex(unsigned int count);
 };
 
 

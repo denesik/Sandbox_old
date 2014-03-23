@@ -12,7 +12,7 @@ class GraphicText
 private:
 	std::vector<uint32_t> utf32text;
 
-	BufferArray buffer;
+//	BufferArrayRoot buffer;
 
 	float constraintWidth;
 	float constraintHeight;

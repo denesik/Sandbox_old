@@ -291,14 +291,16 @@ int Game::Run()
  	geometryRectangle.SetTexture(tex);
 
 
-	BufferArray ba(false, true, false);
-	ba.PushBack(geometryRectangle.GetBufferArray());
-	ba.CreateVideoBuffer();
+// 	BufferArrayRoot ba(false, true, false);
+// 	ba.PushBack(geometryRectangle.GetBufferArray());
+// 	ba.CreateVideoBuffer();
 
 
 //	Sector map;
 //	map.CreateGeometry();
 	
+	BufferArray<VTC> buffer;
+	buffer.CreateVideoBuffer();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -314,13 +316,13 @@ int Game::Run()
 	float const speed = 0.05f;
 
 	FPSCounter fps;
-
-	GraphicText fpsText;
-	fpsText.SetPos(vec3(10, 10, -1));
-
-	GraphicText testText;
-	testText.SetPos(vec3(500, 500, -1));
-	testText.SetText("tessst1");
+// 
+// 	GraphicText fpsText;
+// 	fpsText.SetPos(vec3(10, 10, -1));
+// 
+// 	GraphicText testText;
+// 	testText.SetPos(vec3(500, 500, -1));
+// 	testText.SetText("tessst1");
 
 
 	while(Running && !glfwWindowShouldClose(window)) 
@@ -328,7 +330,7 @@ int Game::Run()
 		
 		fps.Update();
 		auto a = ToString(fps.GetCount()) + "=-+";
-		fpsText.SetText(a);
+	//	fpsText.SetText(a);
 		glfwSetWindowTitle(window, a.c_str());
 
 		// Clear the screen
@@ -394,17 +396,23 @@ int Game::Run()
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
 
-		ba.Draw();
+	/*	ba.Draw();
 		fpsText.Draw();
 		
-
-
-		for(unsigned int i = 0; i < 100; i++)
+ 		for(unsigned int i = 0; i < 100; i++)
+ 		{
+ 			ba.Reset();
+ 			ba.PushBack(geometryRectangle.GetBufferArray());
+ 			ba.CreateVideoBuffer();
+			ba.Draw();
+ 		}
+*/
+/*		for(unsigned int i = 0; i < 100; i++)
 		{
-			testText.SetText("tessst1");
+			testText.SetText("ttttt");
 			testText.Draw();
 		}
-		
+	*/	
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 

@@ -5,13 +5,13 @@
 
 
 GraphicText::GraphicText(void)
-	: buffer(false, true, false)
 {
 	x = 0;
 	y = 0;
 	z = 0;
 	constraintWidth = 0;
 	constraintHeight = 0;
+
 }
 
 
@@ -24,7 +24,7 @@ void GraphicText::SetText( std::string text )
 	utf32text.resize(0);
 	utf8::utf8to32(text.begin(), text.end(), std::back_inserter(utf32text));
 
-	buffer.Reset();
+//	buffer.Reset();
 	CreateBuffer();
 }
 
@@ -33,6 +33,8 @@ void GraphicText::CreateBuffer()
 	float glyphX = x;
 	float glyphY = y;
 	float stringHeight = 22.0f;
+
+	glyphX += fontTexture.width;
 
 	for(unsigned int i = 0; i < utf32text.size(); i++)
 	{
@@ -45,10 +47,10 @@ void GraphicText::CreateBuffer()
 
 		glyphX += fontTexture.width;
 
-		buffer.PushBack(geometryRectangle.GetBufferArray());
+//		buffer.PushBack(geometryRectangle.GetBufferArray());
 	}
-
-	buffer.CreateVideoBuffer();
+	
+//	buffer.CreateVideoBuffer();
 
 }
 
@@ -62,5 +64,5 @@ void GraphicText::SetPos( const vec3 &pos )
 void GraphicText::Draw()
 {
 	glBindTexture(GL_TEXTURE_2D, Font::GetInstance()->GetGlyphTexture(97).texture.textureId);
-	buffer.Draw();
+//	buffer.Draw();
 }

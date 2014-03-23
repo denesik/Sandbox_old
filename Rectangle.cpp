@@ -2,7 +2,6 @@
 
 
 Rectangle::Rectangle(void)
-	: buffer(false, true, false)
 {
 	x = 0.0f;
 	y = 0.0f;
@@ -10,7 +9,7 @@ Rectangle::Rectangle(void)
 	width = 1.0f;
 	height = 1.0f;
 
-	buffer.Reserve(4, 6);
+/*	buffer.Reserve(4, 6);
 
 
 	
@@ -22,7 +21,7 @@ Rectangle::Rectangle(void)
 	buffer.indexBuffer[4] = 1;
 	buffer.indexBuffer[5] = 2;
 
-	buffer.ibSize = 6;
+	buffer.ibSize = 6;*/
 }
 
 
@@ -53,8 +52,8 @@ Texture Rectangle::GetTexture()
 {
 	return texture;
 }
-
-BufferArray &Rectangle::GetBufferArray()
+/*
+BufferArrayRoot &Rectangle::GetBufferArray()
 {
 	// в ортогональной проекции текстура будет перевернута по оси 0X
 	// текстурные координаты v1, v2 инвертированы
@@ -95,3 +94,4 @@ BufferArray &Rectangle::GetBufferArray()
 
 	return buffer;
 }
+*/

@@ -2,7 +2,6 @@
 
 
 Sector::Sector(void)
-	: buffer(false, true, false)
 {
 }
 
@@ -40,7 +39,7 @@ void Sector::CreateGeometry()
 				if( map[x][y][z + 1].full ) map[x][y][z].visible ++;
 			}
 
-	for(int x = 0; x < 64; x++)
+/*	for(int x = 0; x < 64; x++)
 		for(int z = 0; z < 64; z++)
 			for(int y = 0; y < 25; y++)
 			{
@@ -50,10 +49,10 @@ void Sector::CreateGeometry()
 					buffer.PushBack(geometryCube.GetBufferArray());
 				}
 			}
-	buffer.CreateVideoBuffer();
+	buffer.CreateVideoBuffer();*/
 }
 
 void Sector::Draw()
 {
-	buffer.Draw();
+//	buffer.Draw();
 }

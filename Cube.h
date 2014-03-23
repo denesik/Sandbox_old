@@ -9,7 +9,7 @@
 class Cube
 {
 private:
-	BufferArray buffer;
+//	BufferArrayRoot buffer;
 
 	float x, y, z;
 	Texture texture[6];
@@ -20,7 +20,7 @@ public:
 
 	void SetPos(const vec3 &pos);
 
-	BufferArray &GetBufferArray();
+//	BufferArrayRoot &GetBufferArray();
 
 	void SetTextureAllSide(const Texture &texture);
 

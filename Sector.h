@@ -12,7 +12,7 @@ struct B
 class Sector
 {
 private:
-	BufferArray buffer;
+//	BufferArrayRoot buffer;
 	B map[64][25][64];
 	
 	Cube geometryCube;

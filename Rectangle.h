@@ -14,7 +14,7 @@ private:
 	float width;
 	float height;
 
-	BufferArray buffer;
+//	BufferArrayRoot buffer;
 
 public:
 	Rectangle(void);
@@ -26,7 +26,7 @@ public:
 	void SetTexture(const Texture &texture);
 	Texture GetTexture();
 
-	BufferArray &GetBufferArray();
+//	BufferArrayRoot &GetBufferArray();
 
 };
 

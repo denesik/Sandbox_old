@@ -24,9 +24,8 @@ static const uint32_t __vertexIndex[INDEXCOUNT] =
 };
 
 Cube::Cube(void)
-	: buffer(false, true, false)
 {
-	buffer.Reserve(VERTEXCOUNT, INDEXCOUNT);
+/*	buffer.Reserve(VERTEXCOUNT, INDEXCOUNT);
 	x = 0.0f;
 	y = 0.0f;
 	z = 0.0f;
@@ -36,7 +35,7 @@ Cube::Cube(void)
 
 		buffer.indexBuffer[i] = __vertexIndex[i];
 	}
-	buffer.ibSize = INDEXCOUNT;
+	buffer.ibSize = INDEXCOUNT;*/
 }
 
 
@@ -52,8 +51,8 @@ void Cube::SetTextureAllSide(const Texture &_texture)
 		texture[i] = _texture;
 	}
 }
-
-BufferArray & Cube::GetBufferArray()
+/*
+BufferArrayRoot & Cube::GetBufferArray()
 {
 	for(unsigned int i = 0; i < 6; i++)
 	{
@@ -91,7 +90,7 @@ BufferArray & Cube::GetBufferArray()
 
 	return buffer;
 }
-
+*/
 void Cube::SetPos( const vec3 &pos )
 {
 	x = pos[0];

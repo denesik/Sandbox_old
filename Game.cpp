@@ -23,6 +23,7 @@
 #include <sstream>
 #include "GraphicText.h"
 
+
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
 
@@ -310,18 +311,15 @@ int Game::Run()
 
 	t = sizeof(BufferArray<VTC>);
 
-	BufferArray<VCT> buffer;
-	buffer.CreateVideoBuffer();
+	BufferArray<VT> *buffer = new BufferArray<VT>;
 
-/*	Vertex v;
-	Color c;
-	TextCoord tc;
-	*/
+	int q = 0;
+	geometryRectangle.InsertBackVertex(*buffer);
+	geometryRectangle.InsertBackIndex(*buffer, 0);
 
-// 	buffer.Update(1, v);
-// 	buffer.Update(1, c);
-// 	buffer.Update(1, tc);
-//	buffer.Update(1, t);
+	buffer->CreateVertexBuffer();
+	buffer->CreateIndexBuffer();
+
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -417,6 +415,7 @@ int Game::Run()
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
 
+		buffer->Draw();
 	/*	ba.Draw();
 		fpsText.Draw();
 		
@@ -437,7 +436,11 @@ int Game::Run()
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
+		OPENGL_CHECK_ERRORS();
+
 	}
+
+	delete buffer;
 
 	glDeleteProgram(programID);
 

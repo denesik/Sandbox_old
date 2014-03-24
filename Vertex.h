@@ -5,7 +5,7 @@
 
 enum VertexType
 {
-	VERTEX_TYPE_VERTEX,
+	VERTEX_TYPE_VERTEX = 1,
 	VERTEX_TYPE_COLOR,
 	VERTEX_TYPE_TEXTCOORD,
 	VERTEX_TYPE_NORMALE,
@@ -47,7 +47,7 @@ struct Color
 
 typedef TYPELIST_3(Vertex, TextCoord, Color) VTC;
 typedef TYPELIST_3(Vertex, Color, TextCoord) VCT;
-typedef TYPELIST_2(Vertex, Color) VT;
+typedef TYPELIST_2(Vertex, TextCoord) VT;
 
 
 

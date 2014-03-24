@@ -44,15 +44,16 @@ struct VertexCount<TypeList<Head, Tail>, T>
 };
 
 
-
-
 class BufferArrayRoot
 {
 protected:
 	// Коэффициент резервирования памяти = 1.5
 	const float kReserve;
 
-	bool vaoCreated;
+	int stride;
+
+	bool vbCreated;
+	bool ibCreated;
 
 	unsigned int	VAO;
 	unsigned int	videoVertexBuffer;
@@ -62,7 +63,6 @@ protected:
 	unsigned int vbCapacity;
 	unsigned int ibCapacity;
 
-public:
 	float*			vertexBuffer;
 	unsigned int*	indexBuffer;
 
@@ -75,43 +75,112 @@ public:
 	BufferArrayRoot();
 	~BufferArrayRoot();
 
-	// Зарезервировать память. Количество вершин, количество индексов.
-	void Reserve(unsigned int sizeVertex, unsigned int sizeIndex);
+	// Зарезервировать память для count вершин
+	void ReserveVertex(unsigned int count);
+	// Зарезервировать память для count индексов
+	void ReserveIndex(unsigned int count);
 
 	// Обнуляем буфер
 	void Reset();
 
-	// Создаем буфер в видеопамяти
-//	void CreateVideoBuffer();
-	void RemoveVideoBuffer();
+	// Обновляем массив вершин [begin, end] в видео буфере
+	void UpdateVertexBuffer(unsigned int begin, unsigned int count);
+	// Обновляем массив индексов [begin, end] в видео буфере
+	void UpdateIndexBuffer(unsigned int begin, unsigned int count);
 
-	// Добавляем буфер в конец
-//	void PushBack(BufferArrayRoot &bufferArray);
+	// Получаем указатель на данные вершины с номером index
+	float *GetVertexData(unsigned int index);
+	// Получаем указатель на данные индекса с номером index
+	unsigned int *GetIndexData(unsigned int index);
+
+	// Увеличиваем размер буфера
+	void InsertBackVertex(unsigned int count);
+	void InsertBackIndex(unsigned int count);
+
+	unsigned int GetSizeIndex()
+	{
+		return ibSize;
+	};
+	unsigned int GetSizeVertex()
+	{
+		return vbSize;
+	};
 
 	void Draw();
 protected:
-
-	void CreateVideoBuffer_();
-
 	void CreateVertexAttribArray(){};
-	void ReserveVertex(unsigned int count);
-	void ReserveIndex(unsigned int count);
 
+	// Создаем буфер вершин в видео памяти
+	void CreateVertexBuffer_();
+	// Создаем буфер индексов в видео памяти
+	void CreateIndexBuffer_();
 };
 
 template <class T, class Base, class RootTList>
 class BufferArrayGenerated : public Base
 {
 public:
-	void CreateVideoBuffer()
+	BufferArrayGenerated()
 	{
-		CreateVideoBuffer_();
+		// Создаем буфер только 1 раз
+		if(CompareType<TypeAt<RootTList, 0>::Result, T>::value)
+		{
+			stride = VertexStride<RootTList>::value;
+			// Создаем vao
+			glGenVertexArrays(1, &VAO);
+			glBindVertexArray(VAO);
+			// Устанавливаем атрибуты
+
+			CreateVertexBuffer();
+			CreateIndexBuffer();
+			CreateVertexAttribArray();
+			OPENGL_CHECK_ERRORS();
+		}
+	};
+
+	~BufferArrayGenerated()
+	{
+		// Удаляем буфер только 1 раз
+		if(CompareType<TypeAt<RootTList, 0>::Result, T>::value)
+		{
+			if(VAO == 0)
+			{
+				return;
+			}
+
+			glBindVertexArray(VAO);
+
+			if(videoVertexBuffer)
+			{
+				glDeleteBuffers(1, &videoVertexBuffer);
+			}
+			if(videoindexBuffer)
+			{
+				glDeleteBuffers(1, &videoindexBuffer);
+			}
+			glDeleteVertexArrays(1, &VAO);
+
+			OPENGL_CHECK_ERRORS();
+		}
+	};
+
+	// Создаем буфер вершин в видео памяти
+	void CreateVertexBuffer()
+	{
+		CreateVertexBuffer_();
 		CreateVertexAttribArray();
+	};
+	// Создаем буфер индексов в видео памяти
+	void CreateIndexBuffer()
+	{
+		CreateIndexBuffer_();
 	};
 
 protected:
 	void CreateVertexAttribArray()
 	{
+
+		static_assert(CheckDublicates<RootTList>::value == 0, "Creating buffer. Found duplicate types.");
 
 		glEnableVertexAttribArray(T::Type);
 		glVertexAttribPointer
@@ -124,13 +193,10 @@ protected:
 			(void*)(sizeof(float) * VertexCount<RootTList, T>::value)	// array buffer offset
 			);
 
-		LOG_INFO("TYPE: %i; VS: %i; VC: %i;", T::Type, VertexStride<RootTList>::value, VertexCount<RootTList, T>::value);
+		OPENGL_CHECK_ERRORS();
 
 		Base::CreateVertexAttribArray();
 	}
-public:
-	
-
 };
 
 

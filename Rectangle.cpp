@@ -8,20 +8,6 @@ Rectangle::Rectangle(void)
 	z = 0.0f;
 	width = 1.0f;
 	height = 1.0f;
-
-/*	buffer.Reserve(4, 6);
-
-
-	
-	buffer.indexBuffer[0] = 2;
-	buffer.indexBuffer[1] = 3;
-	buffer.indexBuffer[2] = 0;
-
-	buffer.indexBuffer[3] = 0;
-	buffer.indexBuffer[4] = 1;
-	buffer.indexBuffer[5] = 2;
-
-	buffer.ibSize = 6;*/
 }
 
 

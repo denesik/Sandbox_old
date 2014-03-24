@@ -17,7 +17,8 @@ BufferArrayRoot::BufferArrayRoot()
 	vbSize = 0;
 	ibSize = 0;
 
-	vaoCreated = false;
+	vbCreated = false;
+	ibCreated = false;
 
 	VAO = 0;
 	videoVertexBuffer = 0;
@@ -26,23 +27,14 @@ BufferArrayRoot::BufferArrayRoot()
 
 BufferArrayRoot::~BufferArrayRoot()
 {
+	delete[] vertexBuffer;
+	delete[] indexBuffer;
 }
 
-void BufferArrayRoot::Reserve( unsigned int sizeVertex, unsigned int sizeIndex )
-{
-	if(sizeVertex == 0 && sizeIndex == 0)
-		return;
-
-	ReserveVertex(sizeVertex);
-	ReserveIndex(sizeIndex);
-
-	// Видео буфер тоже нужно будет пересоздать
-	// vaoCreated = false;
-}
 
 void BufferArrayRoot::ReserveVertex( unsigned int count )
 {
-	vbCapacity += count /** stride*/;
+	vbCapacity += count * stride;
 	float*	vb;
 
 	vb = new float[vbCapacity];
@@ -62,7 +54,7 @@ void BufferArrayRoot::ReserveVertex( unsigned int count )
 	vertexBuffer = vb;
 
 	// Видео буфер тоже нужно будет пересоздать
-	vaoCreated = false;
+	vbCreated = false;
 }
 
 void BufferArrayRoot::ReserveIndex( unsigned int count )
@@ -88,111 +80,10 @@ void BufferArrayRoot::ReserveIndex( unsigned int count )
 	indexBuffer = ib;
 
 	// Видео буфер тоже нужно будет пересоздать
-	vaoCreated = false;
+	ibCreated = false;
 }
 
 
-void BufferArrayRoot::CreateVideoBuffer_()
-{
-	if(!vaoCreated)
-	{
-		// Пытаемся удалить буфер, вдруг он не был удален
-		RemoveVideoBuffer();
-
-		// создаем VAO
-		glGenVertexArrays(1, &VAO);
-		glBindVertexArray(VAO);
-
-		// Создаем буфер вершин
-		glGenBuffers(1, &videoVertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, videoVertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBuffer[0]) * vbCapacity, &vertexBuffer[0], GL_STATIC_DRAW);
-
-		// Создаем буфер индексов
-		glGenBuffers(1, &videoindexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, videoindexBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexBuffer[0]) * ibCapacity, &indexBuffer[0], GL_STATIC_DRAW);
-
-		OPENGL_CHECK_ERRORS();
-		vaoCreated = true;
-	}
-	else
-	{
-		glBindVertexArray(VAO);
-
-		glBindBuffer(GL_ARRAY_BUFFER, videoVertexBuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertexBuffer[0]) * vbSize, &vertexBuffer[0]);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, videoindexBuffer);
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(indexBuffer[0]) * ibSize, &indexBuffer[0]);		
-
-		OPENGL_CHECK_ERRORS();
-	}
-
-}
-
-void BufferArrayRoot::RemoveVideoBuffer()
-{
-	if(VAO == 0)
-	{
-		return;
-	}
-
-	glBindVertexArray(VAO);
-
-	if(videoVertexBuffer)
-	{
-		glDeleteBuffers(1, &videoVertexBuffer);
-	}
-	if(videoindexBuffer)
-	{
-		glDeleteBuffers(1, &videoindexBuffer);
-	}
-	glDeleteVertexArrays(1, &VAO);
-
-	OPENGL_CHECK_ERRORS();
-}
-/*
-void BufferArrayRoot::PushBack( BufferArrayRoot &ba )
-{
-	if(ba.activeBuffers != activeBuffers)
-	{
-		LOG_ERROR("Типы буферов не совместимы.");
-		return;
-	}
-
-	unsigned int vertexCount = vbSize / stride;
-
-	// Если памяти меньше чем нужно
-	if(vbCapacity < vbSize + ba.vbSize)
-	{
-		if(vbCapacity == 0)
-			ReserveVertex(unsigned int(ba.vbSize / stride));
-		else
-			ReserveVertex(unsigned int((vbCapacity / stride) * kReserve));
-	}
-	if(ibCapacity < ibSize + ba.ibSize)
-	{
-		if(ibCapacity == 0)
-			ReserveIndex(unsigned int(ba.ibSize));
-		else
-			ReserveIndex(unsigned int(ibCapacity * kReserve));
-	}
-
-	for(unsigned int i = 0; i < ba.vbSize; i++)
-	{
-		vertexBuffer[i + vbSize] = ba.vertexBuffer[i];
-	}
-	vbSize += ba.vbSize;
-
-	for(unsigned int i = 0; i < ba.ibSize; i++)
-	{
-		indexBuffer[i + ibSize] = ba.indexBuffer[i] + vertexCount;
-	}
-
-	ibSize += ba.ibSize;	
-}
-*/
 void BufferArrayRoot::Draw()
 {
 	glBindVertexArray(VAO);
@@ -205,74 +96,138 @@ void BufferArrayRoot::Reset()
 	ibSize = 0;
 }
 
-
-
-
-
-
-
-/*
-
-// Настраиваем vao
-unsigned int count = 0;
-if( activeBuffers.test(BUFFER_TYPE_VERTEX) )
+void BufferArrayRoot::CreateVertexBuffer_()
 {
-glEnableVertexAttribArray(BUFFER_TYPE_VERTEX);
-glVertexAttribPointer
-(
-BUFFER_TYPE_VERTEX,				// attribute. No particular reason for 0, but must match the layout in the shader.
-3,								// size
-GL_FLOAT,						// type
-GL_FALSE,						// normalized?
-sizeof(float) * stride,			// stride
-0								// array buffer offset
-);
-count += 3;
+	glBindVertexArray(VAO);
+
+	if(!vbCreated)
+	{
+		if(videoVertexBuffer)
+		{
+			glDeleteBuffers(1, &videoVertexBuffer);
+		}
+
+		// Создаем буфер вершин
+		glGenBuffers(1, &videoVertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, videoVertexBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBuffer[0]) * vbCapacity, &vertexBuffer[0], GL_STATIC_DRAW);
+
+		OPENGL_CHECK_ERRORS();
+		vbCreated = true;
+	}
+	else
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, videoVertexBuffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertexBuffer[0]) * vbSize, &vertexBuffer[0]);
+
+		OPENGL_CHECK_ERRORS();
+	}	
 }
 
-if( activeBuffers.test(BUFFER_TYPE_COLOR) )
+void BufferArrayRoot::CreateIndexBuffer_()
 {
-glEnableVertexAttribArray(BUFFER_TYPE_COLOR);
-glVertexAttribPointer
-(
-BUFFER_TYPE_COLOR,				// attribute. No particular reason for 0, but must match the layout in the shader.
-4,								// size
-GL_FLOAT,						// type
-GL_FALSE,						// normalized?
-sizeof(float) * stride,			// stride
-(void*)(sizeof(float) * count)	// array buffer offset
-);
-count += 4;
+	glBindVertexArray(VAO);
+
+	if(!ibCreated)
+	{
+		if(videoindexBuffer)
+		{
+			glDeleteBuffers(1, &videoindexBuffer);
+		}
+
+		// Создаем буфер индексов
+		glGenBuffers(1, &videoindexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, videoindexBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexBuffer[0]) * ibCapacity, &indexBuffer[0], GL_STATIC_DRAW);
+
+		OPENGL_CHECK_ERRORS();
+		ibCreated = true;
+	}
+	else
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, videoindexBuffer);
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(indexBuffer[0]) * ibSize, &indexBuffer[0]);		
+
+		OPENGL_CHECK_ERRORS();
+	}	
 }
 
-if( activeBuffers.test(BUFFER_TYPE_TEXTCOORD) )
+void BufferArrayRoot::UpdateVertexBuffer( unsigned int begin, unsigned int count )
 {
-glEnableVertexAttribArray(BUFFER_TYPE_TEXTCOORD);
-glVertexAttribPointer
-(
-BUFFER_TYPE_TEXTCOORD,				// attribute. No particular reason for 0, but must match the layout in the shader.
-2,									// size
-GL_FLOAT,							// type
-GL_FALSE,							// normalized?
-sizeof(float) * stride,				// stride
-(void*)(sizeof(float) * count)		// array buffer offset
-);
-count += 2;
+	if(videoVertexBuffer)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, videoVertexBuffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertexBuffer[0]) * count * stride, &vertexBuffer[begin * stride]);
+
+		OPENGL_CHECK_ERRORS();
+	}
 }
 
-if( activeBuffers.test(BUFFER_TYPE_NORMALE) )
+void BufferArrayRoot::UpdateIndexBuffer( unsigned int begin, unsigned int count )
 {
-glEnableVertexAttribArray(BUFFER_TYPE_NORMALE);
-glVertexAttribPointer
-(
-BUFFER_TYPE_NORMALE,				// attribute. No particular reason for 0, but must match the layout in the shader.
-3,									// size
-GL_FLOAT,							// type
-GL_FALSE,							// normalized?
-sizeof(float) * stride,				// stride
-(void*)(sizeof(float) * count)		// array buffer offset
-);
-count += 3;
+	if(videoindexBuffer)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, videoindexBuffer);
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(indexBuffer[0]) * count, &indexBuffer[begin]);		
+
+		OPENGL_CHECK_ERRORS();
+	}
 }
 
- **/
+float * BufferArrayRoot::GetVertexData( unsigned int index )
+{
+
+	if( index < vbSize )
+		return &vertexBuffer[index * stride];
+
+	return nullptr;
+}
+
+unsigned int * BufferArrayRoot::GetIndexData( unsigned int index )
+{
+	if( index < ibSize )
+		return &indexBuffer[index];
+
+	return nullptr;
+}
+
+
+void BufferArrayRoot::InsertBackVertex( unsigned int count )
+{
+	if(vbSize + count * stride > vbCapacity)
+	{
+		if(vbCapacity == 0)
+		{
+			ReserveVertex(count);
+		}
+		else
+		{
+			// Сколько вертексов может поместиться
+			unsigned int tempCapacity = vbCapacity / stride;
+			// Резервируем под kReserve вертексов
+			ReserveVertex(unsigned int(tempCapacity * kReserve - tempCapacity));
+		}
+	}
+
+	vbSize += count;
+}
+
+void BufferArrayRoot::InsertBackIndex( unsigned int count )
+{
+
+	if(ibSize + count > ibCapacity)
+	{
+		if(ibCapacity == 0)
+		{
+			ReserveIndex(count);
+		}
+		else
+		{
+			ReserveIndex(unsigned int(ibCapacity * kReserve - ibCapacity));
+		}
+	}
+
+	ibSize += count;
+}
+
+

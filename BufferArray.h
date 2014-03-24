@@ -7,20 +7,42 @@
 #include "Vertex.h"
 #include "Logger.h"
 
-template <class TList> struct VertexSize;
 
-// Для NullType длина списка равна 0
-template <> struct VertexSize<NullType>
+// Узнаем количество элементов в вершине
+template <class TList> struct VertexStride;
+template <> struct VertexStride<NullType>
+{
+	enum { value = 0 };
+};
+template <class Head,class Tail>
+struct VertexStride< TypeList< Head, Tail> >
+{
+	enum { value = Head::Size + VertexStride<Tail>::value };
+};
+
+
+// Узнаем смещение в списке до типа T
+template <class TList, class T> struct VertexCount;
+
+template <class T>
+struct VertexCount<NullType, T>
+{
+	// Возникнет ошибка, если типа нет в списке типов
+	//enum { value = 0 };
+};
+
+template <class T, class Tail>
+struct VertexCount<TypeList<T, Tail>, T>
 {
 	enum { value = 0 };
 };
 
-// Рекурсивная формула
-template <class T,class U>
-struct VertexSize< TypeList< T, U> >
+template <class Head, class Tail, class T>
+struct VertexCount<TypeList<Head, Tail>, T>
 {
-	enum { value = T::Size + VertexSize<U>::value };
+	enum { value = Head::Size + VertexCount<Tail, T>::value };
 };
+
 
 
 
@@ -29,10 +51,6 @@ class BufferArrayRoot
 protected:
 	// Коэффициент резервирования памяти = 1.5
 	const float kReserve;
-
-	std::bitset<4>	activeBuffers;
-
-//	unsigned int stride;
 
 	bool vaoCreated;
 
@@ -81,7 +99,7 @@ protected:
 
 };
 
-template <class T, class Base, int VertexStride, int VertexCount>
+template <class T, class Base, class RootTList>
 class BufferArrayGenerated : public Base
 {
 public:
@@ -102,24 +120,25 @@ protected:
 			T::Size,							// size
 			GL_FLOAT,							// type
 			GL_FALSE,							// normalized?
-			sizeof(float) * VertexStride,		// stride
-			(void*)(sizeof(float) * VertexCount)// array buffer offset
+			sizeof(float) * VertexStride<RootTList>::value,				// stride
+			(void*)(sizeof(float) * VertexCount<RootTList, T>::value)	// array buffer offset
 			);
 
-		LOG_INFO("TYPE: %i; VS: %i; VC: %i;", T::Type, VertexStride, VertexCount);
+		LOG_INFO("TYPE: %i; VS: %i; VC: %i;", T::Type, VertexStride<RootTList>::value, VertexCount<RootTList, T>::value);
 
 		Base::CreateVertexAttribArray();
 	}
+public:
+	
 
 };
-
 
 
 template
 	<
 		class TList,
-		int VertexStride = VertexSize<TList>::value,
-			template <class AtomicType, class Base, int VS, int VC> class Unit = BufferArrayGenerated,
+		class RootTList = TList,
+			template <class AtomicType, class Base, class TL> class Unit = BufferArrayGenerated,
 		class Root = BufferArrayRoot
 	>
 class BufferArray;
@@ -128,24 +147,24 @@ template
 	<
 		class T1,
 		class T2,
-		int VertexStride,
-		template <class, class, int, int> class Unit,
+		class RootTList,
+		template <class, class, class> class Unit,
 		class Root
 	>
-class BufferArray<TypeList<T1, T2>, VertexStride, Unit, Root>
-	: public Unit< T1, BufferArray<T2, VertexStride, Unit, Root>, VertexStride, VertexStride - VertexSize<TypeList<T1, T2>>::value>
+class BufferArray<TypeList<T1, T2>, RootTList, Unit, Root>
+	: public Unit< T1, BufferArray<T2, RootTList, Unit, Root>, RootTList>
 {
 };
 
 template
 	<
 		class T,
-		int VertexStride,
-		template <class, class, int, int> class Unit,
+		class RootTList,
+		template <class, class, class> class Unit,
 		class Root
 	>
-class BufferArray<TYPELIST_1(T), VertexStride, Unit, Root>
-	: public Unit<T, Root, VertexStride, VertexStride - VertexSize<TYPELIST_1(T)>::value>
+class BufferArray<TYPELIST_1(T), RootTList, Unit, Root>
+	: public Unit<T, Root, RootTList>
 {
 };
 

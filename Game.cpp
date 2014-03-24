@@ -255,8 +255,15 @@ std::string ToString( const T& val )
 	return iss.str();
 }
 
+
 int Game::Run()
 {
+
+	TypeListTest();
+
+	VertexCount<VTC, Vertex>::value;
+	VertexCount<VTC, TextCoord>::value;
+	VertexCount<VTC, Color>::value;
 
 	if(!Initialize()) 
 	{
@@ -299,8 +306,22 @@ int Game::Run()
 //	Sector map;
 //	map.CreateGeometry();
 	
-	BufferArray<VTC> buffer;
+	int t = sizeof(BufferArray<VT>);
+
+	t = sizeof(BufferArray<VTC>);
+
+	BufferArray<VCT> buffer;
 	buffer.CreateVideoBuffer();
+
+/*	Vertex v;
+	Color c;
+	TextCoord tc;
+	*/
+
+// 	buffer.Update(1, v);
+// 	buffer.Update(1, c);
+// 	buffer.Update(1, tc);
+//	buffer.Update(1, t);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

@@ -1,6 +1,7 @@
 #ifndef Vertex_h__
 #define Vertex_h__
 
+#include "TypeList.h"
 
 enum VertexType
 {
@@ -43,23 +44,13 @@ struct Color
 	};
 };
 
-class NullType{};
-struct EmptyType{};
 
-template <class T, class U>
-struct TypeList
-{
-	typedef T head;
-	typedef U Tail;
-};
+typedef TYPELIST_3(Vertex, TextCoord, Color) VTC;
+typedef TYPELIST_3(Vertex, Color, TextCoord) VCT;
+typedef TYPELIST_2(Vertex, Color) VT;
 
-#define TYPELIST_1(T1) TypeList<T1, NullType>
-#define TYPELIST_2(T1, T2) TypeList<T1, TYPELIST_1(T2)>
-#define TYPELIST_3(T1, T2, T3) TypeList<T1, TYPELIST_2(T2, T3)>
-#define TYPELIST_4(T1, T2, T3, T4) TypeList<T1, TYPELIST_3(T2, T3, T4)>
-#define TYPELIST_5(T1, T2, T3, T4, T5) TypeList<T1, TYPELIST_4(T2, T3, T4, T5)>
 
-typedef TYPELIST_3(Vertex, Color, TextCoord) VTC;
+
 
 
 #endif // Vertex_h__

@@ -103,6 +103,7 @@
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="TypeList.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +124,7 @@
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="TypeList.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

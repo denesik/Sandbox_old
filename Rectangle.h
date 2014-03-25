@@ -59,15 +59,16 @@ public:
 		static_assert(Find<TList, TextCoord>::value != -1, "Unsupported format vertices.");
 
 		// Узнаем смещения
-		unsigned int const stride = VertexStride<TList>::value;
-		unsigned int const countVertex = VertexCount<TList, Vertex>::value;
-		unsigned int const countTextCoord = VertexCount<TList, TextCoord>::value;
+		//unsigned int const stride = VertexStride<TList>::value;
+		//unsigned int const countVertex = VertexCount<TList, Vertex>::value;
+		//unsigned int const countTextCoord = VertexCount<TList, TextCoord>::value;
 
 
 		// Мы собираемся добавить 4 вершины
 		buffer.InsertBackVertex(4);
 		float *data = buffer.GetVertexData(buffer.GetSizeVertex() - 4);
-
+		
+		/*
 		data[0 + countVertex] = x;
 		data[1 + countVertex] = y;
 		data[2 + countVertex] = z;
@@ -98,7 +99,36 @@ public:
 
 		data[0 + countTextCoord + stride * 3] = texture.u2;
 		data[1 + countTextCoord + stride * 3] = texture.v2;
+		*/
+		
+		VertexAccess<TList, Vertex>(data, 0).x = x;
+		VertexAccess<TList, Vertex>(data, 0).y = y;
+		VertexAccess<TList, Vertex>(data, 0).z = z;
 
+		VertexAccess<TList, TextCoord>(data, 0).u = texture.u1;
+		VertexAccess<TList, TextCoord>(data, 0).v = texture.v2;
+
+		VertexAccess<TList, Vertex>(data, 1).x = x;
+		VertexAccess<TList, Vertex>(data, 1).y = y + height;
+		VertexAccess<TList, Vertex>(data, 1).z = z;
+
+		VertexAccess<TList, TextCoord>(data, 1).u = texture.u1;
+		VertexAccess<TList, TextCoord>(data, 1).v = texture.v1;
+
+		VertexAccess<TList, Vertex>(data, 2).x = x + width;
+		VertexAccess<TList, Vertex>(data, 2).y = y + height;
+		VertexAccess<TList, Vertex>(data, 2).z = z;
+
+		VertexAccess<TList, TextCoord>(data, 2).u = texture.u2;
+		VertexAccess<TList, TextCoord>(data, 2).v = texture.v1;
+
+		VertexAccess<TList, Vertex>(data, 3).x = x + width;
+		VertexAccess<TList, Vertex>(data, 3).y = y;
+		VertexAccess<TList, Vertex>(data, 3).z = z;
+
+		VertexAccess<TList, TextCoord>(data, 3).u = texture.u2;
+		VertexAccess<TList, TextCoord>(data, 3).v = texture.v2;
+		
 		return 0;
 	};
 

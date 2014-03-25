@@ -8,42 +8,6 @@
 #include "Logger.h"
 
 
-// Узнаем количество элементов в вершине
-template <class TList> struct VertexStride;
-template <> struct VertexStride<NullType>
-{
-	enum { value = 0 };
-};
-template <class Head,class Tail>
-struct VertexStride< TypeList< Head, Tail> >
-{
-	enum { value = Head::Size + VertexStride<Tail>::value };
-};
-
-
-// Узнаем смещение в списке до типа T
-template <class TList, class T> struct VertexCount;
-
-template <class T>
-struct VertexCount<NullType, T>
-{
-	// Возникнет ошибка, если типа нет в списке типов
-	//enum { value = 0 };
-};
-
-template <class T, class Tail>
-struct VertexCount<TypeList<T, Tail>, T>
-{
-	enum { value = 0 };
-};
-
-template <class Head, class Tail, class T>
-struct VertexCount<TypeList<Head, Tail>, T>
-{
-	enum { value = Head::Size + VertexCount<Tail, T>::value };
-};
-
-
 class BufferArrayRoot
 {
 protected:

@@ -256,15 +256,22 @@ std::string ToString( const T& val )
 	return iss.str();
 }
 
+struct tdata
+{
+	union
+	{
+		struct 
+		{ 
+			float x, y, z; 
+		};
+		float data[3];
+	};
+};
 
 int Game::Run()
 {
 
 	TypeListTest();
-
-	VertexCount<VTC, Vertex>::value;
-	VertexCount<VTC, TextCoord>::value;
-	VertexCount<VTC, Color>::value;
 
 	if(!Initialize()) 
 	{

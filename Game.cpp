@@ -256,21 +256,8 @@ std::string ToString( const T& val )
 	return iss.str();
 }
 
-struct tdata
-{
-	union
-	{
-		struct 
-		{ 
-			float x, y, z; 
-		};
-		float data[3];
-	};
-};
-
 int Game::Run()
 {
-
 	TypeListTest();
 
 	if(!Initialize()) 
@@ -281,6 +268,10 @@ int Game::Run()
 	LOG_INFO("Инициализация прошла успешно.");
 
 	LoadContent();
+
+	int size = 0;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
+
 
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "shaders/t2.vs", "shaders/t2.fs" );
@@ -321,8 +312,14 @@ int Game::Run()
 	BufferArray<VT> *buffer = new BufferArray<VT>;
 
 	int q = 0;
-	geometryRectangle.InsertBackVertex(*buffer);
-	geometryRectangle.InsertBackIndex(*buffer, 0);
+
+	for(unsigned int i = 0; i < 10000; i++)
+	{
+		unsigned int c = buffer->GetSizeVertex();
+		geometryRectangle.InsertBackVertex(*buffer);
+
+		geometryRectangle.InsertBackIndex(*buffer, c);
+	}
 
 	buffer->CreateVertexBuffer();
 	buffer->CreateIndexBuffer();
@@ -350,6 +347,8 @@ int Game::Run()
 // 	testText.SetPos(vec3(500, 500, -1));
 // 	testText.SetText("tessst1");
 
+
+	float *test1 = new float[20 * 10000];
 
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
@@ -421,25 +420,19 @@ int Game::Run()
 		glUseProgram(programID);
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
-
-		buffer->Draw();
-	/*	ba.Draw();
-		fpsText.Draw();
 		
- 		for(unsigned int i = 0; i < 100; i++)
- 		{
- 			ba.Reset();
- 			ba.PushBack(geometryRectangle.GetBufferArray());
- 			ba.CreateVideoBuffer();
-			ba.Draw();
- 		}
-*/
-/*		for(unsigned int i = 0; i < 100; i++)
+		buffer->ResetVertex();
+		for(unsigned int i = 0; i < 10000; i++)
 		{
-			testText.SetText("ttttt");
-			testText.Draw();
+			geometryRectangle.InsertBackVertex(*buffer);
 		}
-	*/	
+		
+		
+		buffer->CreateVertexBuffer();
+		
+		buffer->Draw();
+
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 

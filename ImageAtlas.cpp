@@ -206,3 +206,64 @@ void ImageAtlas::InitElasticBox()
 	box->childrenBoxBig = nullptr;
 	box->childrenBoxSmall = nullptr;
 }
+
+
+
+
+Atlas::Atlas( unsigned int format, unsigned int maxSize )
+{
+	image = new Bitmap;
+	image->Generate(format , 16, 16, 0x00000000);
+	if(!box)
+	{
+		box = new ElasticBox();
+	}
+	box->x = 0;
+	box->y = 0;
+	box->w = 16;
+	box->h = 16;
+	box->childSmall = nullptr;
+	box->childBig = nullptr;
+}
+
+Atlas::~Atlas()
+{
+	delete image;
+	image = nullptr;
+	//рекурсивно удалить box
+}
+
+bool Atlas::Load( std::string fileName )
+{
+	return true;
+}
+
+bool Atlas::Save( std::string fileName )
+{
+	return true;
+}
+
+bool Atlas::Insert( Atlas *atlas )
+{
+	return true;
+}
+
+bool Atlas::Insert( Bitmap *image, std::string name )
+{
+	return true;
+}
+
+void Atlas::Create()
+{
+
+}
+
+void Atlas::Clear()
+{
+
+}
+
+glm::i32vec4 Atlas::GetImagePos( std::string name )
+{
+	return i32vec4(0,0,0,0);
+}

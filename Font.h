@@ -41,8 +41,10 @@ private:
 
 		bool operator < (const GlyphBitmap& second)
 		{
-			return (bitmap->GetHeight() * bitmap->GetWidth())
-				< (second.bitmap->GetHeight() * second.bitmap->GetWidth());
+			//return (bitmap->GetHeight() * bitmap->GetWidth())
+			//	< (second.bitmap->GetHeight() * second.bitmap->GetWidth());
+			return ( bitmap->GetHeight() * bitmap->GetHeight() + bitmap->GetWidth() * bitmap->GetWidth()
+				< second.bitmap->GetHeight() * second.bitmap->GetHeight() + second.bitmap->GetWidth() * second.bitmap->GetWidth());
 		}
 	};
 

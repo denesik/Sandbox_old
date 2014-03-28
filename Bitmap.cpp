@@ -247,6 +247,61 @@ static bool SaveBMP(Bitmap &bitmap, FILE *file)
 	return true;
 }
 
+static byte *FormatLuminanceToAny(unsigned int formatOld, unsigned int formatNew, unsigned int width, unsigned int height, byte *data)
+{
+	unsigned int channelCount = GetChannelCount(formatNew);
+
+	byte *dataNew = new byte[width * height * channelCount];
+
+	unsigned int channelAlpha = (IsAvailableAlpha(formatNew)) ? 1 : 0;
+
+	unsigned int isAlphaOld = IsAvailableAlpha(formatOld);
+
+	for(unsigned int i = 0; i < height * width; i++)
+	{
+		for (unsigned int k = 0; k < channelCount - channelAlpha; k++)
+		{
+			dataNew[i * channelCount + k] = (isAlphaOld == 1) ? data[i * 2] : data[i];
+		}
+		if(channelAlpha > 0)
+			dataNew[i * channelCount + channelCount - 1] = (isAlphaOld == 1) ? data[i * 2 + 1] : 255;
+	}
+
+	return dataNew;
+}
+
+static byte *FormatRGBToAny(unsigned int formatOld, unsigned int formatNew, unsigned int width, unsigned int height, byte *data)
+{
+	unsigned int channelCountNew = GetChannelCount(formatNew);
+	unsigned int channelAlphaNew = (IsAvailableAlpha(formatNew)) ? 1 : 0;
+
+	unsigned int isAlphaOld = IsAvailableAlpha(formatOld);
+	unsigned int offsetOld = (isAlphaOld == 1) ? 4 : 3;
+
+
+	byte *dataNew = new byte[width * height * channelCountNew];
+
+	for(unsigned int i = 0; i < height * width; i++)
+	{
+		for (unsigned int k = 0; k < channelCountNew - channelAlphaNew; k++)
+		{
+			if(channelCountNew - channelAlphaNew > 1)
+			{
+				dataNew[i * channelCountNew + k] = data[i * offsetOld + k];
+			}
+			else
+			{
+				dataNew[i * channelCountNew + k] = (data[i * offsetOld] + data[i * offsetOld + 1] + data[i * offsetOld + 2]) / 3;
+			}
+
+		}
+		if(channelAlphaNew > 0)
+			dataNew[i * channelCountNew + channelCountNew - 1] = (isAlphaOld == 1) ? data[i * offsetOld + offsetOld - 1] : 255;
+	}
+
+	return dataNew;
+}
+
 
 Bitmap::Bitmap(void)
 {
@@ -324,61 +379,6 @@ bool Bitmap::Save( std::string fileName )
 	fclose(file);
 	//LOG(LOG_WARNING, "Bitmap. Файл " + fileName + " не загружен.");
 	return false;
-}
-
-static byte *FormatLuminanceToAny(unsigned int formatOld, unsigned int formatNew, unsigned int width, unsigned int height, byte *data)
-{
-	unsigned int channelCount = GetChannelCount(formatNew);
-
-	byte *dataNew = new byte[width * height * channelCount];
-
-	unsigned int channelAlpha = (IsAvailableAlpha(formatNew)) ? 1 : 0;
-
-	unsigned int isAlphaOld = IsAvailableAlpha(formatOld);
-
-	for(unsigned int i = 0; i < height * width; i++)
-	{
-		for (unsigned int k = 0; k < channelCount - channelAlpha; k++)
-		{
-			dataNew[i * channelCount + k] = (isAlphaOld == 1) ? data[i * 2] : data[i];
-		}
-		if(channelAlpha > 0)
-			dataNew[i * channelCount + channelCount - 1] = (isAlphaOld == 1) ? data[i * 2 + 1] : 255;
-	}
-
-	return dataNew;
-}
-
-static byte *FormatRGBToAny(unsigned int formatOld, unsigned int formatNew, unsigned int width, unsigned int height, byte *data)
-{
-	unsigned int channelCountNew = GetChannelCount(formatNew);
-	unsigned int channelAlphaNew = (IsAvailableAlpha(formatNew)) ? 1 : 0;
-
-	unsigned int isAlphaOld = IsAvailableAlpha(formatOld);
-	unsigned int offsetOld = (isAlphaOld == 1) ? 4 : 3;
-
-
-	byte *dataNew = new byte[width * height * channelCountNew];
-
-	for(unsigned int i = 0; i < height * width; i++)
-	{
-		for (unsigned int k = 0; k < channelCountNew - channelAlphaNew; k++)
-		{
-			if(channelCountNew - channelAlphaNew > 1)
-			{
-				dataNew[i * channelCountNew + k] = data[i * offsetOld + k];
-			}
-			else
-			{
-				dataNew[i * channelCountNew + k] = (data[i * offsetOld] + data[i * offsetOld + 1] + data[i * offsetOld + 2]) / 3;
-			}
-
-		}
-		if(channelAlphaNew > 0)
-			dataNew[i * channelCountNew + channelCountNew - 1] = (isAlphaOld == 1) ? data[i * offsetOld + offsetOld - 1] : 255;
-	}
-
-	return dataNew;
 }
 
 #pragma warning (pop)

@@ -116,6 +116,7 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FPSCounter.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameMath.cpp" />
     <ClCompile Include="GraphicText.cpp" />
     <ClCompile Include="ImageAtlas.cpp" />
     <ClCompile Include="Keyboard.cpp" />

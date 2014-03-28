@@ -47,4 +47,42 @@ private:
 };
 
 
+
+
+class Atlas
+{
+private:
+	struct ElasticBox
+	{
+		int x, y, w, h;				
+		ElasticBox *childSmall;
+		ElasticBox *childBig;
+	};
+
+	Bitmap *image;
+	ElasticBox *box;
+
+public:
+	Atlas(unsigned int format, unsigned int maxSize);
+	~Atlas();
+
+	bool Load(std::string fileName);
+	bool Save(std::string fileName);
+
+	bool Insert(Atlas *atlas);
+	bool Insert(Bitmap *image, std::string name);
+
+	// Создаем ogl текстуру
+	void Create();
+
+	void Clear();
+
+	// Вернуть позицию картинки в атласе vec4(x, y, h, w);
+	i32vec4 GetImagePos(std::string name);
+
+	//Texture *GetTexture();
+
+};
+
+
 #endif // ImageAtlas_h__

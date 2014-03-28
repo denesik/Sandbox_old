@@ -67,6 +67,12 @@ struct Vertex
 		};
 		float data[Size];
 	};
+	Vertex(float _x, float _y, float _z)
+	{
+		x = _x;
+		y = _y;
+		z = _z;
+	}
 };
 
 struct TextCoord
@@ -81,6 +87,11 @@ struct TextCoord
 		};
 		float data[Size];
 	};
+	TextCoord(float _u, float _v)
+	{
+		u = _u;
+		v = _v;
+	}
 };
 
 struct Color

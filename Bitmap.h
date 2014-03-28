@@ -13,7 +13,7 @@ class Bitmap
 {
 public:
 
-	enum e_pixel_format
+	enum PixelFormat
 	{
 		FORMAT_NULL,
 		FORMAT_LUMINANCE,
@@ -51,6 +51,7 @@ public:
 
 	void ConvertFormat(unsigned int format);
 
+	// Вставляем изображение с областью srcrect
 	bool Blit(i32vec2 *point, iRect *srcrect, Bitmap *bitmap);
 
 	void Free();

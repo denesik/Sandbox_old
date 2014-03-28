@@ -34,15 +34,15 @@ BufferArrayRoot::~BufferArrayRoot()
 
 void BufferArrayRoot::ReserveVertex( unsigned int count )
 {
-	vbCapacity += count * stride;
+	vbCapacity += count;
 	float*	vb;
 
-	vb = new float[vbCapacity];
+	vb = new float[vbCapacity * stride];
 
 	// перемещаем буфер вершин
 	if(vertexBuffer)
 	{
-		for(unsigned int i = 0; i < vbSize; i++)
+		for(unsigned int i = 0; i < vbSize * stride; i++)
 		{
 			vb[i] = vertexBuffer[i];
 		}
@@ -90,12 +90,6 @@ void BufferArrayRoot::Draw()
 	glDrawElements(GL_TRIANGLES, ibSize, GL_UNSIGNED_INT, NULL);
 }
 
-void BufferArrayRoot::Reset()
-{
-	vbSize = 0;
-	ibSize = 0;
-}
-
 void BufferArrayRoot::CreateVertexBuffer_()
 {
 	glBindVertexArray(VAO);
@@ -110,7 +104,7 @@ void BufferArrayRoot::CreateVertexBuffer_()
 		// Создаем буфер вершин
 		glGenBuffers(1, &videoVertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, videoVertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBuffer[0]) * vbCapacity, &vertexBuffer[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBuffer[0]) * vbCapacity * stride, &vertexBuffer[0], GL_STATIC_DRAW);
 
 		OPENGL_CHECK_ERRORS();
 		vbCreated = true;
@@ -118,13 +112,13 @@ void BufferArrayRoot::CreateVertexBuffer_()
 	else
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, videoVertexBuffer);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertexBuffer[0]) * vbSize, &vertexBuffer[0]);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertexBuffer[0]) * vbSize * stride, &vertexBuffer[0]);
 
 		OPENGL_CHECK_ERRORS();
 	}	
 }
 
-void BufferArrayRoot::CreateIndexBuffer_()
+void BufferArrayRoot::CreateIndexBuffer()
 {
 	glBindVertexArray(VAO);
 
@@ -194,19 +188,14 @@ unsigned int * BufferArrayRoot::GetIndexData( unsigned int index )
 
 void BufferArrayRoot::InsertBackVertex( unsigned int count )
 {
-	if(vbSize + count * stride > vbCapacity)
+	if(vbSize + count > vbCapacity)
 	{
-		if(vbCapacity == 0)
+		unsigned int reserveCount = unsigned int(vbCapacity * kReserve - vbCapacity);
+		if(reserveCount < count)
 		{
-			ReserveVertex(count);
+			reserveCount = count;
 		}
-		else
-		{
-			// Сколько вертексов может поместиться
-			unsigned int tempCapacity = vbCapacity / stride;
-			// Резервируем под kReserve вертексов
-			ReserveVertex(unsigned int(tempCapacity * kReserve - tempCapacity));
-		}
+		ReserveVertex(reserveCount);
 	}
 
 	vbSize += count;
@@ -217,14 +206,12 @@ void BufferArrayRoot::InsertBackIndex( unsigned int count )
 
 	if(ibSize + count > ibCapacity)
 	{
-		if(ibCapacity == 0)
+		unsigned int reserveCount = unsigned int(ibCapacity * kReserve - ibCapacity);
+		if(reserveCount < count)
 		{
-			ReserveIndex(count);
+			reserveCount = count;
 		}
-		else
-		{
-			ReserveIndex(unsigned int(ibCapacity * kReserve - ibCapacity));
-		}
+		ReserveIndex(reserveCount);
 	}
 
 	ibSize += count;

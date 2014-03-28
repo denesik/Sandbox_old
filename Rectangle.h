@@ -58,48 +58,9 @@ public:
 		static_assert(Find<TList, Vertex>::value != -1, "Unsupported format vertices.");
 		static_assert(Find<TList, TextCoord>::value != -1, "Unsupported format vertices.");
 
-		// ”знаем смещени€
-		//unsigned int const stride = VertexStride<TList>::value;
-		//unsigned int const countVertex = VertexCount<TList, Vertex>::value;
-		//unsigned int const countTextCoord = VertexCount<TList, TextCoord>::value;
-
-
 		// ћы собираемс€ добавить 4 вершины
 		buffer.InsertBackVertex(4);
 		float *data = buffer.GetVertexData(buffer.GetSizeVertex() - 4);
-		
-		/*
-		data[0 + countVertex] = x;
-		data[1 + countVertex] = y;
-		data[2 + countVertex] = z;
-
-		data[0 + countTextCoord] = texture.u1;
-		data[1 + countTextCoord] = texture.v2;
-
-		// верх лево
-		data[0 + countVertex + stride] = x;
-		data[1 + countVertex + stride] = y + height;
-		data[2 + countVertex + stride] = z;
-
-		data[0 + countTextCoord + stride] = texture.u1;
-		data[1 + countTextCoord + stride] = texture.v1;
-
-		//верх право
-		data[0 + countVertex + stride * 2] = x + width;
-		data[1 + countVertex + stride * 2] = y + height;
-		data[2 + countVertex + stride * 2] = z;
-
-		data[0 + countTextCoord + stride * 2] = texture.u2;
-		data[1 + countTextCoord + stride * 2] = texture.v1;
-
-		//верх право
-		data[0 + countVertex + stride * 3] = x + width;
-		data[1 + countVertex + stride * 3] = y;
-		data[2 + countVertex + stride * 3] = z;
-
-		data[0 + countTextCoord + stride * 3] = texture.u2;
-		data[1 + countTextCoord + stride * 3] = texture.v2;
-		*/
 		
 		VertexAccess<TList, Vertex>(data, 0).x = x;
 		VertexAccess<TList, Vertex>(data, 0).y = y;

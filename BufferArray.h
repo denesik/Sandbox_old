@@ -45,7 +45,14 @@ public:
 	void ReserveIndex(unsigned int count);
 
 	// Обнуляем буфер
-	void Reset();
+	void ResetVertex()
+	{
+		vbSize = 0;
+	};
+	void ResetIndex()
+	{
+		ibSize = 0;
+	};
 
 	// Обновляем массив вершин [begin, end] в видео буфере
 	void UpdateVertexBuffer(unsigned int begin, unsigned int count);
@@ -53,9 +60,9 @@ public:
 	void UpdateIndexBuffer(unsigned int begin, unsigned int count);
 
 	// Получаем указатель на данные вершины с номером index
-	float *GetVertexData(unsigned int index);
+	float *GetVertexData(unsigned int number);
 	// Получаем указатель на данные индекса с номером index
-	unsigned int *GetIndexData(unsigned int index);
+	unsigned int *GetIndexData(unsigned int number);
 
 	// Увеличиваем размер буфера
 	void InsertBackVertex(unsigned int count);
@@ -70,14 +77,15 @@ public:
 		return vbSize;
 	};
 
+	// Создаем буфер индексов в видео памяти
+	void CreateIndexBuffer();
+
 	void Draw();
 protected:
 	void CreateVertexAttribArray(){};
 
 	// Создаем буфер вершин в видео памяти
 	void CreateVertexBuffer_();
-	// Создаем буфер индексов в видео памяти
-	void CreateIndexBuffer_();
 };
 
 template <class T, class Base, class RootTList>
@@ -131,13 +139,15 @@ public:
 	// Создаем буфер вершин в видео памяти
 	void CreateVertexBuffer()
 	{
-		CreateVertexBuffer_();
-		CreateVertexAttribArray();
-	};
-	// Создаем буфер индексов в видео памяти
-	void CreateIndexBuffer()
-	{
-		CreateIndexBuffer_();
+		if( !vbCreated )
+		{
+			CreateVertexBuffer_();
+			CreateVertexAttribArray();
+		}
+		else
+		{
+			CreateVertexBuffer_();
+		}
 	};
 
 protected:

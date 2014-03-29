@@ -19,7 +19,7 @@ inline unsigned int next_p2( unsigned int a )
 	return rval;
 }
 
-namespace gui
+namespace gm
 {
 	struct Size;
 
@@ -31,31 +31,31 @@ namespace gui
 		Point();
 		Point(int val);
 		Point(int x, int y);
-		Point(Point &p);
+		Point(const Point &p);
 		~Point(){};
 
 		// Смещает точку
-		void Offset(Point &p);
-		void Offset(int x, int y);
+		inline void Offset(const Point &p);
+		inline void Offset(int x, int y);
 
 		// Сравнивает точку
-		bool Equals(Point &p);
-		bool Equals(int x, int y);
+		inline bool Equals(const Point &p) const;
+		inline bool Equals(int x, int y) const;
 
 		// Возвращает true если x и y равны 0
-		bool IsEmpty();
+		inline bool IsEmpty() const;
 
 
-		const Point& operator=(const Point& p);
+		inline const Point& operator=(const Point& p);
 
 		// Смещает точку Point на заданное значение Size.
-		const Point operator+(const Size& s) const;
+		inline const Point operator+(const Size& s) const;
 
-		const Point operator-(const Size& s) const;
+		inline const Point operator-(const Size& s) const;
 
-		const bool operator==(const Point& p) const;
+		inline const bool operator==(const Point& p) const;
 
-		const bool operator!=(const Point& p) const;
+		inline const bool operator!=(const Point& p) const;
 
 	};
 
@@ -65,32 +65,31 @@ namespace gui
 		int height;
 
 		Size();
-		Size(Point &p);
-		Size(Size &s);
+		Size(const Point &p);
+		Size(const Size &s);
 		Size(int width, int height);
 
 		// Возвращает true если w и h равны 0
-		bool IsEmpty();
+		inline bool IsEmpty() const;
 
-		void Add(Size &s);
-		void Subtract(Size &s);
+		inline void Add(const Size &s);
+		inline void Subtract(const Size &s);
 
-		bool Equals(Size &s);
-		bool Equals(int widht, int height);
+		inline bool Equals(const Size &s) const;
+		inline bool Equals(int widht, int height) const;
 
 
-		const Size& operator=(const Size& s);
+		inline const Size& operator=(const Size& s);
 
-		const Size operator+(const Size& s) const;
+		inline const Size operator+(const Size& s) const;
 
-		const Size operator-(const Size& s) const; 
+		inline const Size operator-(const Size& s) const; 
 
-		const bool operator==(const Size& s) const;
+		inline const bool operator==(const Size& s) const;
 
-		const bool operator!=(const Size& s) const;
+		inline const bool operator!=(const Size& s) const;
 
 	};
-
 
 	struct Rectangle
 	{
@@ -108,11 +107,49 @@ namespace gui
 		};
 
 		Rectangle();
-		Rectangle(Point &p, Size &s);
+		Rectangle(const Point &p, const Size &s);
 		Rectangle(int x, int y, int w, int h);
-		Rectangle(Rectangle &rectangle);
+		Rectangle(const Rectangle &rectangle);
+
+		inline bool IsEmpty() const;
+
+		inline int Bottom() const;
+		inline int Top() const;
+		inline int Left() const;
+		inline int Right() const;
+
+		// Определяет, содержится ли заданная точка в структуре Rectangle.
+		inline bool Contains(const Point &p) const;
+		inline bool Contains(int x, int y) const;
+		inline bool Contains(const Rectangle &r) const;
+
+		inline bool Equals(const Rectangle &r) const;
+
+		// Увеличивает данный объект Rectangle на заданную величину.
+		inline void Inflate(const Size &s);
+		inline void Inflate(int w, int h);
+
+		// Возвращает пересечение данного прямоугольника с прямоугольником r.
+		inline const Rectangle Intersect(const Rectangle &r) const;
+
+		// Определяет, пересекается ли данный прямоугольник с прямоугольником r.
+		inline bool IntersectsWith(const Rectangle &r) const;
+
+		// Изменяет положение этого прямоугольника на указанную величину.
+		inline void Offset(Point &p);
+		inline void Offset(int x, int y);
+
+
+		inline const Rectangle& operator=(const Rectangle& r);
+
+		inline const bool operator==(const Rectangle& r) const;
+
+		inline const bool operator!=(const Rectangle& r) const;
 
 	};
+
+	inline const Rectangle FromLTRB(const Point &LT, const Point &RB);
+	inline const Rectangle FromLTRB(int LTx, int LTy, int RBx, int RBy);
 }
 
 struct iRect

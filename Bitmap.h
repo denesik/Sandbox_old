@@ -65,4 +65,55 @@ public:
 };
 
 
+class Bitmap1
+{
+public:
+
+	enum PixelFormat
+	{
+		FORMAT_NULL,
+		FORMAT_LUMINANCE,
+		FORMAT_LUMINANCE_ALPHA,
+		FORMAT_RGB,
+		FORMAT_RGBA,
+	};
+
+private:
+	byte *data;
+	gm::Size size;
+	PixelFormat format;
+
+public:
+	// Создаем битмап заданного размера и цвета
+	Bitmap1(PixelFormat format, gm::Size &size, unsigned int color);
+	
+	// Создаем битмап и загружаем данные из файла
+	Bitmap1(std::string fileName);
+	
+	// Создаем копию битмапа
+	Bitmap1(const Bitmap1 &bitmap);
+	~Bitmap1();
+
+	void Save(std::string fileName);
+
+	int GetHeight();
+	int GetWidth();
+
+	gm::Size &GetSize();
+
+	// unsigned int color GetPixel(const gm::Point &pos);
+	// SetPixel(const gm::Point &pos, unsigned int color);
+	
+	// Вставляем битмап
+	bool Insert(const Bitmap1 &bitmap);
+	bool Insert(const Bitmap1 &bitmap, const gm::Point &pos);
+	bool Insert(const Bitmap1 &bitmap, const gm::Point &pos, const gm::Rectangle &rect);
+
+	// Увеличиваем размер битмапа. Если новый размер больше, то заполнить пикселы цветом color
+	void Inflate(const gm::Size &size, unsigned int color);
+	
+	// byte *GetData();
+
+};
+
 #endif // Bitmap_h__

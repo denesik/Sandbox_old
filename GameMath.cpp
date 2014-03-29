@@ -3,165 +3,165 @@
 
 
 
-gui::Point::Point( int val )
+gm::Point::Point( int val )
 {
 	x = val;
 	y = val;
 }
 
-gui::Point::Point()
+gm::Point::Point()
 {
 	x = 0;
 	y = 0;
 }
 
-gui::Point::Point( int _x, int _y )
+gm::Point::Point( int _x, int _y )
 {
 	x = _x;
 	y = _y;
 }
 
-gui::Point::Point( Point &p )
+gm::Point::Point( const Point &p )
 {
 	x = p.x;
 	y = p.y;
 }
 
-void gui::Point::Offset( Point &p )
+void gm::Point::Offset( const Point &p )
 {
 	x += p.x;
 	y += p.y;
 }
 
-void gui::Point::Offset( int _x, int _y )
+void gm::Point::Offset( int _x, int _y )
 {
 	x += _x;
 	y += _y;
 }
 
-bool gui::Point::Equals( Point &p )
+bool gm::Point::Equals( const Point &p ) const
 {
 	return x == p.x && y == p.y;
 }
 
-bool gui::Point::Equals( int _x, int _y )
+bool gm::Point::Equals( int _x, int _y ) const
 {
 	return x == _x && y == _y;
 }
 
-bool gui::Point::IsEmpty()
+bool gm::Point::IsEmpty() const
 {
 	return x == 0 && y == 0;
 }
 
-const gui::Point gui::Point::operator+( const Size& s ) const
+const gm::Point gm::Point::operator+( const Size& s ) const
 {
 	return Point(x + s.width, y + s.height);
 }
 
-const gui::Point gui::Point::operator-( const Size& s ) const
+const gm::Point gm::Point::operator-( const Size& s ) const
 {
 	return Point(x - s.width, y - s.height);
 }
 
-const bool gui::Point::operator==( const Point& p ) const
+const bool gm::Point::operator==( const Point& p ) const
 {
 	return x == p.x && y == p.y;
 }
 
-const bool gui::Point::operator!=( const Point& p ) const
+const bool gm::Point::operator!=( const Point& p ) const
 {
 	return x != p.x || y != p.y;
 }
 
-const gui::Point& gui::Point::operator=( const Point& p )
+const gm::Point& gm::Point::operator=( const Point& p )
 {
 	x = p.x;
 	y = p.y;
 	return *this;
 }
 
-gui::Size::Size( Point &p )
+gm::Size::Size( const Point &p )
 {
 	width = p.x;
 	height = p.y;
 }
 
-gui::Size::Size()
+gm::Size::Size()
 {
 	width = 0;
 	height = 0;
 }
 
-gui::Size::Size( int _width, int _height )
+gm::Size::Size( int _width, int _height )
 {
 	width = _width;
 	height = _height;
 }
 
-gui::Size::Size( Size &s )
+gm::Size::Size( const Size &s )
 {
 	width = s.width;
 	height = s.height;
 }
 
-bool gui::Size::IsEmpty()
+bool gm::Size::IsEmpty() const
 {
 	return width == 0 && height == 0;
 }
 
-void gui::Size::Add( Size &s )
+void gm::Size::Add( const Size &s )
 {
 	width += s.width;
 	height += s.height;
 }
 
-void gui::Size::Subtract( Size &s )
+void gm::Size::Subtract( const Size &s )
 {
 	width -= s.width;
 	height -= s.height;
 }
 
-bool gui::Size::Equals( Size &s )
+bool gm::Size::Equals( const Size &s ) const
 {
 	return width == s.width && height == s.height;
 }
 
-bool gui::Size::Equals( int _width, int _height )
+bool gm::Size::Equals( int _width, int _height ) const
 {
 	return width == _width && height == _height;
 }
 
-const gui::Size& gui::Size::operator=( const Size& s )
+const gm::Size& gm::Size::operator=( const Size& s )
 {
 	width = s.width;
 	height = s.height;
 	return *this;
 }
 
-const gui::Size gui::Size::operator+( const Size& s ) const
+const gm::Size gm::Size::operator+( const Size& s ) const
 {
 	return Size(width + s.width, height + s.height);
 }
 
-const gui::Size gui::Size::operator-( const Size& s ) const
+const gm::Size gm::Size::operator-( const Size& s ) const
 {
 	return Size(width - s.width, height - s.height);
 }
 
-const bool gui::Size::operator==( const Size& s ) const
+const bool gm::Size::operator==( const Size& s ) const
 {
 	return width == s.width && height == s.height;
 }
 
-const bool gui::Size::operator!=( const Size& s ) const
+const bool gm::Size::operator!=( const Size& s ) const
 {
 	return width != s.width || height != s.height;
 }
 
 
 
-gui::Rectangle::Rectangle()
+gm::Rectangle::Rectangle()
 {
 	x = 0;
 	y = 0;
@@ -169,13 +169,13 @@ gui::Rectangle::Rectangle()
 	h = 0;
 }
 
-gui::Rectangle::Rectangle( Point &p, Size &s )
+gm::Rectangle::Rectangle( const Point &p, const Size &s )
 {
 	pos = p;
 	size = s;
 }
 
-gui::Rectangle::Rectangle( int _x, int _y, int _w, int _h )
+gm::Rectangle::Rectangle( int _x, int _y, int _w, int _h )
 {
 	x = _x;
 	y = _y;
@@ -183,8 +183,121 @@ gui::Rectangle::Rectangle( int _x, int _y, int _w, int _h )
 	h = _h;
 }
 
-gui::Rectangle::Rectangle( Rectangle &rectangle )
+gm::Rectangle::Rectangle( const Rectangle &rectangle )
 {
 	pos = rectangle.pos;
 	size = rectangle.size;
 }
+
+bool gm::Rectangle::IsEmpty() const
+{
+	return pos.IsEmpty() && size.IsEmpty();
+}
+
+int gm::Rectangle::Bottom() const
+{
+	return h >= 0 ? y + h : y;
+}
+
+int gm::Rectangle::Top() const
+{
+	return h >= 0 ? y : y + h;
+}
+
+int gm::Rectangle::Left() const
+{
+	return w >= 0 ? x : x + w;
+}
+
+int gm::Rectangle::Right() const
+{
+	return w >= 0 ? x + w : x;
+}
+
+bool gm::Rectangle::Contains( const Point &p ) const
+{
+	return p.x >= Left() && p.x <= Right() && p.y >= Top() && p.y <= Bottom();
+}
+
+bool gm::Rectangle::Contains( int x, int y ) const
+{
+	return x >= Left() && x <= Right() && y >= Top() && y <= Bottom();
+}
+
+bool gm::Rectangle::Contains( const Rectangle &r ) const
+{
+	return Contains(r.pos) && Contains(r.pos + r.size);
+}
+
+bool gm::Rectangle::Equals( const Rectangle &r ) const
+{
+	return pos.Equals(r.pos) && size.Equals(r.size);
+}
+
+void gm::Rectangle::Inflate( const Size &s )
+{
+	size.Add(s);
+}
+
+void gm::Rectangle::Inflate( int w, int h )
+{
+	size.width += w;
+	size.height += h;
+}
+
+void gm::Rectangle::Offset( Point &p )
+{
+	pos.Offset(p);
+}
+
+void gm::Rectangle::Offset( int x, int y )
+{
+	pos.Offset(x, y);
+}
+
+const gm::Rectangle& gm::Rectangle::operator=( const Rectangle& r )
+{
+	pos = r.pos;
+	size = r.size;
+	return *this;
+}
+
+const bool gm::Rectangle::operator==( const Rectangle& r ) const
+{
+	return pos == r.pos && size == r.size;
+}
+
+const bool gm::Rectangle::operator!=( const Rectangle& r ) const
+{
+	return pos != r.pos || size != r.size;
+}
+
+const gm::Rectangle gm::Rectangle::Intersect( const Rectangle &r ) const
+{
+	if( !IntersectsWith(r) )
+		return Rectangle(0, 0, 0, 0);
+
+	Rectangle LT(pos, r.size);
+	Rectangle RB(r.pos, size);
+
+	return Rectangle(LT.Right(), LT.Bottom(), RB.Left(), RB.Top());
+}
+
+bool gm::Rectangle::IntersectsWith( const Rectangle &r ) const
+{
+	return Contains(r.pos) && r.Contains(pos);
+}
+
+
+
+
+const gm::Rectangle gm::FromLTRB( const Point &LT, const Point &RB )
+{
+	return Rectangle(LT.x, LT.y, RB.x, RB.y);
+}
+
+const gm::Rectangle gm::FromLTRB( int LTx, int LTy, int RBx, int RBy )
+{
+	return Rectangle(LTx, LTy, RBx, RBy);
+}
+

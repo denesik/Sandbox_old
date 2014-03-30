@@ -652,12 +652,12 @@ static glm::uint8 *LoadBMP(Bitmap1::PixelFormat &format, gm::Size &size, FILE *f
 
 	for (unsigned int i = 0; i < pass_count; i++)
 	{
-		int offset = row_length * (size.height - 1);
+		int offset = (row_length * (size.height - 1)) * i;
 
 		for(int j = 0; j < size.height; j++)
 		{
 			png_read_row(png, data + offset, NULL);
-			offset -= row_length;
+			offset += row_length;
 		}
 	}
 
@@ -745,12 +745,12 @@ static bool SaveBMP(Bitmap1::PixelFormat format, const gm::Size &size, const glm
 
 	for (unsigned int i = 0; i < pass_count; i++)
 	{
-		int offset = row_length * (size.height - 1);
+		int offset = (row_length * (size.height - 1)) * i;
 
 		for (int j = 0; j < size.height; j++)
 		{
 			png_write_row(png, (png_byte*)data + offset);
-			offset -= row_length;
+			offset += row_length;
 		}
 	}
 
@@ -919,19 +919,59 @@ void Bitmap1::SetPixel( const gm::Point &pos, const gm::Color &color )
 		}
 }
 
-gm::Rectangle Bitmap1::Insert( const Bitmap1 &bitmap )
-{
-	return gm::Rectangle();
-}
-
 gm::Rectangle Bitmap1::Insert( const Bitmap1 &bitmap, const gm::Point &pos )
 {
-	return gm::Rectangle();
+	gm::Rectangle iRect;
+	if(format != bitmap.format)
+	{
+		LOG_WARNING("BitmapInsert. Форматы изображений не соответствуют.");
+		return iRect;
+	}
+	
+	gm::Rectangle srcRect(pos, bitmap.size);
+	gm::Rectangle recRect(gm::Point(), size);
+	iRect = recRect.Intersect(srcRect);
+
+	for(int i = 0; i < iRect.size.height; i++)
+		for(int j = 0; j < iRect.size.width; j++)
+		{
+			for(unsigned int k = 0; k < stride; k++)
+			{
+				data[((i + iRect.pos.y) * size.width + j + iRect.pos.x) * stride + k] = 
+					bitmap.data[(i * bitmap.size.width + j) * stride + k];
+			}
+		}
+
+	return iRect;
 }
 
-gm::Rectangle Bitmap1::Insert( const Bitmap1 &bitmap, const gm::Point &pos, const gm::Rectangle &rect )
+gm::Rectangle Bitmap1::Insert( const Bitmap1 &bitmap, const gm::Rectangle &rect, const gm::Point &pos )
 {
-	return gm::Rectangle();
+	gm::Rectangle iRect;
+	if(format != bitmap.format)
+	{
+		LOG_WARNING("BitmapInsert. Форматы изображений не соответствуют.");
+		return iRect;
+	}
+
+	// Узнаем область, которую нужно вставить
+	gm::Rectangle bitmapRect(gm::Rectangle(gm::Point(), bitmap.size).Intersect(rect));
+	// Узнаем облать, куда нужно вставить
+	gm::Rectangle srcRect(pos, bitmapRect.size);
+	gm::Rectangle recRect(gm::Point(), size);
+	iRect = recRect.Intersect(srcRect);
+
+	for(int i = 0; i < iRect.size.height; i++)
+		for(int j = 0; j < iRect.size.width; j++)
+		{
+			for(unsigned int k = 0; k < stride; k++)
+			{
+				data[((i + iRect.pos.y) * size.width + j + iRect.pos.x) * stride + k] = 
+					bitmap.data[((i + bitmapRect.pos.y) * bitmap.size.width + j + bitmapRect.pos.x) * stride + k];
+			}
+		}
+
+	return iRect;
 }
 
 void Bitmap1::Inflate( const gm::Size &_size, const gm::Color &color /*= gm::Color()*/ )

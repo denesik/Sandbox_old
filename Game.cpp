@@ -272,7 +272,12 @@ int Game::Run()
 	
 
 	Bitmap1 b1("atlas.png");
+	Bitmap1 b2("img12.png");
 	b1.Inflate(gm::Size(50, 20), gm::Color(0xFF0000FF));
+	//b1.Insert(b2, gm::Rectangle(5,5,20,20), gm::Point(10, 20));
+	//b1.Insert(b2, gm::Rectangle(5,5,20,20));
+	//b1.Insert(b2, gm::Point(10, 20));
+	b1.Insert(b2);
 	b1.Save("b1.png");
 
 	int size = 0;

@@ -110,9 +110,8 @@ public:
 	void SetPixel(const gm::Point &pos, const gm::Color &color);
 	
 	// Вставляем битмап
-	gm::Rectangle Insert(const Bitmap1 &bitmap);
-	gm::Rectangle Insert(const Bitmap1 &bitmap, const gm::Point &pos);
-	gm::Rectangle Insert(const Bitmap1 &bitmap, const gm::Point &pos, const gm::Rectangle &rect);
+	gm::Rectangle Insert(const Bitmap1 &bitmap, const gm::Point &pos = gm::Point());
+	gm::Rectangle Insert(const Bitmap1 &bitmap, const gm::Rectangle &rect, const gm::Point &pos = gm::Point());
 
 	// Увеличиваем размер битмапа. Если новый размер больше, то заполнить пикселы цветом color
 	void Inflate(const gm::Size &size, const gm::Color &color = gm::Color());

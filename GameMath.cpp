@@ -256,7 +256,7 @@ void Rectangle::Offset( int x, int y )
 	pos.Offset(x, y);
 }
 
-const Rectangle& Rectangle::operator=( const Rectangle& r )
+Rectangle& Rectangle::operator=( const Rectangle& r )
 {
 	pos = r.pos;
 	size = r.size;
@@ -273,7 +273,7 @@ const bool Rectangle::operator!=( const Rectangle& r ) const
 	return pos != r.pos || size != r.size;
 }
 
-const Rectangle Rectangle::Intersect( const Rectangle &r ) const
+Rectangle Rectangle::Intersect( const Rectangle &r ) const
 {
 	if( !IntersectsWith(r) )
 		return Rectangle();
@@ -286,18 +286,18 @@ const Rectangle Rectangle::Intersect( const Rectangle &r ) const
 
 bool Rectangle::IntersectsWith( const Rectangle &r ) const
 {
-	return Contains(r.pos) && r.Contains(pos);
+	return Contains(r.pos) || r.Contains(pos);
 }
 
 
 const Rectangle FromLTRB( const Point &LT, const Point &RB )
 {
-	return Rectangle(LT.x, LT.y, RB.x, RB.y);
+	return Rectangle(LT.x, LT.y, RB.x - LT.x, RB.y - LT.y);
 }
 
 const Rectangle FromLTRB( int LTx, int LTy, int RBx, int RBy )
 {
-	return Rectangle(LTx, LTy, RBx, RBy);
+	return Rectangle(LTx, LTy, RBx - LTx, RBy - LTy);
 }
 
 

@@ -79,7 +79,7 @@ namespace gm
 		inline bool Equals(int widht, int height) const;
 
 
-		inline const Size& operator=(const Size& s);
+		const Size& operator=(const Size& s);
 
 		const Size operator+(const Size& s) const;
 
@@ -130,7 +130,7 @@ namespace gm
 		inline void Inflate(int w, int h);
 
 		// Возвращает пересечение данного прямоугольника с прямоугольником r.
-		inline const Rectangle Intersect(const Rectangle &r) const;
+		Rectangle Intersect(const Rectangle &r) const;
 
 		// Определяет, пересекается ли данный прямоугольник с прямоугольником r.
 		inline bool IntersectsWith(const Rectangle &r) const;
@@ -140,7 +140,7 @@ namespace gm
 		inline void Offset(int x, int y);
 
 
-		inline const Rectangle& operator=(const Rectangle& r);
+		Rectangle& operator=(const Rectangle& r);
 
 		inline const bool operator==(const Rectangle& r) const;
 

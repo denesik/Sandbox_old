@@ -3,6 +3,8 @@
 
 #include "GameMath.h"
 
+using namespace glm;
+
 class Camera
 {
 private:

@@ -3,7 +3,7 @@
 
 #include "glm.hpp"
 
-using namespace glm;
+//using namespace glm;
 
 inline int next_p2( int a )
 {
@@ -72,8 +72,8 @@ namespace gm
 		// Возвращает true если w и h равны 0
 		inline bool IsEmpty() const;
 
-		inline void Add(const Size &s);
-		inline void Subtract(const Size &s);
+		void Add(const Size &s);
+		void Subtract(const Size &s);
 
 		inline bool Equals(const Size &s) const;
 		inline bool Equals(int widht, int height) const;
@@ -81,9 +81,9 @@ namespace gm
 
 		inline const Size& operator=(const Size& s);
 
-		inline const Size operator+(const Size& s) const;
+		const Size operator+(const Size& s) const;
 
-		inline const Size operator-(const Size& s) const; 
+		const Size operator-(const Size& s) const; 
 
 		inline const bool operator==(const Size& s) const;
 
@@ -155,7 +155,7 @@ namespace gm
 		{
 			struct
 			{
-				glm::uint8 R, G, B, A;
+				glm::uint8 A, B, G, R;
 			};
 
 			glm::uint32 color32;

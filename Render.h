@@ -7,6 +7,8 @@
 #include <vector>
 #include "BufferArray.h"
 
+using namespace glm;
+
 class Render
 {
 private:

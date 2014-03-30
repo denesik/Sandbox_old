@@ -4,6 +4,8 @@
 #include <string>
 #include "GameMath.h"
 
+using namespace glm;
+
 extern unsigned int GetChannelCount(unsigned int format);
 extern unsigned int IsAvailableAlpha(unsigned int format);
 
@@ -79,40 +81,41 @@ public:
 	};
 
 private:
-	byte *data;
+	glm::uint8 *data;
 	gm::Size size;
 	PixelFormat format;
+	unsigned int isAlpha;
+	unsigned int stride;
 
 public:
+
+	Bitmap1();
+
 	// Создаем битмап заданного размера и цвета
-	Bitmap1(PixelFormat format, gm::Size &size, unsigned int color);
-	
+	Bitmap1(PixelFormat format, const gm::Size &size, const gm::Color &color = gm::Color());
+
 	// Создаем битмап и загружаем данные из файла
 	Bitmap1(std::string fileName);
-	
-	// Создаем копию битмапа
 	Bitmap1(const Bitmap1 &bitmap);
 	~Bitmap1();
 
-	void Save(std::string fileName);
+	bool Save(std::string fileName) const;
 
-	int GetHeight();
-	int GetWidth();
+	int GetHeight() const;
+	int GetWidth() const;
 
-	gm::Size &GetSize();
+	const gm::Size &GetSize() const;
 
-	// unsigned int color GetPixel(const gm::Point &pos);
-	// SetPixel(const gm::Point &pos, unsigned int color);
+	gm::Color GetPixel(const gm::Point &pos) const;
+	void SetPixel(const gm::Point &pos, const gm::Color &color);
 	
 	// Вставляем битмап
-	bool Insert(const Bitmap1 &bitmap);
-	bool Insert(const Bitmap1 &bitmap, const gm::Point &pos);
-	bool Insert(const Bitmap1 &bitmap, const gm::Point &pos, const gm::Rectangle &rect);
+	gm::Rectangle Insert(const Bitmap1 &bitmap);
+	gm::Rectangle Insert(const Bitmap1 &bitmap, const gm::Point &pos);
+	gm::Rectangle Insert(const Bitmap1 &bitmap, const gm::Point &pos, const gm::Rectangle &rect);
 
 	// Увеличиваем размер битмапа. Если новый размер больше, то заполнить пикселы цветом color
-	void Inflate(const gm::Size &size, unsigned int color);
-	
-	// byte *GetData();
+	void Inflate(const gm::Size &size, const gm::Color &color = gm::Color());
 
 };
 

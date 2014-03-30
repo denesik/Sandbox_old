@@ -23,6 +23,7 @@
 #include <sstream>
 #include "GraphicText.h"
 
+#include "GameMath.h"
 
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
@@ -268,6 +269,11 @@ int Game::Run()
 	LOG_INFO("Инициализация прошла успешно.");
 
 	LoadContent();
+	
+
+	Bitmap1 b1("atlas.png");
+	b1.Inflate(gm::Size(50, 20), gm::Color(0xFF0000FF));
+	b1.Save("b1.png");
 
 	int size = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
@@ -295,7 +301,7 @@ int Game::Run()
  	tex.u2 = 1.0f;
  	tex.v2 = 1.0f;
  	geometryRectangle.SetTexture(tex);
-
+	
 
 // 	BufferArrayRoot ba(false, true, false);
 // 	ba.PushBack(geometryRectangle.GetBufferArray());
@@ -323,7 +329,7 @@ int Game::Run()
 
 	buffer->CreateVertexBuffer();
 	buffer->CreateIndexBuffer();
-
+	
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -431,7 +437,7 @@ int Game::Run()
 		buffer->CreateVertexBuffer();
 		
 		buffer->Draw();
-
+		
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -440,7 +446,7 @@ int Game::Run()
 
 	}
 
-	delete buffer;
+	//delete buffer;
 
 	glDeleteProgram(programID);
 

@@ -275,20 +275,18 @@ const bool gm::Rectangle::operator!=( const Rectangle& r ) const
 const gm::Rectangle gm::Rectangle::Intersect( const Rectangle &r ) const
 {
 	if( !IntersectsWith(r) )
-		return Rectangle(0, 0, 0, 0);
+		return Rectangle();
 
-	Rectangle LT(pos, r.size);
-	Rectangle RB(r.pos, size);
+	Rectangle LT = FromLTRB(Left(), Top(), r.Left(), r.Top());
+	Rectangle RB = FromLTRB(Right(), Bottom(), r.Right(), r.Bottom());
 
-	return Rectangle(LT.Right(), LT.Bottom(), RB.Left(), RB.Top());
+	return gm::FromLTRB(LT.Right(), LT.Bottom(), RB.Left(), RB.Top());
 }
 
 bool gm::Rectangle::IntersectsWith( const Rectangle &r ) const
 {
 	return Contains(r.pos) && r.Contains(pos);
 }
-
-
 
 
 const gm::Rectangle gm::FromLTRB( const Point &LT, const Point &RB )
@@ -301,3 +299,47 @@ const gm::Rectangle gm::FromLTRB( int LTx, int LTy, int RBx, int RBy )
 	return Rectangle(LTx, LTy, RBx, RBy);
 }
 
+
+gm::Color::Color()
+{
+	color32 = 0;
+}
+
+gm::Color::Color( glm::uint32 rgba )
+{
+	color32 = rgba;
+}
+
+gm::Color::Color( glm::uint8 r, glm::uint8 g, glm::uint8 b, glm::uint8 a /*= 0*/ )
+{
+	R = r;
+	G = g;
+	B = b;
+	A = a;
+}
+
+gm::Color::Color( const Color &c )
+{
+	color32 = c.color32;
+}
+
+bool gm::Color::Equals( const Color &c ) const
+{
+	return color32 == c.color32;
+}
+
+const gm::Color& gm::Color::operator=( const Color& c )
+{
+	color32 == c.color32;
+	return *this;
+}
+
+const bool gm::Color::operator==( const Color& c ) const
+{
+	return color32 == c.color32;
+}
+
+const bool gm::Color::operator!=( const Color& c ) const
+{
+	return color32 != c.color32;
+}

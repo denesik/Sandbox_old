@@ -148,6 +148,35 @@ namespace gm
 
 	};
 
+
+	struct Color
+	{
+		union
+		{
+			struct
+			{
+				glm::uint8 R, G, B, A;
+			};
+
+			glm::uint32 color32;
+			glm::uint8 color8[4];
+		};
+
+		Color();
+		Color(glm::uint32 rgba);
+		Color(glm::uint8 r, glm::uint8 g, glm::uint8 b, glm::uint8 a = 0);
+		Color(const Color &c);
+
+		inline bool Equals(const Color &c) const;
+
+		inline const Color& operator=(const Color& c);
+
+		inline const bool operator==(const Color& c) const;
+
+		inline const bool operator!=(const Color& c) const;
+
+	};
+
 	inline const Rectangle FromLTRB(const Point &LT, const Point &RB);
 	inline const Rectangle FromLTRB(int LTx, int LTy, int RBx, int RBy);
 }

@@ -427,7 +427,7 @@ int Game::Run()
 			geometryRectangle.InsertBackVertex(*buffer);
 		}
 		
-		
+
 		buffer->CreateVertexBuffer();
 		
 		buffer->Draw();

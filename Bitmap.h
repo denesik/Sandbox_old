@@ -115,7 +115,8 @@ public:
 
 	// Увеличиваем размер битмапа. Если новый размер больше, то заполнить пикселы цветом color
 	void Inflate(const gm::Size &size, const gm::Color &color = gm::Color());
-
+	// Изменяем размер битмапа. Новый размер равен size
+	void Resize(const gm::Size &size, const gm::Color &color = gm::Color());
 };
 
 #endif // Bitmap_h__

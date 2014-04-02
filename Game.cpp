@@ -24,6 +24,7 @@
 #include "GraphicText.h"
 
 #include "GameMath.h"
+#include "Recognition.h"
 
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
@@ -259,6 +260,7 @@ std::string ToString( const T& val )
 
 int Game::Run()
 {
+
 	TypeListTest();
 
 	if(!Initialize()) 
@@ -270,15 +272,32 @@ int Game::Run()
 
 	LoadContent();
 	
+// 
+// 	double currentTime = glfwGetTime();
+// 	Recognition recognition;
+// 	recognition.Main();
+// 	LOG_INFO("Время преобразования картинки: %f", glfwGetTime() - currentTime);
+
 
 	Bitmap1 b1("atlas.png");
 	Bitmap1 b2("img12.png");
-	b1.Inflate(gm::Size(50, 20), gm::Color(0xFF0000FF));
+	//b1.Inflate(gm::Size(50, 20), gm::Color(0xFF0000FF));
+	b1.Inflate(gm::Size(50, 20));
 	//b1.Insert(b2, gm::Rectangle(5,5,20,20), gm::Point(10, 20));
 	//b1.Insert(b2, gm::Rectangle(5,5,20,20));
 	//b1.Insert(b2, gm::Point(10, 20));
 	b1.Insert(b2);
 	b1.Save("b1.png");
+
+
+	Atlas atlas(Bitmap1::FORMAT_RGBA, gm::Size(256, 256), gm::Size(128, 128));
+
+	atlas.Insert(Bitmap1("img1.png"), "1");
+	atlas.Insert(Bitmap1("img12.png"), "2");
+	atlas.Insert(Bitmap1("img2.png"), "3");
+	atlas.Insert(Bitmap1("img32.png"), "4");
+
+	atlas.GetBitmap()->Save("newAtlas.png");
 
 	int size = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
@@ -295,7 +314,6 @@ int Game::Run()
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 MVP = camera.CalculateMatrix() * model;
 
-	LOG_INFO("1");
 
  	Rectangle geometryRectangle;
  	geometryRectangle.SetPos(vec3(0, 50, -1));
@@ -359,6 +377,7 @@ int Game::Run()
 // 	testText.SetText("tessst1");
 
 
+
 	float *test1 = new float[20 * 10000];
 
 	while(Running && !glfwWindowShouldClose(window)) 
@@ -366,7 +385,7 @@ int Game::Run()
 		
 		fps.Update();
 		auto a = ToString(fps.GetCount()) + "=-+";
-	//	fpsText.SetText(a);
+//		fpsText.SetText(a);
 		glfwSetWindowTitle(window, a.c_str());
 
 		// Clear the screen

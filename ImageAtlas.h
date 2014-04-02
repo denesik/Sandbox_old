@@ -2,6 +2,15 @@
 #define ImageAtlas_h__
 
 #include "Bitmap.h"
+#include <map>
+#include <list>
+
+class Texture1
+{
+public:
+	unsigned int id;
+	gm::Size size;
+};
 
 class ImageAtlas
 {
@@ -54,33 +63,44 @@ class Atlas
 private:
 	struct ElasticBox
 	{
-		int x, y, w, h;				
+		gm::Rectangle rect;	
 		ElasticBox *childSmall;
 		ElasticBox *childBig;
+		ElasticBox *parent;
 	};
 
-	Bitmap *image;
-	ElasticBox *box;
+	Bitmap1 *atlasImage;
+	ElasticBox *atlasBox;
+
+	Bitmap1::PixelFormat format;
+	gm::Size maxSize;
+
+	std::list<ElasticBox *> emptyBoxList;
+
+	std::map<std::string, gm::Rectangle> atlasMap;
 
 public:
-	Atlas(unsigned int format, unsigned int maxSize);
+	Atlas(Bitmap1::PixelFormat format, const gm::Size &maxSize, const gm::Size &initSize = gm::Size(16, 16));
 	~Atlas();
 
 	bool Load(std::string fileName);
 	bool Save(std::string fileName);
 
-	bool Insert(Atlas *atlas);
-	bool Insert(Bitmap *image, std::string name);
-
-	// Создаем ogl текстуру
-	void Create();
+	bool Insert(Atlas &atlas);
+	bool Insert(const Bitmap1 &image, std::string name);
 
 	void Clear();
 
-	// Вернуть позицию картинки в атласе vec4(x, y, h, w);
-	i32vec4 GetImagePos(std::string name);
+	// Вернуть позицию картинки в атласе
+	gm::Rectangle GetImagePos(std::string name);
 
-	//Texture *GetTexture();
+	Bitmap1 *GetBitmap();
+
+	//Texture1 GetTexture();
+private:
+	void CreateEmptyBox(ElasticBox &box, gm::Rectangle &insertRect);
+	void PushEmptyBox(ElasticBox *box);
+	bool MajorRect(gm::Rectangle &r1, gm::Rectangle &r2);
 
 };
 

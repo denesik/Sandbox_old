@@ -976,8 +976,13 @@ gm::Rectangle Bitmap1::Insert( const Bitmap1 &bitmap, const gm::Rectangle &rect,
 
 void Bitmap1::Inflate( const gm::Size &_size, const gm::Color &color /*= gm::Color()*/ )
 {
+	Resize(size + _size, color);
+}
+
+void Bitmap1::Resize( const gm::Size &_size, const gm::Color &color /*= gm::Color()*/ )
+{
 	gm::Size oldSize = size;
-	size.Add(_size);
+	size = _size;
 
 	glm::uint8 *oldData = data;
 	data = new glm::uint8[size.width * size.height * stride];

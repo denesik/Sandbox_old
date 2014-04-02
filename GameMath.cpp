@@ -160,6 +160,19 @@ const bool Size::operator!=( const Size& s ) const
 	return width != s.width || height != s.height;
 }
 
+void Size::Clamp( const Size &min, const Size &max )
+{
+	if(width > max.width) 
+		width = max.width;
+	else
+		if(width < min.width) 
+			width = min.width;
+	if(height > max.height) 
+		height = max.height;
+	else
+		if(height < min.height) 
+			height = min.height;
+}
 
 
 Rectangle::Rectangle()
@@ -287,6 +300,11 @@ Rectangle Rectangle::Intersect( const Rectangle &r ) const
 bool Rectangle::IntersectsWith( const Rectangle &r ) const
 {
 	return Contains(r.pos) || r.Contains(pos);
+}
+
+bool Rectangle::IsAreaNull() const
+{
+	return w == 0 || h == 0;
 }
 
 

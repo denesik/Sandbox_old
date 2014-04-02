@@ -71,13 +71,14 @@ namespace gm
 
 		// Возвращает true если w и h равны 0
 		inline bool IsEmpty() const;
-
+		
 		void Add(const Size &s);
 		void Subtract(const Size &s);
 
 		inline bool Equals(const Size &s) const;
 		inline bool Equals(int widht, int height) const;
 
+		void Clamp(const Size &min, const Size &max);
 
 		const Size& operator=(const Size& s);
 
@@ -113,6 +114,9 @@ namespace gm
 
 		inline bool IsEmpty() const;
 
+		// Возвращает true если площадь = 0
+		bool IsAreaNull() const;
+
 		inline int Bottom() const;
 		inline int Top() const;
 		inline int Left() const;
@@ -121,7 +125,7 @@ namespace gm
 		// Определяет, содержится ли заданная точка в структуре Rectangle.
 		inline bool Contains(const Point &p) const;
 		inline bool Contains(int x, int y) const;
-		inline bool Contains(const Rectangle &r) const;
+		bool Contains(const Rectangle &r) const;
 
 		inline bool Equals(const Rectangle &r) const;
 
@@ -142,7 +146,7 @@ namespace gm
 
 		Rectangle& operator=(const Rectangle& r);
 
-		inline const bool operator==(const Rectangle& r) const;
+		const bool operator==(const Rectangle& r) const;
 
 		inline const bool operator!=(const Rectangle& r) const;
 

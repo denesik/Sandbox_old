@@ -1,0 +1,82 @@
+
+{
+	"ElasticBox" : 
+	[
+		
+		{
+			"childBig" : 6,
+			"childSmall" : 1,
+			"parent" : -1,
+			"rect" : [ 0, 0, 128, 128 ]
+		},
+		
+		{
+			"childBig" : -1,
+			"childSmall" : 2,
+			"parent" : 0,
+			"rect" : [ 0, 32, 32, 96 ]
+		},
+		
+		{
+			"childBig" : 4,
+			"childSmall" : 3,
+			"parent" : 1,
+			"rect" : [ 0, 64, 32, 64 ]
+		},
+		
+		{
+			"childBig" : -1,
+			"childSmall" : -1,
+			"parent" : 2,
+			"rect" : [ 16, 64, 16, 16 ]
+		},
+		
+		{
+			"childBig" : -1,
+			"childSmall" : 5,
+			"parent" : 2,
+			"rect" : [ 0, 80, 32, 48 ]
+		},
+		
+		{
+			"childBig" : -1,
+			"childSmall" : -1,
+			"parent" : 4,
+			"rect" : [ 0, 112, 32, 16 ]
+		},
+		
+		{
+			"childBig" : 8,
+			"childSmall" : 7,
+			"parent" : 0,
+			"rect" : [ 32, 0, 96, 128 ]
+		},
+		
+		{
+			"childBig" : -1,
+			"childSmall" : -1,
+			"parent" : 6,
+			"rect" : [ 64, 0, 64, 32 ]
+		},
+		
+		{
+			"childBig" : -1,
+			"childSmall" : -1,
+			"parent" : 6,
+			"rect" : [ 32, 32, 96, 96 ]
+		}
+	],
+	"EmptyBoxList" : [ 3, 5, 7, 8 ],
+	"MaxSize" : 
+	{
+		"Height" : 256,
+		"Width" : 256
+	},
+	"Name" : "Atlas",
+	"RootBoxList" : [ 0 ],
+	"Size" : 
+	{
+		"Height" : 128,
+		"Width" : 128
+	}
+}

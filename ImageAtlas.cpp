@@ -1,5 +1,7 @@
 #include "ImageAtlas.h"
 #include "Logger.h"
+#include <value.h>
+#include <writer.h>
 
 
 
@@ -211,20 +213,23 @@ void ImageAtlas::InitElasticBox()
 
 
 
-Atlas::Atlas( Bitmap1::PixelFormat _format, const gm::Size &_maxSize, const gm::Size &initSize )
+Atlas::Atlas( std::string name, Bitmap1::PixelFormat _format, const gm::Size &_maxSize, const gm::Size &initSize )
 {
+	atlasName = name;
 	format = _format;
 	maxSize = _maxSize;
+	atlasSize = initSize;
 
 	gm::Size boxSize = initSize;
 	boxSize.Clamp(gm::Size(), maxSize);
 
-	atlasBox = new ElasticBox();
+	ElasticBox *atlasBox = new ElasticBox();
 	atlasBox->rect = gm::Rectangle(gm::Point(),boxSize);
 	atlasBox->childSmall = nullptr;
 	atlasBox->childBig = nullptr;
 	atlasBox->parent = nullptr;
 
+	rootBoxList.push_back(atlasBox);
 	emptyBoxList.push_back(atlasBox);
 
 	atlasImage = new Bitmap1(format, atlasBox->rect.size);
@@ -242,8 +247,142 @@ bool Atlas::Load( std::string fileName )
 	return true;
 }
 
-bool Atlas::Save( std::string fileName )
+bool Atlas::Save()
 {
+	std::ofstream configFile(atlasName + ".json");
+
+	Json::Value root;
+
+	root["Name"] = atlasName;
+	root["Size"]["Width"] = atlasSize.width;
+	root["Size"]["Height"] = atlasSize.height;
+	root["MaxSize"]["Width"] = maxSize.width;
+	root["MaxSize"]["Height"] = maxSize.height;
+
+	//root["RootBoxList"] = 
+
+	Json::Value rootBoxListVal(Json::arrayValue);
+	Json::Value emptyBoxListVal(Json::arrayValue);
+	//rootBoxListVal.append(Json::Value(1));
+
+	std::list<ElasticBox *> stackBox;
+	for(auto i = rootBoxList.begin(); i != rootBoxList.end(); i++)
+	{
+		stackBox.push_back(*i);
+	}
+
+	std::vector<ElasticBox *> vectorBox;
+
+	while(stackBox.begin() != stackBox.end())
+	{
+		ElasticBox *box = stackBox.back();
+		stackBox.pop_back();
+
+		vectorBox.push_back(box);
+
+		if(box->childBig)
+			stackBox.push_back(box->childBig);
+		if(box->childSmall)
+			stackBox.push_back(box->childSmall);
+	}
+
+	for(auto i = rootBoxList.begin(); i != rootBoxList.end(); i++)
+	{
+		for(unsigned int j = 0; j < vectorBox.size(); j++)
+		{
+			if(vectorBox[j] == *i)
+			{
+				rootBoxListVal.append(Json::Value(j));
+				break;
+			}
+		}
+	}
+
+	for(auto i = emptyBoxList.begin(); i != emptyBoxList.end(); i++)
+	{
+		for(unsigned int j = 0; j < vectorBox.size(); j++)
+		{
+			if(vectorBox[j] == *i)
+			{
+				emptyBoxListVal.append(Json::Value(j));
+				break;
+			}
+		}
+	}
+
+	stackBox.clear();
+	for(auto i = rootBoxList.begin(); i != rootBoxList.end(); i++)
+	{
+		stackBox.push_back(*i);
+	}
+
+	while(stackBox.begin() != stackBox.end())
+	{
+		ElasticBox *box = stackBox.back();
+		stackBox.pop_back();
+
+		for(unsigned int j = 0; j < vectorBox.size(); j++)
+		{
+			if(vectorBox[j] == box)
+			{
+				Json::Value rectVal(Json::arrayValue);
+				rectVal.append(Json::Value(box->rect.x));
+				rectVal.append(Json::Value(box->rect.y));
+				rectVal.append(Json::Value(box->rect.w));
+				rectVal.append(Json::Value(box->rect.h));
+				root["ElasticBox"][j]["rect"] = rectVal;
+
+				int childSmall = -1;
+				for(unsigned int k = 0; k < vectorBox.size(); k++)
+				{
+					if(vectorBox[k] == box->childSmall)
+					{
+						childSmall = k;
+						break;
+					}
+				}
+				root["ElasticBox"][j]["childSmall"] = childSmall;
+
+				int childBig = -1;
+				for(unsigned int k = 0; k < vectorBox.size(); k++)
+				{
+					if(vectorBox[k] == box->childBig)
+					{
+						childBig = k;
+						break;
+					}
+				}
+				root["ElasticBox"][j]["childBig"] = childBig;
+
+				int parent = -1;
+				for(unsigned int k = 0; k < vectorBox.size(); k++)
+				{
+					if(vectorBox[k] == box->parent)
+					{
+						parent = k;
+						break;
+					}
+				}
+				root["ElasticBox"][j]["parent"] = parent;
+
+				break;
+			}
+		}
+
+		if(box->childBig)
+			stackBox.push_back(box->childBig);
+		if(box->childSmall)
+			stackBox.push_back(box->childSmall);
+	}
+
+	root["RootBoxList"] = rootBoxListVal;
+	root["EmptyBoxList"] = emptyBoxListVal;
+
+	atlasImage->Save(atlasName + ".png");
+
+	configFile << root;
+	configFile.close();
+
 	return true;
 }
 
@@ -263,37 +402,40 @@ bool Atlas::Insert( const Bitmap1 &image, std::string name )
 
 	const gm::Size &imageSize = image.GetSize();
 
-	for(auto i = emptyBoxList.begin(); i != emptyBoxList.end(); i++)
-	{
-		gm::Rectangle bitmapRect((*i)->rect.pos, imageSize);
 
-		if((*i)->rect.Contains(bitmapRect))
+	for(auto j = emptyBoxList.begin(); j != emptyBoxList.end(); j++)
+	{
+		gm::Rectangle bitmapRect((*j)->rect.pos, imageSize);
+
+		if((*j)->rect.Contains(bitmapRect))
 		{
-			ElasticBox &box = **i;
+			ElasticBox &box = **j;
 			gm::Rectangle insertRect = atlasImage->Insert(image, box.rect.pos);
 			atlasMap[name] = insertRect;
 
 			// Удаляем бокс из списка пустых боксов
-			emptyBoxList.erase(i);
+			emptyBoxList.erase(j);
 
 			// Выбираем бокс
 			// Вставляем пустые боксы в список в упорядоченном виде по возрастанию
 			CreateEmptyBox(box, insertRect);
-			
+
 			return true;
 		}
 	}
 
+	// Не смогли вставить битмап.
 	// Размер атласа равен максимальному. Выход
-/*	if()
+	if(atlasSize == maxSize)
 	{
-
+		LOG_WARNING("Невозможно вставить битмап в атлас. Достигнут максимальный размер атласа.");
 		return false;
 	}
-*/
+	// Увеличиваем размер атласа.
 
-	// Не получилось вставить изображение
-	return false;
+	ResizeAtlas(gm::Size(atlasSize.width * 2, atlasSize.height * 2));
+
+	return Insert(image, name);
 }
 
 void Atlas::Clear()
@@ -359,7 +501,7 @@ void Atlas::CreateEmptyBox( ElasticBox &box, gm::Rectangle &insertRect )
 		rs2 = RectBottomBig;
 		rb2 = RectTopSmall;
 	}
-	
+
 
 	gm::Rectangle &rectBig = rb1;
 	gm::Rectangle &rectSmall = rs1;
@@ -420,4 +562,44 @@ bool Atlas::MajorRect( gm::Rectangle &r1, gm::Rectangle &r2 )
 Bitmap1 * Atlas::GetBitmap()
 {
 	return atlasImage;
+}
+
+void Atlas::ResizeAtlas( const gm::Size &newSize )
+{
+	gm::Size boxSize = newSize;
+	boxSize.Clamp(atlasSize, maxSize);
+
+	gm::Rectangle atlasRect(gm::Point(), atlasSize);
+	gm::Rectangle newAtlasRect(gm::Point(), boxSize);
+
+	gm::Rectangle RectLeftSmall(gm::FromLTRB(newAtlasRect.Left(), atlasRect.Bottom(), atlasRect.Right(), newAtlasRect.Bottom()));
+	gm::Rectangle RectRightBig(gm::FromLTRB(atlasRect.Right(), atlasRect.Top(), newAtlasRect.Right(), newAtlasRect.Bottom()));
+
+	// Если площадь не нулевая
+	if(!RectLeftSmall.IsAreaNull())
+	{
+		ElasticBox *atlasBox = new ElasticBox();
+		atlasBox->rect = RectLeftSmall;
+		atlasBox->childSmall = nullptr;
+		atlasBox->childBig = nullptr;
+		atlasBox->parent = nullptr;
+
+		rootBoxList.push_back(atlasBox);
+		emptyBoxList.push_back(atlasBox);
+	}
+
+	if(!RectRightBig.IsAreaNull())
+	{
+		ElasticBox *atlasBox = new ElasticBox();
+		atlasBox->rect = RectRightBig;
+		atlasBox->childSmall = nullptr;
+		atlasBox->childBig = nullptr;
+		atlasBox->parent = nullptr;
+
+		rootBoxList.push_back(atlasBox);
+		emptyBoxList.push_back(atlasBox);
+	}
+
+	atlasSize = boxSize;
+	atlasImage->Resize(atlasSize);
 }

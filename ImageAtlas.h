@@ -69,22 +69,25 @@ private:
 		ElasticBox *parent;
 	};
 
+	std::string atlasName;
+
 	Bitmap1 *atlasImage;
-	ElasticBox *atlasBox;
 
 	Bitmap1::PixelFormat format;
 	gm::Size maxSize;
+	gm::Size atlasSize;
 
+	std::list<ElasticBox *> rootBoxList;
 	std::list<ElasticBox *> emptyBoxList;
 
 	std::map<std::string, gm::Rectangle> atlasMap;
 
 public:
-	Atlas(Bitmap1::PixelFormat format, const gm::Size &maxSize, const gm::Size &initSize = gm::Size(16, 16));
+	Atlas(std::string name, Bitmap1::PixelFormat format, const gm::Size &maxSize, const gm::Size &initSize = gm::Size(16, 16));
 	~Atlas();
 
 	bool Load(std::string fileName);
-	bool Save(std::string fileName);
+	bool Save();
 
 	bool Insert(Atlas &atlas);
 	bool Insert(const Bitmap1 &image, std::string name);
@@ -101,6 +104,8 @@ private:
 	void CreateEmptyBox(ElasticBox &box, gm::Rectangle &insertRect);
 	void PushEmptyBox(ElasticBox *box);
 	bool MajorRect(gm::Rectangle &r1, gm::Rectangle &r2);
+
+	void ResizeAtlas(const gm::Size &newSize);
 
 };
 

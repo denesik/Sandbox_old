@@ -84,9 +84,9 @@ private:
 
 public:
 	Atlas(std::string name, Bitmap1::PixelFormat format, const gm::Size &maxSize, const gm::Size &initSize = gm::Size(16, 16));
+	Atlas(std::string fileName);
 	~Atlas();
 
-	bool Load(std::string fileName);
 	bool Save();
 
 	bool Insert(Atlas &atlas);

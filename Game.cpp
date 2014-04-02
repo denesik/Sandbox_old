@@ -289,8 +289,8 @@ int Game::Run()
 	b1.Insert(b2);
 	b1.Save("b1.png");
 
-
-	Atlas atlas("Atlas", Bitmap1::FORMAT_RGBA, gm::Size(256, 256), gm::Size(128, 128));
+	/*
+	Atlas atlas("TestAtlas", Bitmap1::FORMAT_RGBA, gm::Size(256, 256), gm::Size(128, 128));
 
 	atlas.Insert(Bitmap1("img1.png"), "1");
 	atlas.Insert(Bitmap1("img12.png"), "2");
@@ -301,6 +301,12 @@ int Game::Run()
 	atlas.GetBitmap()->Save("newAtlas.png");
 
 	atlas.Save();
+	*/
+	Atlas atlas("TestAtlas.json");
+	atlas.Insert(Bitmap1("test.png"), "5");
+	atlas.Insert(Bitmap1("img2.png"), "3");
+
+	atlas.GetBitmap()->Save("newAtlas.png");
 
 	int size = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);

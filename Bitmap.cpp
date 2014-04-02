@@ -1004,3 +1004,8 @@ void Bitmap1::Resize( const gm::Size &_size, const gm::Color &color /*= gm::Colo
 		}
 }
 
+Bitmap1::PixelFormat Bitmap1::GetFormat()
+{
+	return format;
+}
+

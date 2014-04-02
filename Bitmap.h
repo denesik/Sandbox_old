@@ -51,6 +51,8 @@ public:
 		return format;
 	}
 
+
+
 	void ConvertFormat(unsigned int format);
 
 	// Вставляем изображение с областью srcrect
@@ -109,6 +111,8 @@ public:
 	gm::Color GetPixel(const gm::Point &pos) const;
 	void SetPixel(const gm::Point &pos, const gm::Color &color);
 	
+	PixelFormat GetFormat();
+
 	// Вставляем битмап
 	gm::Rectangle Insert(const Bitmap1 &bitmap, const gm::Point &pos = gm::Point());
 	gm::Rectangle Insert(const Bitmap1 &bitmap, const gm::Rectangle &rect, const gm::Point &pos = gm::Point());

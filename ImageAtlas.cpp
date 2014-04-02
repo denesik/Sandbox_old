@@ -2,6 +2,7 @@
 #include "Logger.h"
 #include <value.h>
 #include <writer.h>
+#include <reader.h>
 
 
 
@@ -235,16 +236,108 @@ Atlas::Atlas( std::string name, Bitmap1::PixelFormat _format, const gm::Size &_m
 	atlasImage = new Bitmap1(format, atlasBox->rect.size);
 }
 
+Atlas::Atlas( std::string fileName )
+{
+	std::ifstream configFile(fileName);
+
+	if (!configFile.is_open()) 
+	{
+		LOG_WARNING("Не корректный формат атласа %s.", fileName);
+		Atlas(fileName, Bitmap1::FORMAT_RGBA, gm::Size(1024, 1024));
+		return;
+	}
+
+	Json::Value root;
+	Json::Reader reader;
+
+	bool parsingSuccessful = reader.parse( configFile, root );
+	if ( !parsingSuccessful )
+	{
+		LOG_WARNING("Загрузка атласа. Ошибка в структуре конфигурационного файла %s. %s", fileName, reader.getFormatedErrorMessages());
+		configFile.close();
+		Atlas(fileName, Bitmap1::FORMAT_RGBA, gm::Size(1024, 1024));
+		return;
+	}
+
+	atlasName = root["Name"].asString();
+	atlasSize.width = root["Size"]["Width"].asInt();
+	atlasSize.height = root["Size"]["Height"].asInt();
+	maxSize.width = root["MaxSize"]["Width"].asInt();
+	maxSize.height = root["MaxSize"]["Height"].asInt();
+
+	std::vector<ElasticBox *> vectorBox;
+	const Json::Value vectorBoxVal = root["ElasticBox"];
+
+	for(unsigned int i = 0; i < vectorBoxVal.size(); i++)
+	{
+		ElasticBox *box = new ElasticBox;
+		const Json::Value rectVal = vectorBoxVal[i]["rect"];
+		box->rect.x = rectVal[0U].asInt();
+		box->rect.y = rectVal[1U].asInt();
+		box->rect.w = rectVal[2U].asInt();
+		box->rect.h = rectVal[3U].asInt();
+
+		box->childBig = nullptr;
+		box->childSmall = nullptr;
+		box->parent = nullptr;
+
+		vectorBox.push_back(box);
+	}
+
+	for(unsigned int i = 0; i < vectorBoxVal.size(); i++)
+	{
+		ElasticBox &box = *vectorBox[i];
+		
+		int childBig = vectorBoxVal[i]["childBig"].asInt();
+		if(childBig > -1 && childBig < (int)vectorBoxVal.size())
+		{
+			box.childBig = vectorBox[childBig];
+		}
+
+		int childSmall = vectorBoxVal[i]["childSmall"].asInt();
+		if(childSmall > -1 && childSmall < (int)vectorBoxVal.size())
+		{
+			box.childSmall = vectorBox[childSmall];
+		}
+
+		int parent = vectorBoxVal[i]["parent"].asInt();
+		if(parent > -1 && parent < (int)vectorBoxVal.size())
+		{
+			box.parent = vectorBox[parent];
+		}
+	}
+
+
+	const Json::Value rootBoxListVal = root["RootBoxList"];
+	const Json::Value emptyBoxListVal = root["EmptyBoxList"];
+
+	for(unsigned int i = 0; i < rootBoxListVal.size(); i++)
+	{
+		int rootBoxVal = rootBoxListVal[i].asInt();
+		if(rootBoxVal > -1 && rootBoxVal < (int)vectorBoxVal.size())
+		{
+			rootBoxList.push_back(vectorBox[rootBoxVal]);
+		}
+	}
+
+	for(unsigned int i = 0; i < emptyBoxListVal.size(); i++)
+	{
+		int emptyBoxVal = emptyBoxListVal[i].asInt();
+		if(emptyBoxVal > -1 && emptyBoxVal < (int)vectorBoxVal.size())
+		{
+			emptyBoxList.push_back(vectorBox[emptyBoxVal]);
+		}
+	}
+
+	atlasImage = new Bitmap1(atlasName + ".png");
+	format = atlasImage->GetFormat();
+}
+
 Atlas::~Atlas()
 {
 	delete atlasImage;
 	atlasImage = nullptr;
 	//рекурсивно удалить box
-}
-
-bool Atlas::Load( std::string fileName )
-{
-	return true;
 }
 
 bool Atlas::Save()
@@ -259,11 +352,8 @@ bool Atlas::Save()
 	root["MaxSize"]["Width"] = maxSize.width;
 	root["MaxSize"]["Height"] = maxSize.height;
 
-	//root["RootBoxList"] = 
-
 	Json::Value rootBoxListVal(Json::arrayValue);
 	Json::Value emptyBoxListVal(Json::arrayValue);
-	//rootBoxListVal.append(Json::Value(1));
 
 	std::list<ElasticBox *> stackBox;
 	for(auto i = rootBoxList.begin(); i != rootBoxList.end(); i++)

@@ -50,6 +50,7 @@ public:
 	Font1(std::string fileName, std::string fontName, unsigned int size, Atlas *atlas);
 	~Font1(void);
 
+	// Генерируем текстурные координаты для глифов
 	void Create();
 
 	bool CreateGlyph(std::string utf8glyph);

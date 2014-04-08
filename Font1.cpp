@@ -66,6 +66,11 @@ bool Font1::CreateGlyph( std::string utf8glyph )
 	unsigned int glyphNumber;
 	std::vector<int> glyphsUTF32;
 	utf8::utf8to32(utf8glyph.begin(), utf8glyph.end(), std::back_inserter(glyphsUTF32));
+	if(glyphsUTF32.size() <= 0)
+	{
+		return false;
+	}
+
 	glyphNumber = glyphsUTF32[0];
 	
 	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, glyphNumber ), FT_LOAD_DEFAULT ))
@@ -120,6 +125,16 @@ bool Font1::CreateGlyph( std::string utf8glyph )
 
 void Font1::Create()
 {
+	gm::Size atlasSize = glyphAtlas->GetSize();
+
+	for(auto i = glyphsTextureMap.begin(); i != glyphsTextureMap.end(); i++)
+	{
+		FontGlyphTexture &fgt = (*i).second;
+		fgt.fontGlyph.u1 = float(atlasSize.width) / float(fgt.rect.Left());
+		fgt.fontGlyph.v1 = float(atlasSize.height) / float(fgt.rect.Bottom());
+		fgt.fontGlyph.u2 = float(atlasSize.width) / float(fgt.rect.Right());
+		fgt.fontGlyph.v2 = float(atlasSize.height) / float(fgt.rect.Top());
+	}
 
 }
 

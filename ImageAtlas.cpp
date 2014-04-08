@@ -740,3 +740,8 @@ void Atlas::ResizeAtlas( const gm::Size &newSize )
 	atlasSize = boxSize;
 	atlasImage->Resize(atlasSize);
 }
+
+const gm::Size & Atlas::GetSize() const
+{
+	return atlasSize;
+}

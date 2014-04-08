@@ -19,6 +19,11 @@ inline unsigned int next_p2( unsigned int a )
 	return rval;
 }
 
+namespace Json
+{
+	class Value;
+}
+
 namespace gm
 {
 	struct Size;
@@ -45,6 +50,8 @@ namespace gm
 		// Возвращает true если x и y равны 0
 		inline bool IsEmpty() const;
 
+		::Json::Value Serialize() const;
+		void UnSerialize(const ::Json::Value &val);
 
 		inline const Point& operator=(const Point& p);
 
@@ -71,14 +78,17 @@ namespace gm
 
 		// Возвращает true если w и h равны 0
 		inline bool IsEmpty() const;
-		
-		void Add(const Size &s);
-		void Subtract(const Size &s);
+
+		void Inflate(const Size &s);
+		void Inflate(int w, int h);
 
 		inline bool Equals(const Size &s) const;
 		inline bool Equals(int widht, int height) const;
 
 		void Clamp(const Size &min, const Size &max);
+
+		::Json::Value Serialize() const;
+		void UnSerialize(const ::Json::Value &val);
 
 		const Size& operator=(const Size& s);
 
@@ -143,6 +153,8 @@ namespace gm
 		inline void Offset(Point &p);
 		inline void Offset(int x, int y);
 
+		::Json::Value Serialize() const;
+		void UnSerialize(const ::Json::Value &val);
 
 		Rectangle& operator=(const Rectangle& r);
 

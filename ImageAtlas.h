@@ -100,6 +100,7 @@ public:
 	gm::Rectangle GetImagePos(std::string name);
 
 	Bitmap1 *GetBitmap();
+	const gm::Size &GetSize() const;
 
 	//Texture1 GetTexture();
 private:

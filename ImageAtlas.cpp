@@ -221,6 +221,7 @@ Atlas::Atlas( std::string name, Bitmap1::PixelFormat _format, int _indent, const
 	indent = _indent;
 	maxSize = _maxSize;
 	atlasSize = initSize;
+	atlasImage = nullptr;
 
 	gm::Size boxSize = initSize;
 	boxSize.Clamp(gm::Size(), maxSize);
@@ -239,6 +240,11 @@ Atlas::Atlas( std::string name, Bitmap1::PixelFormat _format, int _indent, const
 
 Atlas::Atlas( std::string fileName )
 {
+	atlasName = "";
+	format = Bitmap1::FORMAT_NULL;
+	indent = 0;
+	atlasImage = nullptr;
+
 	std::ifstream configFile(fileName);
 
 	if (!configFile.is_open()) 
@@ -353,8 +359,11 @@ Atlas::Atlas( std::string fileName )
 
 Atlas::~Atlas()
 {
-	delete atlasImage;
-	atlasImage = nullptr;
+	if(atlasImage)
+	{
+		delete atlasImage;
+		atlasImage = nullptr;
+	}
 	//рекурсивно удалить box
 }
 
@@ -526,7 +535,7 @@ bool Atlas::Insert( const Bitmap1 &image, std::string name )
 	// Проверяем, есть ли битмап с таким именем
 	if(atlasMap.find(name) != atlasMap.end())
 	{
-		LOG_WARNING("Битмап %s уже имеется в атласе.", name.c_str());
+	//	LOG_WARNING("Битмап %s уже имеется в атласе.", name.c_str());
 		return false;
 	}
 
@@ -745,4 +754,9 @@ void Atlas::ResizeAtlas( const gm::Size &newSize )
 const gm::Size & Atlas::GetSize() const
 {
 	return atlasSize;
+}
+
+std::string Atlas::GetName() const
+{
+	return atlasName;
 }

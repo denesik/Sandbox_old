@@ -1,0 +1,37 @@
+{
+	"Default" :
+	{
+		"FontName" : "times",
+		"FileName" : "fonts/times.ttf",
+		"Size" : 14,
+		"Glyphs" : 
+		[
+			"1234567890",
+			"abcdefghijklmnopqrstuvwxyz",
+			"абвгдеёжзийклмнопрстуфхцч шщъыьэюя"
+		]
+	},
+	"Mini" :
+	{
+		"FontName" : "timesMini",
+		"FileName" : "fonts/times.ttf",
+		"Size" : 8,
+		"Glyphs" : 
+		[
+			"1234567890",
+			"абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+		]
+	},
+	"1" :
+	{
+		"FontName" : "times1",
+		"FileName" : "fonts/times.ttf",
+		"Size" : 64,
+		"Glyphs" : 
+		[
+			"1234567890",
+			"abcdefghijklmnopqrstuvwxyz",
+			"абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+		]
+	}
+}

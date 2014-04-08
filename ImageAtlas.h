@@ -102,6 +102,8 @@ public:
 	Bitmap1 *GetBitmap();
 	const gm::Size &GetSize() const;
 
+	std::string GetName() const;
+
 	//Texture1 GetTexture();
 private:
 	void CreateEmptyBox(ElasticBox &box, gm::Rectangle &insertRect);

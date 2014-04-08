@@ -825,7 +825,8 @@ Bitmap1::Bitmap1( const Bitmap1 &bitmap )
 
 Bitmap1::~Bitmap1()
 {
-	delete[] data;
+	if(data)
+		delete[] data;
 }
 
 #pragma warning(push)

@@ -40,29 +40,29 @@ namespace gm
 		~Point(){};
 
 		// Смещает точку
-		inline void Offset(const Point &p);
-		inline void Offset(int x, int y);
+		 void Offset(const Point &p);
+		 void Offset(int x, int y);
 
 		// Сравнивает точку
-		inline bool Equals(const Point &p) const;
-		inline bool Equals(int x, int y) const;
+		 bool Equals(const Point &p) const;
+		 bool Equals(int x, int y) const;
 
 		// Возвращает true если x и y равны 0
-		inline bool IsEmpty() const;
+		 bool IsEmpty() const;
 
 		::Json::Value Serialize() const;
 		void UnSerialize(const ::Json::Value &val);
 
-		inline const Point& operator=(const Point& p);
+		 const Point& operator=(const Point& p);
 
 		// Смещает точку Point на заданное значение Size.
-		inline const Point operator+(const Size& s) const;
+		 const Point operator+(const Size& s) const;
 
-		inline const Point operator-(const Size& s) const;
+		 const Point operator-(const Size& s) const;
 
-		inline const bool operator==(const Point& p) const;
+		 const bool operator==(const Point& p) const;
 
-		inline const bool operator!=(const Point& p) const;
+		 const bool operator!=(const Point& p) const;
 
 	};
 
@@ -82,8 +82,8 @@ namespace gm
 		void Inflate(const Size &s);
 		void Inflate(int w, int h);
 
-		inline bool Equals(const Size &s) const;
-		inline bool Equals(int widht, int height) const;
+		 bool Equals(const Size &s) const;
+		 bool Equals(int widht, int height) const;
 
 		void Clamp(const Size &min, const Size &max);
 
@@ -96,9 +96,9 @@ namespace gm
 
 		const Size operator-(const Size& s) const; 
 
-		inline const bool operator==(const Size& s) const;
+		 const bool operator==(const Size& s) const;
 
-		inline const bool operator!=(const Size& s) const;
+		 const bool operator!=(const Size& s) const;
 
 	};
 
@@ -122,22 +122,22 @@ namespace gm
 		Rectangle(int x, int y, int w, int h);
 		Rectangle(const Rectangle &rectangle);
 
-		inline bool IsEmpty() const;
+		 bool IsEmpty() const;
 
 		// Возвращает true если площадь = 0
 		bool IsAreaNull() const;
 
-		inline int Bottom() const;
-		inline int Top() const;
-		inline int Left() const;
-		inline int Right() const;
+		 int Bottom() const;
+		 int Top() const;
+		 int Left() const;
+		 int Right() const;
 
 		// Определяет, содержится ли заданная точка в структуре Rectangle.
-		inline bool Contains(const Point &p) const;
-		inline bool Contains(int x, int y) const;
+		 bool Contains(const Point &p) const;
+		 bool Contains(int x, int y) const;
 		bool Contains(const Rectangle &r) const;
 
-		inline bool Equals(const Rectangle &r) const;
+		 bool Equals(const Rectangle &r) const;
 
 		// Увеличивает данный объект Rectangle на заданную величину.
 		void Inflate(const Size &s);
@@ -147,11 +147,11 @@ namespace gm
 		Rectangle Intersect(const Rectangle &r) const;
 
 		// Определяет, пересекается ли данный прямоугольник с прямоугольником r.
-		inline bool IntersectsWith(const Rectangle &r) const;
+		 bool IntersectsWith(const Rectangle &r) const;
 
 		// Изменяет положение этого прямоугольника на указанную величину.
-		inline void Offset(Point &p);
-		inline void Offset(int x, int y);
+		 void Offset(Point &p);
+		 void Offset(int x, int y);
 
 		::Json::Value Serialize() const;
 		void UnSerialize(const ::Json::Value &val);
@@ -160,7 +160,7 @@ namespace gm
 
 		const bool operator==(const Rectangle& r) const;
 
-		inline const bool operator!=(const Rectangle& r) const;
+		 const bool operator!=(const Rectangle& r) const;
 
 	};
 
@@ -183,18 +183,18 @@ namespace gm
 		Color(glm::uint8 r, glm::uint8 g, glm::uint8 b, glm::uint8 a = 0);
 		Color(const Color &c);
 
-		inline bool Equals(const Color &c) const;
+		 bool Equals(const Color &c) const;
 
-		inline const Color& operator=(const Color& c);
+		 const Color& operator=(const Color& c);
 
-		inline const bool operator==(const Color& c) const;
+		 const bool operator==(const Color& c) const;
 
-		inline const bool operator!=(const Color& c) const;
+		 const bool operator!=(const Color& c) const;
 
 	};
 
-	inline const Rectangle FromLTRB(const Point &LT, const Point &RB);
-	inline const Rectangle FromLTRB(int LTx, int LTy, int RBx, int RBy);
+	 const Rectangle FromLTRB(const Point &LT, const Point &RB);
+	 const Rectangle FromLTRB(int LTx, int LTy, int RBx, int RBy);
 }
 
 struct iRect

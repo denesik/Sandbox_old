@@ -4,7 +4,7 @@
 #include <fstream>
 
 //#define LOG_DEBUG_INFO
-//#define LOG_DEBUG_WARNING
+#define LOG_DEBUG_WARNING
 #define LOG_DEBUG_ERROR
 #define LOG_DEBUG_FATAL
 

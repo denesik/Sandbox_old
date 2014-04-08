@@ -56,11 +56,15 @@ public:
 	// Генерируем текстурные координаты для глифов
 	bool Create();
 
-	// Генерируем символ в кодировке utf-8
-	bool CreateGlyph(std::string utf8glyph);
+	// Генерируем символ в кодировке utf-32
+	bool CreateGlyph(unsigned int utf32glyph);
 
-	// получаем символ в кодировке utf-8
-	const FontGlyph &GetGlyph(std::string utf8glyph) const;
+	// получаем символ в кодировке utf-32
+	const FontGlyph &GetGlyph(unsigned int utf32glyph) const;
+
+	bool FindGlyph(unsigned int utf32glyph) const;
+
+	std::string GetName() const;
 
 private:
 	bool GenerateEmptyGlyph();

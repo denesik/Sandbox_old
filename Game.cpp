@@ -26,6 +26,7 @@
 #include "GameMath.h"
 #include "Recognition.h"
 #include "Font1.h"
+#include "ResourceManager.h"
 
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
@@ -280,37 +281,16 @@ int Game::Run()
 // 	LOG_INFO("Время преобразования картинки: %f", glfwGetTime() - currentTime);
 
 
-
-	
-	Atlas fontAtlas("fontAtlas", Bitmap1::FORMAT_RGBA, 1, gm::Size(512, 512), gm::Size(128, 128));
-
-	Font1 f("fonts/times.ttf", "times", 14, &fontAtlas);
-
-	std::string s = "qwertyuiop[]asdfghjkl;'zxcvbnm,./";
-	std::string s1 = "0";
-	for(unsigned int i = 0; i < s.size(); i++)
-	{
-		s1[0] = s[i];
-
-		f.CreateGlyph(s1);
-	}
-
-	f.Create();
-	f.Save();
-
-	fontAtlas.Save();
-	
-/*
-	Atlas testAtlas("testAtlas", Bitmap1::FORMAT_RGBA, 1, gm::Size(512, 512), gm::Size(128, 128));
-	testAtlas.Insert(Bitmap1("img1.png"), "1");
-	testAtlas.Insert(Bitmap1("img2.png"), "2");
-	testAtlas.Insert(Bitmap1("img3.png"), "3");
-	testAtlas.Insert(Bitmap1("img5.png"), "5");
-	testAtlas.Save();
-*/
 	int size = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
 
+
+
+	ResourceManager rc;
+	rc.LoadFont("Default");
+	rc.LoadFont("Mini");
+	rc.LoadFont("1");
+	rc.CreateFonts();
 
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "shaders/t2.vs", "shaders/t2.fs" );

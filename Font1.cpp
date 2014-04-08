@@ -1,10 +1,20 @@
 #include "Font1.h"
 #include "Logger.h"
 #include <vector>
-#include <utf8.h>
 #include <value.h>
 #include <writer.h>
 #include <reader.h>
+
+
+#include <sstream>
+template< typename T >
+std::string ToString( const T& val )
+{
+	std::stringstream iss;
+	iss << val;
+	return iss.str();
+}
+
 
 Font1::Font1(std::string _fileName, std::string _fontName, unsigned int _size, Atlas *atlas)
 {
@@ -65,14 +75,6 @@ Font1::Font1( std::string configFileName, Atlas *atlas )
 	}
 
 
-	if (FT_New_Face( library, fileName.c_str(), 0, &face )) 
-	{
-		LOG_WARNING("Шрифт %s не инициализирован.", fileName.c_str());
-		return;
-	}
-	FT_Set_Char_Size( face, size << 6, size << 6, 96, 96);
-
-
 	std::ifstream configFile(configFileName);
 
 	if (!configFile.is_open()) 
@@ -95,6 +97,13 @@ Font1::Font1( std::string configFileName, Atlas *atlas )
 	fontName = root["FontName"].asString();
 	fileName = root["FileName"].asString();
 	size = root["Size"].asUInt();
+
+	if (FT_New_Face( library, fileName.c_str(), 0, &face )) 
+	{
+		LOG_WARNING("Шрифт %s не инициализирован.", fileName.c_str());
+		return;
+	}
+	FT_Set_Char_Size( face, size << 6, size << 6, 96, 96);
 
 	emptyGlyph.rect.UnSerialize(root["EmptyGlyph"]["Rect"]);
 	emptyGlyph.fontGlyph.u1 = (float)root["EmptyGlyph"]["FontGlyph"]["u1"].asDouble();
@@ -152,24 +161,15 @@ Font1::~Font1(void)
 	}
 }
 
-bool Font1::CreateGlyph( std::string utf8glyph )
+
+bool Font1::CreateGlyph( unsigned int utf32glyph )
 {
 	if(!(library && face && glyphAtlas))
 	{
 		return false;
 	}
 
-	unsigned int glyphNumber;
-	std::vector<int> glyphsUTF32;
-	utf8::utf8to32(utf8glyph.begin(), utf8glyph.end(), std::back_inserter(glyphsUTF32));
-	if(glyphsUTF32.size() <= 0)
-	{
-		return false;
-	}
-
-	glyphNumber = glyphsUTF32[0];
-
-	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, glyphNumber ), FT_LOAD_DEFAULT ))
+	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, utf32glyph ), FT_LOAD_DEFAULT ))
 	{
 		// Невозможно загрузить глиф.
 		return false;
@@ -200,7 +200,7 @@ bool Font1::CreateGlyph( std::string utf8glyph )
 		}
 	}
 
-	std::string glyphName = fontName + "_" + utf8glyph;
+	std::string glyphName = fontName + "_" + ToString(utf32glyph);
 
 	FontGlyphTexture fontGlyphTexture;
 	if(!glyphAtlas->Insert(img, glyphName))
@@ -214,7 +214,7 @@ bool Font1::CreateGlyph( std::string utf8glyph )
 	fontGlyphTexture.fontGlyph.height = bitmap.rows;
 	fontGlyphTexture.fontGlyph.offsetDown = bitmap_glyph->top - bitmap.rows;
 
-	glyphsTextureMap[glyphNumber] = fontGlyphTexture;
+	glyphsTextureMap[utf32glyph] = fontGlyphTexture;
 
 	return true;
 }
@@ -279,9 +279,12 @@ bool Font1::GenerateEmptyGlyph()
 
 	std::string glyphName = fontName + "_" + "null";
 
-	if(!glyphAtlas->Insert(img, glyphName))
+	if(glyphAtlas->GetImagePos(glyphName).IsEmpty())
 	{
-		return false;
+		if(!glyphAtlas->Insert(img, glyphName))
+		{
+			return false;
+		}
 	}
 
 	emptyGlyph.rect = glyphAtlas->GetImagePos(glyphName);
@@ -293,19 +296,9 @@ bool Font1::GenerateEmptyGlyph()
 	return true;
 }
 
-const FontGlyph & Font1::GetGlyph( std::string utf8glyph ) const
+const FontGlyph & Font1::GetGlyph( unsigned int utf32glyph ) const
 {
-	unsigned int glyphNumber;
-	std::vector<int> glyphsUTF32;
-	utf8::utf8to32(utf8glyph.begin(), utf8glyph.end(), std::back_inserter(glyphsUTF32));
-	if(glyphsUTF32.size() <= 0)
-	{
-		return emptyGlyph.fontGlyph;
-	}
-
-	glyphNumber = glyphsUTF32[0];
-
-	auto i = glyphsTextureMap.find(glyphNumber);
+	auto i = glyphsTextureMap.find(utf32glyph);
 	if(i == glyphsTextureMap.end())
 	{
 		return emptyGlyph.fontGlyph;
@@ -375,4 +368,20 @@ bool Font1::Save( std::string dir /*= ""*/ ) const
 	configFile.close();
 
 	return true;
+}
+
+bool Font1::FindGlyph( unsigned int utf32glyph ) const
+{
+	auto i = glyphsTextureMap.find(utf32glyph);
+	if(i == glyphsTextureMap.end())
+	{
+		return false;
+	}
+
+	return true;
+}
+
+std::string Font1::GetName() const
+{
+	return fontName;
 }

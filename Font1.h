@@ -49,11 +49,18 @@ private:
 public:
 	Font1(std::string fileName, std::string fontName, unsigned int size, Atlas *atlas);
 	~Font1(void);
+	Font1(std::string configFileName, Atlas *atlas);
+
+	bool Save(std::string dir = "") const;
 
 	// Генерируем текстурные координаты для глифов
-	void Create();
+	bool Create();
 
+	// Генерируем символ в кодировке utf-8
 	bool CreateGlyph(std::string utf8glyph);
+
+	// получаем символ в кодировке utf-8
+	const FontGlyph &GetGlyph(std::string utf8glyph) const;
 
 private:
 	bool GenerateEmptyGlyph();

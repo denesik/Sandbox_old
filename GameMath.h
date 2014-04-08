@@ -77,7 +77,7 @@ namespace gm
 		Size(int width, int height);
 
 		// Возвращает true если w и h равны 0
-		inline bool IsEmpty() const;
+		bool IsEmpty() const;
 
 		void Inflate(const Size &s);
 		void Inflate(int w, int h);

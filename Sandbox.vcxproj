@@ -102,6 +102,7 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Recognition.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Sector.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Rectangle.h" />
@@ -126,6 +127,7 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Recognition.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Sector.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Rectangle.cpp" />

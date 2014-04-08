@@ -348,6 +348,7 @@ Atlas::Atlas( std::string fileName )
 	std::string imgFileName = root["ImageFileName"].asString();
 	atlasImage = new Bitmap1(imgFileName);
 	format = atlasImage->GetFormat();
+	configFile.close();
 }
 
 Atlas::~Atlas()

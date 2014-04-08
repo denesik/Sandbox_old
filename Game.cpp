@@ -295,6 +295,8 @@ int Game::Run()
 		f.CreateGlyph(s1);
 	}
 
+	f.Create();
+	f.Save();
 
 	fontAtlas.Save();
 	

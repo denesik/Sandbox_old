@@ -2,6 +2,9 @@
 #include "Logger.h"
 #include <vector>
 #include <utf8.h>
+#include <value.h>
+#include <writer.h>
+#include <reader.h>
 
 Font1::Font1(std::string _fileName, std::string _fontName, unsigned int _size, Atlas *atlas)
 {
@@ -40,6 +43,99 @@ Font1::Font1(std::string _fileName, std::string _fontName, unsigned int _size, A
 
 }
 
+Font1::Font1( std::string configFileName, Atlas *atlas )
+{
+	face = nullptr;
+	library = nullptr;
+	fileName = "";
+	fontName = "";
+	size = 0;
+	glyphAtlas = atlas;
+
+	if(!atlas)
+	{
+		LOG_WARNING("Шрифт %s не инициализирован. Отсутствует атлас.");
+		return;
+	}
+
+	if (FT_Init_FreeType( &library )) 
+	{
+		LOG_WARNING("Шрифт %s не инициализирован.", fileName.c_str());
+		return;
+	}
+
+
+	if (FT_New_Face( library, fileName.c_str(), 0, &face )) 
+	{
+		LOG_WARNING("Шрифт %s не инициализирован.", fileName.c_str());
+		return;
+	}
+	FT_Set_Char_Size( face, size << 6, size << 6, 96, 96);
+
+
+	std::ifstream configFile(configFileName);
+
+	if (!configFile.is_open()) 
+	{
+		LOG_WARNING("Файл конфигурации шрифтов %s не загружен.", configFileName.c_str());
+		return ;
+	}
+
+	Json::Value root;
+	Json::Reader reader;
+
+	bool parsingSuccessful = reader.parse( configFile, root );
+	if ( !parsingSuccessful )
+	{
+		LOG_WARNING("Загрузка шрифтов. Ошибка в структуре конфигурационного файла %s. %s", configFileName.c_str(), reader.getFormatedErrorMessages());
+		configFile.close();
+		return ;
+	}
+
+	fontName = root["FontName"].asString();
+	fileName = root["FileName"].asString();
+	size = root["Size"].asUInt();
+
+	emptyGlyph.rect.UnSerialize(root["EmptyGlyph"]["Rect"]);
+	emptyGlyph.fontGlyph.u1 = (float)root["EmptyGlyph"]["FontGlyph"]["u1"].asDouble();
+	emptyGlyph.fontGlyph.v1 = (float)root["EmptyGlyph"]["FontGlyph"]["v1"].asDouble();
+	emptyGlyph.fontGlyph.u2 = (float)root["EmptyGlyph"]["FontGlyph"]["u2"].asDouble();
+	emptyGlyph.fontGlyph.v2 = (float)root["EmptyGlyph"]["FontGlyph"]["v2"].asDouble();
+
+	emptyGlyph.fontGlyph.width = root["EmptyGlyph"]["FontGlyph"]["width"].asUInt();
+	emptyGlyph.fontGlyph.height = root["EmptyGlyph"]["FontGlyph"]["height"].asUInt();
+	emptyGlyph.fontGlyph.offsetDown = root["EmptyGlyph"]["FontGlyph"]["offsetDown"].asInt();
+
+	if(emptyGlyph.rect.IsAreaNull())
+	{
+		if(!GenerateEmptyGlyph())
+		{
+			LOG_WARNING("Шрифт %s. EmptyGlyph не создан.", fontName.c_str());
+			return;
+		}
+	}
+
+	const Json::Value igtm = root["GlyphsTextureMap"];
+
+	for(unsigned int i = 0; i < igtm.size(); i++)
+	{
+		FontGlyphTexture fgt;
+		fgt.rect.UnSerialize(igtm[i]["Rect"]);
+		emptyGlyph.fontGlyph.u1 = (float)igtm[i]["FontGlyph"]["u1"].asDouble();
+		emptyGlyph.fontGlyph.v1 = (float)igtm[i]["FontGlyph"]["v1"].asDouble();
+		emptyGlyph.fontGlyph.u2 = (float)igtm[i]["FontGlyph"]["u2"].asDouble();
+		emptyGlyph.fontGlyph.v2 = (float)igtm[i]["FontGlyph"]["v2"].asDouble();
+
+		emptyGlyph.fontGlyph.width = igtm[i]["FontGlyph"]["width"].asUInt();
+		emptyGlyph.fontGlyph.height = igtm[i]["FontGlyph"]["height"].asUInt();
+		emptyGlyph.fontGlyph.offsetDown = igtm[i]["FontGlyph"]["offsetDown"].asInt();
+
+		glyphsTextureMap[igtm[i]["GlyphNumber"].asUInt()] = fgt;
+	}
+
+	configFile.close();
+}
+
 
 Font1::~Font1(void)
 {
@@ -72,7 +168,7 @@ bool Font1::CreateGlyph( std::string utf8glyph )
 	}
 
 	glyphNumber = glyphsUTF32[0];
-	
+
 	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, glyphNumber ), FT_LOAD_DEFAULT ))
 	{
 		// Невозможно загрузить глиф.
@@ -123,19 +219,40 @@ bool Font1::CreateGlyph( std::string utf8glyph )
 	return true;
 }
 
-void Font1::Create()
+bool Font1::Create()
 {
+	if(!(library && face && glyphAtlas))
+	{
+		return false;
+	}
+
 	gm::Size atlasSize = glyphAtlas->GetSize();
+
+	if(atlasSize.IsEmpty())
+	{
+		return false;
+	}
+
+	if(emptyGlyph.rect.IsAreaNull())
+	{
+		return false;
+	}
+
+	emptyGlyph.fontGlyph.u1 = float(emptyGlyph.rect.Left()) / float(atlasSize.width);
+	emptyGlyph.fontGlyph.v1 = float(emptyGlyph.rect.Bottom()) / float(atlasSize.height);
+	emptyGlyph.fontGlyph.u2 = float(emptyGlyph.rect.Right()) / float(atlasSize.width);
+	emptyGlyph.fontGlyph.v2 = float(emptyGlyph.rect.Top()) / float(atlasSize.height);
 
 	for(auto i = glyphsTextureMap.begin(); i != glyphsTextureMap.end(); i++)
 	{
 		FontGlyphTexture &fgt = (*i).second;
-		fgt.fontGlyph.u1 = float(atlasSize.width) / float(fgt.rect.Left());
-		fgt.fontGlyph.v1 = float(atlasSize.height) / float(fgt.rect.Bottom());
-		fgt.fontGlyph.u2 = float(atlasSize.width) / float(fgt.rect.Right());
-		fgt.fontGlyph.v2 = float(atlasSize.height) / float(fgt.rect.Top());
+		fgt.fontGlyph.u1 = float(fgt.rect.Left()) / float(atlasSize.width);
+		fgt.fontGlyph.v1 = float(fgt.rect.Bottom()) / float(atlasSize.height);
+		fgt.fontGlyph.u2 = float(fgt.rect.Right()) / float(atlasSize.width);
+		fgt.fontGlyph.v2 = float(fgt.rect.Top()) / float(atlasSize.height);
 	}
 
+	return true;
 }
 
 bool Font1::GenerateEmptyGlyph()
@@ -172,6 +289,90 @@ bool Font1::GenerateEmptyGlyph()
 	emptyGlyph.fontGlyph.width = size;
 	emptyGlyph.fontGlyph.height = size;
 	emptyGlyph.fontGlyph.offsetDown = 0;
+
+	return true;
+}
+
+const FontGlyph & Font1::GetGlyph( std::string utf8glyph ) const
+{
+	unsigned int glyphNumber;
+	std::vector<int> glyphsUTF32;
+	utf8::utf8to32(utf8glyph.begin(), utf8glyph.end(), std::back_inserter(glyphsUTF32));
+	if(glyphsUTF32.size() <= 0)
+	{
+		return emptyGlyph.fontGlyph;
+	}
+
+	glyphNumber = glyphsUTF32[0];
+
+	auto i = glyphsTextureMap.find(glyphNumber);
+	if(i == glyphsTextureMap.end())
+	{
+		return emptyGlyph.fontGlyph;
+	}
+
+	return (*i).second.fontGlyph;
+}
+
+bool Font1::Save( std::string dir /*= ""*/ ) const
+{
+	if(!(library && face && glyphAtlas))
+	{
+		LOG_WARNING("Не удалось сохранить шрифт %s.", fontName.c_str());
+		return false;
+	}
+
+	gm::Size atlasSize = glyphAtlas->GetSize();
+
+	if(atlasSize.IsEmpty() || emptyGlyph.rect.IsAreaNull())
+	{
+		LOG_WARNING("Не удалось сохранить шрифт %s.", fontName.c_str());
+		return false;
+	}
+
+
+	std::string fileDir = dir;
+	if(dir.size() > 0)
+		fileDir += "/";
+
+	std::ofstream configFile(fileDir + fontName + ".json");
+
+	Json::Value root;
+
+	root["FontName"] = fontName;
+	root["FileName"] = fileName;
+	root["Size"] = size;
+
+	root["EmptyGlyph"]["Rect"] = emptyGlyph.rect.Serialize();
+	root["EmptyGlyph"]["FontGlyph"]["u1"] = emptyGlyph.fontGlyph.u1;
+	root["EmptyGlyph"]["FontGlyph"]["v1"] = emptyGlyph.fontGlyph.v1;
+	root["EmptyGlyph"]["FontGlyph"]["u2"] = emptyGlyph.fontGlyph.u2;
+	root["EmptyGlyph"]["FontGlyph"]["v2"] = emptyGlyph.fontGlyph.v2;
+
+	root["EmptyGlyph"]["FontGlyph"]["width"] = emptyGlyph.fontGlyph.width;
+	root["EmptyGlyph"]["FontGlyph"]["height"] = emptyGlyph.fontGlyph.height;
+	root["EmptyGlyph"]["FontGlyph"]["offsetDown"] = emptyGlyph.fontGlyph.offsetDown;
+
+	unsigned int igtm = 0;
+	for(auto i = glyphsTextureMap.begin(); i != glyphsTextureMap.end(); i++)
+	{
+		const FontGlyphTexture &fgt = (*i).second;
+		root["GlyphsTextureMap"][igtm]["GlyphNumber"] = (*i).first;
+		root["GlyphsTextureMap"][igtm]["Rect"] = fgt.rect.Serialize();
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["u1"] = fgt.fontGlyph.u1;
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["v1"] = fgt.fontGlyph.v1;
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["u2"] = fgt.fontGlyph.u2;
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["v2"] = fgt.fontGlyph.v2;
+
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["width"] = fgt.fontGlyph.width;
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["height"] = fgt.fontGlyph.height;
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["offsetDown"] = fgt.fontGlyph.offsetDown;
+
+		igtm++;
+	}
+
+	configFile << root;
+	configFile.close();
 
 	return true;
 }

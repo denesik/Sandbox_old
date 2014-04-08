@@ -121,6 +121,8 @@ public:
 	void Inflate(const gm::Size &size, const gm::Color &color = gm::Color());
 	// Изменяем размер битмапа. Новый размер равен size
 	void Resize(const gm::Size &size, const gm::Color &color = gm::Color());
+
+	glm::uint8 *GetData();
 };
 
 #endif // Bitmap_h__

@@ -77,17 +77,19 @@ private:
 	gm::Size maxSize;
 	gm::Size atlasSize;
 
+	int indent;
+
 	std::list<ElasticBox *> rootBoxList;
 	std::list<ElasticBox *> emptyBoxList;
 
 	std::map<std::string, gm::Rectangle> atlasMap;
 
 public:
-	Atlas(std::string name, Bitmap1::PixelFormat format, const gm::Size &maxSize, const gm::Size &initSize = gm::Size(16, 16));
+	Atlas(std::string name, Bitmap1::PixelFormat format, int indent, const gm::Size &maxSize, const gm::Size &initSize = gm::Size(16, 16));
 	Atlas(std::string fileName);
 	~Atlas();
 
-	bool Save();
+	bool Save(std::string dir = "");
 
 	bool Insert(Atlas &atlas);
 	bool Insert(const Bitmap1 &image, std::string name);

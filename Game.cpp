@@ -25,6 +25,7 @@
 
 #include "GameMath.h"
 #include "Recognition.h"
+#include "Font1.h"
 
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 {
@@ -215,7 +216,7 @@ bool Game::Initialize()
 
 	//*******************************
 
-	if(!Font::Init())
+/*	if(!Font::Init())
 	{
 		LOG_ERROR("Ошибка инициализации шрифтов.");
 		delete Font::GetInstance();
@@ -226,7 +227,7 @@ bool Game::Initialize()
 		return false;
 	}
 	LOG_INFO("Шрифты инициализированы.");
-
+	*/
 
 	Bitmap *b = new Bitmap();
 
@@ -244,10 +245,10 @@ bool Game::Initialize()
 
 void Game::LoadContent()
 {
-	if(Font::GetInstance()->Create("font.json"))
+/*	if(Font::GetInstance()->Create("font.json"))
 	{
 		LOG_INFO("Шрифты Загружены.");
-	}
+	}*/
 }
 
 template< typename T >
@@ -279,35 +280,32 @@ int Game::Run()
 // 	LOG_INFO("Время преобразования картинки: %f", glfwGetTime() - currentTime);
 
 
-	Bitmap1 b1("atlas.png");
-	Bitmap1 b2("img12.png");
-	//b1.Inflate(gm::Size(50, 20), gm::Color(0xFF0000FF));
-	b1.Inflate(gm::Size(50, 20));
-	//b1.Insert(b2, gm::Rectangle(5,5,20,20), gm::Point(10, 20));
-	//b1.Insert(b2, gm::Rectangle(5,5,20,20));
-	//b1.Insert(b2, gm::Point(10, 20));
-	b1.Insert(b2);
-	b1.Save("b1.png");
 
-	/*
-	Atlas atlas("TestAtlas", Bitmap1::FORMAT_RGBA, gm::Size(256, 256), gm::Size(128, 128));
+	
+	Atlas fontAtlas("fontAtlas", Bitmap1::FORMAT_RGBA, 1, gm::Size(512, 512), gm::Size(128, 128));
 
-	atlas.Insert(Bitmap1("img1.png"), "1");
-	atlas.Insert(Bitmap1("img12.png"), "2");
-	atlas.Insert(Bitmap1("img2.png"), "3");
-	atlas.Insert(Bitmap1("img32.png"), "4");
-	atlas.Insert(Bitmap1("img32.png"), "5");
+	Font1 f("fonts/times.ttf", "times", 14, &fontAtlas);
 
-	atlas.GetBitmap()->Save("newAtlas.png");
+	std::string s = "qwertyuiop[]asdfghjkl;'zxcvbnm,./";
+	std::string s1 = "0";
+	for(unsigned int i = 0; i < s.size(); i++)
+	{
+		s1[0] = s[i];
 
-	atlas.Save();
-	*/
-	Atlas atlas("TestAtlas.json");
-	atlas.Insert(Bitmap1("test.png"), "5");
-	atlas.Insert(Bitmap1("img2.png"), "3");
+		f.CreateGlyph(s1);
+	}
 
-	atlas.GetBitmap()->Save("newAtlas.png");
 
+	fontAtlas.Save();
+	
+/*
+	Atlas testAtlas("testAtlas", Bitmap1::FORMAT_RGBA, 1, gm::Size(512, 512), gm::Size(128, 128));
+	testAtlas.Insert(Bitmap1("img1.png"), "1");
+	testAtlas.Insert(Bitmap1("img2.png"), "2");
+	testAtlas.Insert(Bitmap1("img3.png"), "3");
+	testAtlas.Insert(Bitmap1("img5.png"), "5");
+	testAtlas.Save();
+*/
 	int size = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
 

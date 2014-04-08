@@ -214,10 +214,11 @@ void ImageAtlas::InitElasticBox()
 
 
 
-Atlas::Atlas( std::string name, Bitmap1::PixelFormat _format, const gm::Size &_maxSize, const gm::Size &initSize )
+Atlas::Atlas( std::string name, Bitmap1::PixelFormat _format, int _indent, const gm::Size &_maxSize, const gm::Size &initSize )
 {
 	atlasName = name;
 	format = _format;
+	indent = _indent;
 	maxSize = _maxSize;
 	atlasSize = initSize;
 
@@ -225,7 +226,7 @@ Atlas::Atlas( std::string name, Bitmap1::PixelFormat _format, const gm::Size &_m
 	boxSize.Clamp(gm::Size(), maxSize);
 
 	ElasticBox *atlasBox = new ElasticBox();
-	atlasBox->rect = gm::Rectangle(gm::Point(),boxSize);
+	atlasBox->rect = gm::Rectangle(gm::Point(), boxSize);
 	atlasBox->childSmall = nullptr;
 	atlasBox->childBig = nullptr;
 	atlasBox->parent = nullptr;
@@ -243,7 +244,7 @@ Atlas::Atlas( std::string fileName )
 	if (!configFile.is_open()) 
 	{
 		LOG_WARNING("Не корректный формат атласа %s.", fileName);
-		Atlas(fileName, Bitmap1::FORMAT_RGBA, gm::Size(1024, 1024));
+		Atlas(fileName, Bitmap1::FORMAT_RGBA, 0, gm::Size(1024, 1024));
 		return;
 	}
 
@@ -255,11 +256,12 @@ Atlas::Atlas( std::string fileName )
 	{
 		LOG_WARNING("Загрузка атласа. Ошибка в структуре конфигурационного файла %s. %s", fileName, reader.getFormatedErrorMessages());
 		configFile.close();
-		Atlas(fileName, Bitmap1::FORMAT_RGBA, gm::Size(1024, 1024));
+		Atlas(fileName, Bitmap1::FORMAT_RGBA, 0, gm::Size(1024, 1024));
 		return;
 	}
 
 	atlasName = root["Name"].asString();
+	indent = root["Indent"].asInt();
 	atlasSize.width = root["Size"]["Width"].asInt();
 	atlasSize.height = root["Size"]["Height"].asInt();
 	maxSize.width = root["MaxSize"]["Width"].asInt();
@@ -329,7 +331,22 @@ Atlas::Atlas( std::string fileName )
 		}
 	}
 
-	atlasImage = new Bitmap1(atlasName + ".png");
+	const Json::Value AtlasMapVal = root["atlasMap"];
+	for(unsigned int i = 0; i < AtlasMapVal.size(); i++)
+	{
+		std::string nameRect = AtlasMapVal[i]["name"].asString();
+
+		Json::Value rectAtlasMapVal = AtlasMapVal[i]["rect"];
+		gm::Rectangle rect;
+		rect.x = rectAtlasMapVal[0U].asInt();
+		rect.y = rectAtlasMapVal[1U].asInt();
+		rect.w = rectAtlasMapVal[2U].asInt();
+		rect.h = rectAtlasMapVal[3U].asInt();
+		atlasMap[nameRect] = rect;
+	}
+
+	std::string imgFileName = root["ImageFileName"].asString();
+	atlasImage = new Bitmap1(imgFileName);
 	format = atlasImage->GetFormat();
 }
 
@@ -340,13 +357,18 @@ Atlas::~Atlas()
 	//рекурсивно удалить box
 }
 
-bool Atlas::Save()
+bool Atlas::Save(std::string dir)
 {
-	std::ofstream configFile(atlasName + ".json");
+	std::string fileDir = dir;
+	if(dir.size() > 0)
+		fileDir += "/";
+
+	std::ofstream configFile(fileDir + atlasName + ".json");
 
 	Json::Value root;
 
 	root["Name"] = atlasName;
+	root["Indent"] = indent;
 	root["Size"]["Width"] = atlasSize.width;
 	root["Size"]["Height"] = atlasSize.height;
 	root["MaxSize"]["Width"] = maxSize.width;
@@ -468,7 +490,24 @@ bool Atlas::Save()
 	root["RootBoxList"] = rootBoxListVal;
 	root["EmptyBoxList"] = emptyBoxListVal;
 
-	atlasImage->Save(atlasName + ".png");
+	unsigned int indexAtlasMap = 0;
+	for(auto i = atlasMap.begin(); i != atlasMap.end(); i++)
+	{
+		root["atlasMap"][indexAtlasMap]["name"] = (*i).first;
+
+		Json::Value rectAtlasMapVal(Json::arrayValue);
+		rectAtlasMapVal.append(Json::Value((*i).second.x));
+		rectAtlasMapVal.append(Json::Value((*i).second.y));
+		rectAtlasMapVal.append(Json::Value((*i).second.w));
+		rectAtlasMapVal.append(Json::Value((*i).second.h));
+
+		root["atlasMap"][indexAtlasMap]["rect"] = rectAtlasMapVal;
+		indexAtlasMap++;
+	}
+
+	root["ImageFileName"] = fileDir + atlasName + ".png";
+
+	atlasImage->Save(fileDir + atlasName + ".png");
 
 	configFile << root;
 	configFile.close();
@@ -486,11 +525,13 @@ bool Atlas::Insert( const Bitmap1 &image, std::string name )
 	// Проверяем, есть ли битмап с таким именем
 	if(atlasMap.find(name) != atlasMap.end())
 	{
-		LOG_WARNING("Битмап %s уже имеется в атласе.", name);
+		LOG_WARNING("Битмап %s уже имеется в атласе.", name.c_str());
 		return false;
 	}
 
-	const gm::Size &imageSize = image.GetSize();
+	gm::Size indentSize(indent, indent);
+
+	const gm::Size &imageSize = image.GetSize() + indentSize;
 
 
 	for(auto j = emptyBoxList.begin(); j != emptyBoxList.end(); j++)
@@ -502,6 +543,7 @@ bool Atlas::Insert( const Bitmap1 &image, std::string name )
 			ElasticBox &box = **j;
 			gm::Rectangle insertRect = atlasImage->Insert(image, box.rect.pos);
 			atlasMap[name] = insertRect;
+			insertRect.Inflate(indentSize);
 
 			// Удаляем бокс из списка пустых боксов
 			emptyBoxList.erase(j);
@@ -535,6 +577,11 @@ void Atlas::Clear()
 
 gm::Rectangle Atlas::GetImagePos( std::string name )
 {
+	auto it = atlasMap.find(name);
+	if(it != atlasMap.end())
+	{
+		return (*it).second;
+	}
 	return gm::Rectangle();
 }
 

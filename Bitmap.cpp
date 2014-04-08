@@ -796,7 +796,7 @@ Bitmap1::Bitmap1( std::string fileName )
 	FILE *file = fopen(fileName.c_str(), "rb");
 	if (file == NULL) 
 	{
-		LOG_ERROR("Bitmap. Невозможно открыть файл %s.", fileName);
+		LOG_ERROR("Bitmap. Невозможно открыть файл %s.", fileName.c_str());
 		return;
 	}
 
@@ -807,7 +807,7 @@ Bitmap1::Bitmap1( std::string fileName )
 
 	if(!data)
 	{
-		LOG_ERROR("Bitmap. Файл %s не загружен.", fileName);
+		LOG_ERROR("Bitmap. Файл %s не загружен.", fileName.c_str());
 	}
 }
 #pragma warning(pop)
@@ -835,7 +835,7 @@ bool Bitmap1::Save( std::string fileName ) const
 	FILE *file = fopen(fileName.c_str(), "wb");
 	if (!file) 
 	{
-		LOG_ERROR("Bitmap. Невозможно открыть файл %s.", fileName);
+		LOG_ERROR("Bitmap. Невозможно открыть файл %s.", fileName.c_str());
 		return false;
 	}
 
@@ -846,7 +846,7 @@ bool Bitmap1::Save( std::string fileName ) const
 	}
 
 	fclose(file);
-	LOG_ERROR("Bitmap. Файл %s не сохранен.", fileName);
+	LOG_ERROR("Bitmap. Файл %s не сохранен.", fileName.c_str());
 	return false;
 }
 #pragma warning(pop)
@@ -1007,5 +1007,10 @@ void Bitmap1::Resize( const gm::Size &_size, const gm::Color &color /*= gm::Colo
 Bitmap1::PixelFormat Bitmap1::GetFormat()
 {
 	return format;
+}
+
+glm::uint8 * Bitmap1::GetData()
+{
+	return data;
 }
 

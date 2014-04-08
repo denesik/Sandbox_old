@@ -130,8 +130,8 @@ namespace gm
 		inline bool Equals(const Rectangle &r) const;
 
 		// Увеличивает данный объект Rectangle на заданную величину.
-		inline void Inflate(const Size &s);
-		inline void Inflate(int w, int h);
+		void Inflate(const Size &s);
+		void Inflate(int w, int h);
 
 		// Возвращает пересечение данного прямоугольника с прямоугольником r.
 		Rectangle Intersect(const Rectangle &r) const;

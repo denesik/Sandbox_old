@@ -1,7 +1,7 @@
 #ifndef ResourceManager_h__
 #define ResourceManager_h__
 
-#include "Font1.h"
+#include "Font.h"
 #include <vector>
 
 class ResourceManager
@@ -9,15 +9,15 @@ class ResourceManager
 private:
 	std::string fontsConfig;
 
-	Atlas *fontAtlas;
+	ImageAtlas *fontAtlas;
 
-	std::vector<Font1 *> fontsList;
+	std::vector<Font *> fontsList;
 
 public:
 	ResourceManager(void);
 	~ResourceManager(void);
 
-	Font1 *LoadFont(std::string type);
+	Font *LoadFont(std::string type);
 
 	void CreateFonts();
 

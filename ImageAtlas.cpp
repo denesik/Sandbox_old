@@ -4,217 +4,7 @@
 #include <writer.h>
 #include <reader.h>
 
-
-
-ImageAtlas::ImageAtlas(void)
-{
-	image = nullptr;
-	box = new ElasticBox;
-	InitElasticBox();
-}
-
-
-ImageAtlas::~ImageAtlas(void)
-{
-	Remove();
-	if(box)
-	{
-		delete box;
-		box = nullptr;
-	}
-}
-
-bool ImageAtlas::InsertImage( Bitmap *_image, iRect &rect )
-{
-	boxTmp = box;
-	imageTmp = _image;
-	bool result = InsertImage();
-
-	rect.x = xTmp;
-	rect.y = yTmp;
-	rect.w = _image->GetWidth();
-	rect.h = _image->GetHeight();
-
-	return result;
-}
-
-bool ImageAtlas::InsertImage()
-{
-	ElasticBox *boxTmpParent = boxTmp;
-
-	if(boxTmp->surfaceHeight == 0 && boxTmp->surfaceWidth == 0)
-	{
-		i32vec2 dstPoint;
-
-		xTmp = dstPoint.x = boxTmp->x;
-		yTmp = dstPoint.y = boxTmp->y;
-
-		// Копируем всю поверхность
-		bool blitResult = image->Blit(&dstPoint, nullptr, imageTmp);
-		if(!blitResult)
-		{
-			//LOG(LOG_ERROR, "TextureAtlas. Image не добавлена.");
-			return false;
-		}
-
-		unsigned int w1 = boxTmp->surfaceWidth = imageTmp->GetWidth();
-		unsigned int h1 = boxTmp->surfaceHeight = imageTmp->GetHeight();
-
-		boxTmp->childrenBoxSmall = new ElasticBox;
-		boxTmp->childrenBoxSmall->surfaceHeight = 0;
-		boxTmp->childrenBoxSmall->surfaceWidth = 0;
-		boxTmp->childrenBoxSmall->childrenBoxBig = nullptr;
-		boxTmp->childrenBoxSmall->childrenBoxSmall = nullptr;
-		boxTmp->childrenBoxBig = new ElasticBox;
-		boxTmp->childrenBoxBig->surfaceHeight = 0;
-		boxTmp->childrenBoxBig->surfaceWidth = 0;
-		boxTmp->childrenBoxBig->childrenBoxBig = nullptr;
-		boxTmp->childrenBoxBig->childrenBoxSmall = nullptr;
-		// Правый нижний прямоугольник
-		//double d1 = sqrt(double(h1 * h1) + double((boxTmp->width - w1) * (boxTmp->width - w1)));
-		// Левый верхний прямоугольник
-		//double d2 = sqrt(double((boxTmp->height - h1) * (boxTmp->height - h1)) + double(w1 * w1));
-
-		// Правый нижний прямоугольник
-		double d1 = sqrt(double(boxTmp->height * boxTmp->height) + double((boxTmp->width - w1 - indent) * (boxTmp->width - w1 - indent)));
-		// Левый верхний прямоугольник
-		double d2 = sqrt(double((boxTmp->height - h1 - indent) * (boxTmp->height - h1 - indent)) + double(boxTmp->width * boxTmp->width));
-
-		if(d1 < d2)
-		{
-			// Правый нижний прямоугольник - маленький
-			boxTmp->childrenBoxSmall->height = h1;
-			boxTmp->childrenBoxSmall->width = boxTmp->width - w1 - indent;
-			boxTmp->childrenBoxSmall->x = boxTmp->x + w1 + indent;
-			boxTmp->childrenBoxSmall->y = boxTmp->y;
-
-			boxTmp->childrenBoxBig->x = boxTmp->x;
-			boxTmp->childrenBoxBig->y = boxTmp->y + h1 + indent;
-			boxTmp->childrenBoxBig->width = boxTmp->width;
-			boxTmp->childrenBoxBig->height = boxTmp->height - h1 - indent;
-		}
-		else
-		{
-			// Левый верхний прямоугольник - маленький
-			boxTmp->childrenBoxSmall->height = boxTmp->height - h1 - indent;
-			boxTmp->childrenBoxSmall->width = w1;
-			boxTmp->childrenBoxSmall->x = boxTmp->x;
-			boxTmp->childrenBoxSmall->y = boxTmp->y + h1 + indent;
-
-			boxTmp->childrenBoxBig->x = boxTmp->x + w1 + indent;
-			boxTmp->childrenBoxBig->y = boxTmp->y;
-			boxTmp->childrenBoxBig->width = boxTmp->width - w1 - indent;
-			boxTmp->childrenBoxBig->height = boxTmp->height;
-		}
-	}
-	else
-	{
-		int w1 = imageTmp->GetWidth();
-		int h1 = imageTmp->GetHeight();
-		// Попытаемся уместиться в маленькую площадь.
-		if(boxTmp->childrenBoxSmall->height >= h1 && boxTmp->childrenBoxSmall->width >= w1)
-		{
-			boxTmp = boxTmp->childrenBoxSmall;
-			if(InsertImage())
-			{
-				return true;
-			}
-			else
-				boxTmp = boxTmpParent;
-		}
-
-		if(boxTmp->childrenBoxBig->height >= h1 && boxTmp->childrenBoxBig->width >= w1)
-		{
-			boxTmp = boxTmp->childrenBoxBig;
-			return InsertImage();
-		}
-		return false;
-	}
-
-	return true;
-
-}
-
-bool ImageAtlas::Create( unsigned int format, unsigned int width, unsigned int height )
-{
-	if(!box)
-	{
-		box = new ElasticBox();
-		InitElasticBox();
-	}
-	image = new Bitmap;
-	image->Generate(format , width, height, 0x00000000);
-	box->x = 0;
-	box->y = 0;
-	box->width = width;
-	box->height = height;
-	box->surfaceHeight = 0;
-	box->surfaceWidth = 0;
-	box->childrenBoxBig = nullptr;
-	box->childrenBoxSmall = nullptr;
-	return true;
-}
-
-void ImageAtlas::Remove()
-{
-	if(image != nullptr)
-	{
-		delete image;
-		image = nullptr;
-	}
-	if(box)
-	{
-		ElasticBox *boxParent = box;
-		if(boxParent->childrenBoxBig)
-		{
-			box = boxParent->childrenBoxBig;
-			RemoveElasticBox();
-		}
-		if(boxParent->childrenBoxSmall)
-		{
-			box = boxParent->childrenBoxSmall;
-			RemoveElasticBox();
-		}
-
-		box = boxParent;
-		InitElasticBox();
-	}
-}
-
-void ImageAtlas::RemoveElasticBox()
-{
-	ElasticBox *boxParent = box;
-	if(boxParent->childrenBoxBig)
-	{
-		box = boxParent->childrenBoxBig;
-		RemoveElasticBox();
-	}
-	if(boxParent->childrenBoxSmall)
-	{
-		box = boxParent->childrenBoxSmall;
-		RemoveElasticBox();
-	}
-
-	delete boxParent;
-	boxParent = nullptr;
-}
-
-void ImageAtlas::InitElasticBox()
-{
-	box->x = 0;
-	box->y = 0;
-	box->width = 0;
-	box->height = 0;
-	box->surfaceHeight = 0;
-	box->surfaceWidth = 0;
-	box->childrenBoxBig = nullptr;
-	box->childrenBoxSmall = nullptr;
-}
-
-
-
-
-Atlas::Atlas( std::string name, Bitmap1::PixelFormat _format, int _indent, const gm::Size &_maxSize, const gm::Size &initSize )
+ImageAtlas::ImageAtlas( std::string name, Bitmap::PixelFormat _format, int _indent, const gm::Size &_maxSize, const gm::Size &initSize )
 {
 	atlasName = name;
 	format = _format;
@@ -235,13 +25,13 @@ Atlas::Atlas( std::string name, Bitmap1::PixelFormat _format, int _indent, const
 	rootBoxList.push_back(atlasBox);
 	emptyBoxList.push_back(atlasBox);
 
-	atlasImage = new Bitmap1(format, atlasBox->rect.size);
+	atlasImage = new Bitmap(format, atlasBox->rect.size);
 }
 
-Atlas::Atlas( std::string fileName )
+ImageAtlas::ImageAtlas( std::string fileName )
 {
 	atlasName = "";
-	format = Bitmap1::FORMAT_NULL;
+	format = Bitmap::FORMAT_NULL;
 	indent = 0;
 	atlasImage = nullptr;
 
@@ -250,7 +40,7 @@ Atlas::Atlas( std::string fileName )
 	if (!configFile.is_open()) 
 	{
 		LOG_WARNING("Не корректный формат атласа %s.", fileName);
-		Atlas(fileName, Bitmap1::FORMAT_RGBA, 0, gm::Size(1024, 1024));
+		ImageAtlas(fileName, Bitmap::FORMAT_RGBA, 0, gm::Size(1024, 1024));
 		return;
 	}
 
@@ -262,7 +52,7 @@ Atlas::Atlas( std::string fileName )
 	{
 		LOG_WARNING("Загрузка атласа. Ошибка в структуре конфигурационного файла %s. %s", fileName, reader.getFormatedErrorMessages());
 		configFile.close();
-		Atlas(fileName, Bitmap1::FORMAT_RGBA, 0, gm::Size(1024, 1024));
+		ImageAtlas(fileName, Bitmap::FORMAT_RGBA, 0, gm::Size(1024, 1024));
 		return;
 	}
 
@@ -352,12 +142,12 @@ Atlas::Atlas( std::string fileName )
 	}
 
 	std::string imgFileName = root["ImageFileName"].asString();
-	atlasImage = new Bitmap1(imgFileName);
+	atlasImage = new Bitmap(imgFileName);
 	format = atlasImage->GetFormat();
 	configFile.close();
 }
 
-Atlas::~Atlas()
+ImageAtlas::~ImageAtlas()
 {
 	if(atlasImage)
 	{
@@ -367,7 +157,7 @@ Atlas::~Atlas()
 	//рекурсивно удалить box
 }
 
-bool Atlas::Save(std::string dir)
+bool ImageAtlas::Save(std::string dir)
 {
 	std::string fileDir = dir;
 	if(dir.size() > 0)
@@ -525,12 +315,12 @@ bool Atlas::Save(std::string dir)
 	return true;
 }
 
-bool Atlas::Insert( Atlas &atlas )
+bool ImageAtlas::Insert( ImageAtlas &atlas )
 {
 	return true;
 }
 
-bool Atlas::Insert( const Bitmap1 &image, std::string name )
+bool ImageAtlas::Insert( const Bitmap &image, std::string name )
 {
 	// Проверяем, есть ли битмап с таким именем
 	if(atlasMap.find(name) != atlasMap.end())
@@ -580,12 +370,12 @@ bool Atlas::Insert( const Bitmap1 &image, std::string name )
 	return Insert(image, name);
 }
 
-void Atlas::Clear()
+void ImageAtlas::Clear()
 {
 
 }
 
-gm::Rectangle Atlas::GetImagePos( std::string name )
+gm::Rectangle ImageAtlas::GetImagePos( std::string name )
 {
 	auto it = atlasMap.find(name);
 	if(it != atlasMap.end())
@@ -595,7 +385,7 @@ gm::Rectangle Atlas::GetImagePos( std::string name )
 	return gm::Rectangle();
 }
 
-void Atlas::CreateEmptyBox( ElasticBox &box, gm::Rectangle &insertRect )
+void ImageAtlas::CreateEmptyBox( ElasticBox &box, gm::Rectangle &insertRect )
 {
 
 	if(box.rect == insertRect)
@@ -677,7 +467,7 @@ void Atlas::CreateEmptyBox( ElasticBox &box, gm::Rectangle &insertRect )
 
 }
 
-void Atlas::PushEmptyBox( ElasticBox *insertBox )
+void ImageAtlas::PushEmptyBox( ElasticBox *insertBox )
 {
 
 	if(emptyBoxList.begin() == emptyBoxList.end())
@@ -701,17 +491,17 @@ void Atlas::PushEmptyBox( ElasticBox *insertBox )
 	emptyBoxList.push_back(insertBox);
 }
 
-bool Atlas::MajorRect( gm::Rectangle &r1, gm::Rectangle &r2 )
+bool ImageAtlas::MajorRect( gm::Rectangle &r1, gm::Rectangle &r2 )
 {
 	return r1.w * r1.w + r1.h * r1.h > r2.w * r2.w + r2.h * r2.h;
 }
 
-Bitmap1 * Atlas::GetBitmap()
+Bitmap * ImageAtlas::GetBitmap()
 {
 	return atlasImage;
 }
 
-void Atlas::ResizeAtlas( const gm::Size &newSize )
+void ImageAtlas::ResizeAtlas( const gm::Size &newSize )
 {
 	gm::Size boxSize = newSize;
 	boxSize.Clamp(atlasSize, maxSize);
@@ -751,12 +541,12 @@ void Atlas::ResizeAtlas( const gm::Size &newSize )
 	atlasImage->Resize(atlasSize);
 }
 
-const gm::Size & Atlas::GetSize() const
+const gm::Size & ImageAtlas::GetSize() const
 {
 	return atlasSize;
 }
 
-std::string Atlas::GetName() const
+std::string ImageAtlas::GetName() const
 {
 	return atlasName;
 }

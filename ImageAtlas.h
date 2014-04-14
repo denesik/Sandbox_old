@@ -5,60 +5,7 @@
 #include <map>
 #include <list>
 
-class Texture1
-{
-public:
-	unsigned int id;
-	gm::Size size;
-};
-
 class ImageAtlas
-{
-private:
-
-	static const int indent = 1;
-	struct ElasticBox
-	{
-		int surfaceWidth, surfaceHeight;		// Ширина и высота "ящика"
-		int x, y, width, height;				// Габариты "контейнера"
-		ElasticBox *childrenBoxSmall;
-		ElasticBox *childrenBoxBig;
-	};
-
-	Bitmap *image;
-	ElasticBox *box;
-
-	Bitmap *imageTmp;
-	ElasticBox *boxTmp;
-
-	unsigned int xTmp;
-	unsigned int yTmp;
-
-public:
-	ImageAtlas(void);
-	~ImageAtlas(void);
-
-	bool InsertImage(Bitmap *image, iRect &rect);
-
-	bool Create(unsigned int format, unsigned int width, unsigned int height);
-
-	void Remove();
-
-	Bitmap *GetAtlas()
-	{
-		return image;
-	}
-
-private:
-	bool InsertImage();
-	void RemoveElasticBox();
-	void InitElasticBox();
-};
-
-
-
-
-class Atlas
 {
 private:
 	struct ElasticBox
@@ -71,9 +18,9 @@ private:
 
 	std::string atlasName;
 
-	Bitmap1 *atlasImage;
+	Bitmap *atlasImage;
 
-	Bitmap1::PixelFormat format;
+	Bitmap::PixelFormat format;
 	gm::Size maxSize;
 	gm::Size atlasSize;
 
@@ -85,21 +32,21 @@ private:
 	std::map<std::string, gm::Rectangle> atlasMap;
 
 public:
-	Atlas(std::string name, Bitmap1::PixelFormat format, int indent, const gm::Size &maxSize, const gm::Size &initSize = gm::Size(16, 16));
-	Atlas(std::string fileName);
-	~Atlas();
+	ImageAtlas(std::string name, Bitmap::PixelFormat format, int indent, const gm::Size &maxSize, const gm::Size &initSize = gm::Size(16, 16));
+	ImageAtlas(std::string fileName);
+	~ImageAtlas();
 
 	bool Save(std::string dir = "");
 
-	bool Insert(Atlas &atlas);
-	bool Insert(const Bitmap1 &image, std::string name);
+	bool Insert(ImageAtlas &atlas);
+	bool Insert(const Bitmap &image, std::string name);
 
 	void Clear();
 
 	// Вернуть позицию картинки в атласе
 	gm::Rectangle GetImagePos(std::string name);
 
-	Bitmap1 *GetBitmap();
+	Bitmap *GetBitmap();
 	const gm::Size &GetSize() const;
 
 	std::string GetName() const;

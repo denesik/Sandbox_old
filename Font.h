@@ -1,5 +1,5 @@
-#ifndef FontTTF_h__
-#define FontTTF_h__
+#ifndef Font1_h__
+#define Font1_h__
 
 #include <ft2build.h>
 #include <freetype.h>
@@ -7,81 +7,69 @@
 //#include <ftoutln.h>
 //#include <fttrigon.h>
 #include <ftmodapi.h>
-
-#include "ImageAtlas.h"
 #include <string>
-#include "TextureManager.h"
-#include <map>
-#include <list>
-#include <vector>
-#include "Render.h"
+#include "GameMath.h"
+#include "ImageAtlas.h"
 
-struct FontTexture
+
+struct FontGlyph
 {
-	Texture texture;
+	float u1;
+	float v1;
+	float u2;
+	float v2;
 	unsigned int width;
 	unsigned int height;
 	int offsetDown;
 };
 
+
 class Font
 {
 private:
-
 	FT_Library library;
 	FT_Face face;
 
-	ImageAtlas glyphAtlas;
+	ImageAtlas *glyphAtlas;
 
-	struct GlyphBitmap
+	std::string fontName;
+	std::string fileName;
+	unsigned int size;
+
+	struct FontGlyphTexture
 	{
-		Bitmap* bitmap;
-		int offsetDown;
-		unsigned int key;
-
-		bool operator < (const GlyphBitmap& second)
-		{
-			//return (bitmap->GetHeight() * bitmap->GetWidth())
-			//	< (second.bitmap->GetHeight() * second.bitmap->GetWidth());
-			return ( bitmap->GetHeight() * bitmap->GetHeight() + bitmap->GetWidth() * bitmap->GetWidth()
-				< second.bitmap->GetHeight() * second.bitmap->GetHeight() + second.bitmap->GetWidth() * second.bitmap->GetWidth());
-		}
+		FontGlyph fontGlyph;
+		gm::Rectangle rect;
 	};
 
-	
-	std::list<GlyphBitmap> glyphsBitmapList;
+	std::map<unsigned int, FontGlyphTexture> glyphsTextureMap;
 
-	std::map<unsigned int, FontTexture> glyphsTextureMap;
-
-
-private:
-	bool CreateFromConfig( std::string configFileName );
-
-	bool GenerateGlyphsList( std::string glyphList );
-	bool GenerateGlyph(unsigned int gliphNumber, GlyphBitmap &glyphBitmap);
-	bool GenerateOpenglGlyphs();
-
-	bool GenerateEmptyGlyph();
-
-private:
-	static Font* instance;
-
-	Font();
-	Font(const Font& root);
-	Font& operator=(const Font&);
+	FontGlyphTexture emptyGlyph;
 
 public:
-	~Font();
+	Font(std::string fileName, std::string fontName, unsigned int size, ImageAtlas *atlas);
+	~Font(void);
+	Font(std::string configFileName, ImageAtlas *atlas);
 
-	static bool Init();
-	static Font* GetInstance();
+	bool Save(std::string dir = "") const;
 
-	bool Create(std::string configFileName);
-	void Remove();
+	// Генерируем текстурные координаты для глифов
+	bool Create();
 
-	FontTexture GetGlyphTexture(unsigned int utf32glyph);
+	// Генерируем символ в кодировке utf-32
+	bool CreateGlyph(unsigned int utf32glyph);
+
+	// получаем символ в кодировке utf-32
+	const FontGlyph &GetGlyph(unsigned int utf32glyph) const;
+
+	bool FindGlyph(unsigned int utf32glyph) const;
+
+	std::string GetName() const;
+
+private:
+	bool GenerateEmptyGlyph();
 
 };
 
 
-#endif // FontTTF_h__
+#endif // Font1_h__

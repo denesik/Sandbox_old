@@ -6,8 +6,18 @@
 #include "GameMath.h"
 #include <vector>
 #include "BufferArray.h"
+#include "Bitmap.h"
+#include <memory>
 
 using namespace glm;
+
+struct Texture
+{
+	unsigned int id;
+	gm::Size size;
+};
+
+std::shared_ptr<Texture> CreateTexture(const Bitmap &bitmap, bool smoothing);
 
 class Render
 {

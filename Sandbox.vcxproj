@@ -93,11 +93,9 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Font.h" />
-    <ClInclude Include="Font1.h" />
     <ClInclude Include="FPSCounter.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameMath.h" />
-    <ClInclude Include="GraphicText.h" />
     <ClInclude Include="ImageAtlas.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Logger.h" />
@@ -107,7 +105,6 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="Render.h" />
-    <ClInclude Include="TextureManager.h" />
     <ClInclude Include="TypeList.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
@@ -117,11 +114,9 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="Font.cpp" />
-    <ClCompile Include="Font1.cpp" />
     <ClCompile Include="FPSCounter.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameMath.cpp" />
-    <ClCompile Include="GraphicText.cpp" />
     <ClCompile Include="ImageAtlas.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Logger.cpp" />
@@ -132,7 +127,6 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="Render.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="TypeList.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>

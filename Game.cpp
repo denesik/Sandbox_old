@@ -1,7 +1,6 @@
 #include "Game.h"
 #include "Logger.h"
 #include "Bitmap.h"
-#include "TextureManager.h"
 #include "ImageAtlas.h"
 #include "Font.h"
 
@@ -21,11 +20,10 @@
 #include "FPSCounter.h"
 
 #include <sstream>
-#include "GraphicText.h"
 
 #include "GameMath.h"
 #include "Recognition.h"
-#include "Font1.h"
+#include "Font.h"
 #include "ResourceManager.h"
 
 GLuint LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
@@ -217,27 +215,6 @@ bool Game::Initialize()
 
 	//*******************************
 
-/*	if(!Font::Init())
-	{
-		LOG_ERROR("Ошибка инициализации шрифтов.");
-		delete Font::GetInstance();
-		delete render;
-		render = nullptr;
-		glfwDestroyWindow(window);
-		glfwTerminate();
-		return false;
-	}
-	LOG_INFO("Шрифты инициализированы.");
-	*/
-
-	Bitmap *b = new Bitmap();
-
-	b->Load("img.png");
-
-	texture = 0;
-	texture = GenerateOpenglBitmap(*b, true, true);
-
-	b->Free();
 
 	glActiveTexture(GL_TEXTURE1);
 
@@ -274,7 +251,7 @@ int Game::Run()
 
 	LoadContent();
 	
-// 
+
 // 	double currentTime = glfwGetTime();
 // 	Recognition recognition;
 // 	recognition.Main();
@@ -304,43 +281,6 @@ int Game::Run()
 	glm::mat4 MVP = camera.CalculateMatrix() * model;
 
 
- 	Rectangle geometryRectangle;
- 	geometryRectangle.SetPos(vec3(0, 50, -1));
- 	geometryRectangle.SetSize(100, 100);
- 	Texture tex;
- 	tex.u1 = 0.0f;
- 	tex.v1 = 0.0f;
- 	tex.u2 = 1.0f;
- 	tex.v2 = 1.0f;
- 	geometryRectangle.SetTexture(tex);
-	
-
-// 	BufferArrayRoot ba(false, true, false);
-// 	ba.PushBack(geometryRectangle.GetBufferArray());
-// 	ba.CreateVideoBuffer();
-
-
-//	Sector map;
-//	map.CreateGeometry();
-	
-	int t = sizeof(BufferArray<VT>);
-
-	t = sizeof(BufferArray<VTC>);
-
-	BufferArray<VT> *buffer = new BufferArray<VT>;
-
-	int q = 0;
-
-	for(unsigned int i = 0; i < 10000; i++)
-	{
-		unsigned int c = buffer->GetSizeVertex();
-		geometryRectangle.InsertBackVertex(*buffer);
-
-		geometryRectangle.InsertBackIndex(*buffer, c);
-	}
-
-	buffer->CreateVertexBuffer();
-	buffer->CreateIndexBuffer();
 	
 
 	glEnable(GL_BLEND);
@@ -440,16 +380,7 @@ int Game::Run()
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
 		
-		buffer->ResetVertex();
-		for(unsigned int i = 0; i < 10000; i++)
-		{
-			geometryRectangle.InsertBackVertex(*buffer);
-		}
-		
 
-		buffer->CreateVertexBuffer();
-		
-		buffer->Draw();
 		
 
 		glfwSwapBuffers(window);

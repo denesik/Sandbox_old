@@ -25,11 +25,11 @@ ResourceManager::~ResourceManager(void)
 }
 
 
-Font1 * ResourceManager::LoadFont( std::string type )
+Font * ResourceManager::LoadFont( std::string type )
 {
 	if(!fontAtlas)
 	{
-		fontAtlas = new Atlas("fontAtlas", Bitmap1::FORMAT_RGBA, 1, gm::Size(2048, 2048), gm::Size(64, 64));
+		fontAtlas = new ImageAtlas("fontAtlas", Bitmap::FORMAT_RGBA, 1, gm::Size(2048, 2048), gm::Size(64, 64));
 	}
 
 	std::ifstream configFile(fontsConfig);
@@ -46,8 +46,8 @@ Font1 * ResourceManager::LoadFont( std::string type )
 	bool parsingSuccessful = reader.parse( configFile, root );
 	if ( !parsingSuccessful )
 	{
-		LOG_WARNING("Загрузка шрифтов. Ошибка в структуре конфигурационного файла %s. %s", configFile, reader.getFormatedErrorMessages());
-//		configFile.close();
+		LOG_WARNING("Загрузка шрифтов. Ошибка в структуре конфигурационного файла %s. %s", fontsConfig.c_str(), reader.getFormatedErrorMessages());
+		configFile.close();
 		return nullptr;
 	}
 
@@ -63,10 +63,10 @@ Font1 * ResourceManager::LoadFont( std::string type )
 		glyphsUTF8.push_back(glyphsLines[i].asString());
 	}
 
-	Font1 *font = nullptr;
+	Font *font = nullptr;
 
 
-	font = new Font1(fileName, fontName, size, fontAtlas);
+	font = new Font(fileName, fontName, size, fontAtlas);
 
 	// генерируем глифы
 	for(unsigned int i = 0; i < glyphsUTF8.size(); i++)

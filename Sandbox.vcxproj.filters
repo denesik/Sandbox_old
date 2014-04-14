@@ -19,6 +19,12 @@
     <Filter Include="Рендер\Геометрия">
       <UniqueIdentifier>{4d3e6b30-268f-4569-943f-72e9f38e1395}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Level">
+      <UniqueIdentifier>{67e9e955-43d9-42b3-bae7-1dee95e4e87d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Распознавание">
+      <UniqueIdentifier>{3784eb29-4520-4f51-b5c3-fb764f195201}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -33,13 +39,7 @@
     <ClInclude Include="GameMath.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="TextureManager.h">
-      <Filter>Рендер</Filter>
-    </ClInclude>
     <ClInclude Include="ImageAtlas.h">
-      <Filter>Рендер</Filter>
-    </ClInclude>
-    <ClInclude Include="Font.h">
       <Filter>Рендер</Filter>
     </ClInclude>
     <ClInclude Include="Render.h">
@@ -60,32 +60,29 @@
     <ClInclude Include="Rectangle.h">
       <Filter>Рендер\Геометрия</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicText.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="BufferArray.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="FPSCounter.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="Sector.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="TypeList.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="Recognition.h">
-      <Filter>Заголовочные файлы</Filter>
+    <ClInclude Include="Sector.h">
+      <Filter>Level</Filter>
     </ClInclude>
-    <ClInclude Include="Font1.h">
-      <Filter>Заголовочные файлы</Filter>
+    <ClInclude Include="Recognition.h">
+      <Filter>Распознавание</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferArray.h">
+      <Filter>Рендер</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Рендер</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManager.h">
       <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>Рендер</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -101,13 +98,7 @@
     <ClCompile Include="Bitmap.cpp">
       <Filter>Рендер</Filter>
     </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
-      <Filter>Рендер</Filter>
-    </ClCompile>
     <ClCompile Include="ImageAtlas.cpp">
-      <Filter>Рендер</Filter>
-    </ClCompile>
-    <ClCompile Include="Font.cpp">
       <Filter>Рендер</Filter>
     </ClCompile>
     <ClCompile Include="Render.cpp">
@@ -128,19 +119,7 @@
     <ClCompile Include="Rectangle.cpp">
       <Filter>Рендер\Геометрия</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicText.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="BufferArray.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="FPSCounter.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="Sector.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="Vertex.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="TypeList.cpp">
@@ -149,14 +128,23 @@
     <ClCompile Include="GameMath.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="Recognition.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
-    <ClCompile Include="Font1.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="Sector.cpp">
+      <Filter>Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Recognition.cpp">
+      <Filter>Распознавание</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferArray.cpp">
+      <Filter>Рендер</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertex.cpp">
+      <Filter>Рендер</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>Рендер</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

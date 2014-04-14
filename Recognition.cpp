@@ -15,12 +15,12 @@ Recognition::~Recognition(void)
 
 void Recognition::Main()
 {
-	Bitmap1 image("depp.png");
+	Bitmap image("depp.png");
 
 	gm::Size imageSize = image.GetSize();
 
 	
-	Bitmap1 imageDerg(Bitmap1::FORMAT_RGB, imageSize);
+	Bitmap imageDerg(Bitmap::FORMAT_RGB, imageSize);
 
 	glm::uint8 mat55[5][5] = 
 	{
@@ -57,7 +57,7 @@ void Recognition::Main()
 	imageDerg.Save("depp_derp.png");
 
 
-	Bitmap1 imageLum(Bitmap1::FORMAT_LUMINANCE, imageSize);
+	Bitmap imageLum(Bitmap::FORMAT_LUMINANCE, imageSize);
 
 	for (int i = 0; i < imageSize.height; i++)
 		for (int j = 0; j < imageSize.width; j++)
@@ -72,7 +72,7 @@ void Recognition::Main()
 	imageLum.Save("depp_lum.png");
 
 
-	Bitmap1 imageRob(Bitmap1::FORMAT_LUMINANCE, imageSize);
+	Bitmap imageRob(Bitmap::FORMAT_LUMINANCE, imageSize);
 
 	for (int i = 0; i < imageSize.height - 1; i++)
 		for (int j = 0; j < imageSize.width - 1; j++)

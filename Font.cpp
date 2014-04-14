@@ -1,125 +1,87 @@
 #include "Font.h"
 #include "Logger.h"
-
+#include <vector>
+#include <value.h>
 #include <writer.h>
 #include <reader.h>
-#include <fstream>
-#include <utf8.h>
-#include <math.h>
-#include <algorithm>
-#include "Render.h"
-#include "Rectangle.h"
 
-Font *Font::instance = nullptr;
 
-Font::Font()
+#include <sstream>
+template< typename T >
+std::string ToString( const T& val )
 {
-	library = nullptr;
+	std::stringstream iss;
+	iss << val;
+	return iss.str();
+}
+
+
+Font::Font(std::string _fileName, std::string _fontName, unsigned int _size, ImageAtlas *atlas)
+{
 	face = nullptr;
+	library = nullptr;
+	fileName = _fileName;
+	fontName = _fontName;
+	size = _size;
+	glyphAtlas = atlas;
+
+	if(!atlas)
+	{
+		LOG_WARNING("Шрифт %s не инициализирован. Отсутствует атлас.");
+		return;
+	}
+
+	if (FT_Init_FreeType( &library )) 
+	{
+		LOG_WARNING("Шрифт %s не инициализирован.", fileName.c_str());
+		return;
+	}
+
+
+	if (FT_New_Face( library, fileName.c_str(), 0, &face )) 
+	{
+		LOG_WARNING("Шрифт %s не инициализирован.", fileName.c_str());
+		return;
+	}
+	FT_Set_Char_Size( face, size << 6, size << 6, 96, 96);
+
+	if(!GenerateEmptyGlyph())
+	{
+		LOG_WARNING("Шрифт %s. EmptyGlyph не создан.", fontName.c_str());
+		return;
+	}
 
 }
 
-
-Font::~Font()
+Font::Font( std::string configFileName, ImageAtlas *atlas )
 {
-	if(library)
-	{
-		FT_Done_FreeType(library);
-		library = nullptr;
-	}
-	instance = nullptr;
-}
+	face = nullptr;
+	library = nullptr;
+	fileName = "";
+	fontName = "";
+	size = 0;
+	glyphAtlas = atlas;
 
-bool Font::Init()
-{
-	if(!instance)
+	if(!atlas)
 	{
-		instance = new Font();
-		if (FT_Init_FreeType( &instance->library )) 
-		{
-			LOG_ERROR("FreeType не инициализирован.");
-			return false;
-		}
-		// Создаем глиф с кодом 0.
-		if(!instance->GenerateEmptyGlyph())
-		{
-			LOG_ERROR("Глиф с кодом 0 не создан.");
-			return false;
-		}
-	}
-	else
-	{
-		LOG_WARNING("Повторная инициализация. Freetype уже был инициализирован.");
+		LOG_WARNING("Шрифт %s не инициализирован. Отсутствует атлас.");
+		return;
 	}
 
-	return true;
-}
-
-bool Font::Create( std::string configFileName )
-{
-	bool processing = true;
-	if(!CreateFromConfig(configFileName))
+	if (FT_Init_FreeType( &library )) 
 	{
-		processing = false;
+		LOG_WARNING("Шрифт %s не инициализирован.", fileName.c_str());
+		return;
 	}
 
-	if(!GenerateOpenglGlyphs())
-	{
-		processing = false;
-	}
 
-	return processing;
-}
-
-void Font::Remove()
-{
-	glyphsTextureMap.clear();
-	// удалить glyphsTextureMap[0].texture
-}
-
-bool Font::GenerateEmptyGlyph()
-{
-	unsigned int key = 0;
-	GlyphBitmap glyphBitmap;
-	glyphBitmap.bitmap = new Bitmap();
-	glyphBitmap.bitmap->Generate(Bitmap::FORMAT_RGBA, 6, 8, 0x00000000);
-	unsigned int channelCount = GetChannelCount(Bitmap::FORMAT_RGBA);
-
-	byte *glyphImageData = glyphBitmap.bitmap->GetData();
-
-	unsigned int w = glyphBitmap.bitmap->GetWidth();
-	unsigned int h = glyphBitmap.bitmap->GetHeight();
-
-	
-	for(unsigned int i = 0; i < w; i++)
-	{
-		glyphImageData[i * channelCount + channelCount - 1] = 255;
-		glyphImageData[(h - 1) * w * channelCount + i * channelCount + channelCount - 1] = 255;
-	}
-	for(unsigned int j = 0; j < h; j++)
-	{
-		glyphImageData[j * w * channelCount + channelCount - 1] = 255;
-		glyphImageData[j * w * channelCount + (w - 1) * channelCount + channelCount - 1] = 255;
-	}
-	glyphBitmap.offsetDown = 0;
-
-	glyphBitmap.key = key;
-	glyphsBitmapList.push_back(glyphBitmap);
-
-	return true;
-}
-
-
-bool Font::CreateFromConfig( std::string configFileName )
-{
 	std::ifstream configFile(configFileName);
 
 	if (!configFile.is_open()) 
 	{
-		LOG_WARNING("Шрифты. Невозможно открыть конфигурационный файл шрифтов %s.", configFileName);
-		return false;
+		LOG_WARNING("Файл конфигурации шрифтов %s не загружен.", configFileName.c_str());
+		return ;
 	}
-
 
 	Json::Value root;
 	Json::Reader reader;
@@ -127,102 +89,87 @@ bool Font::CreateFromConfig( std::string configFileName )
 	bool parsingSuccessful = reader.parse( configFile, root );
 	if ( !parsingSuccessful )
 	{
-		LOG_WARNING("Шрифты. Ошибка в структуре конфигурационного файла %s. %s", configFileName, reader.getFormatedErrorMessages());
+		LOG_WARNING("Загрузка шрифтов. Ошибка в структуре конфигурационного файла %s. %s", configFileName.c_str(), reader.getFormatedErrorMessages());
 		configFile.close();
-		return false;
+		return ;
 	}
 
-	const Json::Value fontList = root["FontList"];
-	for ( unsigned int i = 0; i < fontList.size(); i++ )
+	fontName = root["FontName"].asString();
+	fileName = root["FileName"].asString();
+	size = root["Size"].asUInt();
+
+	if (FT_New_Face( library, fileName.c_str(), 0, &face )) 
 	{
-		std::string fontFileName = fontList[i].get("FileName", "").asString();
-		unsigned int fontSize = fontList[i].get("Size", 14).asUInt();
-		const Json::Value glyphs = fontList[i]["Glyphs"];
+		LOG_WARNING("Шрифт %s не инициализирован.", fileName.c_str());
+		return;
+	}
+	FT_Set_Char_Size( face, size << 6, size << 6, 96, 96);
 
-		if (FT_New_Face( library, fontFileName.c_str(), 0, &face )) 
-		{
-			LOG_WARNING("Файл шрифтов %s не загружен.", fontFileName);
-			configFile.close();
-			return false;
-		}
-		// По некоторым причинам FreeType измеряет размер шрифта в терминах 1/64 пикселя.
-		// Таким образом, для того чтобы сделать шрифт выстой size пикселей, мы запрашиваем размер size*64.
-		// (size << 6 тоже самое что и size*64)
-		FT_Set_Char_Size( face, fontSize << 6, fontSize << 6, 96, 96);
+	emptyGlyph.rect.UnSerialize(root["EmptyGlyph"]["Rect"]);
+	emptyGlyph.fontGlyph.u1 = (float)root["EmptyGlyph"]["FontGlyph"]["u1"].asDouble();
+	emptyGlyph.fontGlyph.v1 = (float)root["EmptyGlyph"]["FontGlyph"]["v1"].asDouble();
+	emptyGlyph.fontGlyph.u2 = (float)root["EmptyGlyph"]["FontGlyph"]["u2"].asDouble();
+	emptyGlyph.fontGlyph.v2 = (float)root["EmptyGlyph"]["FontGlyph"]["v2"].asDouble();
 
-		// Создаем глифы для заданных наборов символов.
-		for ( unsigned int j = 0; j < glyphs.size(); j++ )
-		{
-			std::string glyphList = glyphs[j].asString();
-			GenerateGlyphsList(glyphList);
-		}
+	emptyGlyph.fontGlyph.width = root["EmptyGlyph"]["FontGlyph"]["width"].asUInt();
+	emptyGlyph.fontGlyph.height = root["EmptyGlyph"]["FontGlyph"]["height"].asUInt();
+	emptyGlyph.fontGlyph.offsetDown = root["EmptyGlyph"]["FontGlyph"]["offsetDown"].asInt();
 
-		if(face)
+	if(emptyGlyph.rect.IsAreaNull())
+	{
+		if(!GenerateEmptyGlyph())
 		{
-			FT_Done_Face(face);
-			face = nullptr;
+			LOG_WARNING("Шрифт %s. EmptyGlyph не создан.", fontName.c_str());
+			return;
 		}
+	}
+
+	const Json::Value igtm = root["GlyphsTextureMap"];
+
+	for(unsigned int i = 0; i < igtm.size(); i++)
+	{
+		FontGlyphTexture fgt;
+		fgt.rect.UnSerialize(igtm[i]["Rect"]);
+		emptyGlyph.fontGlyph.u1 = (float)igtm[i]["FontGlyph"]["u1"].asDouble();
+		emptyGlyph.fontGlyph.v1 = (float)igtm[i]["FontGlyph"]["v1"].asDouble();
+		emptyGlyph.fontGlyph.u2 = (float)igtm[i]["FontGlyph"]["u2"].asDouble();
+		emptyGlyph.fontGlyph.v2 = (float)igtm[i]["FontGlyph"]["v2"].asDouble();
+
+		emptyGlyph.fontGlyph.width = igtm[i]["FontGlyph"]["width"].asUInt();
+		emptyGlyph.fontGlyph.height = igtm[i]["FontGlyph"]["height"].asUInt();
+		emptyGlyph.fontGlyph.offsetDown = igtm[i]["FontGlyph"]["offsetDown"].asInt();
+
+		glyphsTextureMap[igtm[i]["GlyphNumber"].asUInt()] = fgt;
 	}
 
 	configFile.close();
-
-	return true;
 }
 
-Font* Font::GetInstance()
-{
 
-	if(!instance)
+Font::~Font(void)
+{
+	if(face)
 	{
-		LOG_FATAL("Попытка обратиться к несуществеющему классу шрифтов. Инициализируйте класс шрифтов.");
+		FT_Done_Face(face);
+		face = nullptr;
 	}
 
-	return instance;
+	if(library)
+	{
+		FT_Done_FreeType(library);
+		library = nullptr;
+	}
 }
 
-bool Font::GenerateGlyphsList( std::string glyphList )
+
+bool Font::CreateGlyph( unsigned int utf32glyph )
 {
-	GlyphBitmap glyphBitmap;
-
-	std::vector<int> glyphsUTF32;
-	utf8::utf8to32(glyphList.c_str(), glyphList.c_str() + glyphList.length(), std::back_inserter(glyphsUTF32));
-
-	for(unsigned int i = 0; i < glyphsUTF32.size(); i++)
-	{	
-		// Проверяем есть ли такой символ в нашем списке.
-		int key = glyphsUTF32[i];
-		if( std::find_if( glyphsBitmapList.begin(), glyphsBitmapList.end(), 
-			[&key](GlyphBitmap n) { return n.key == key; } 
-		) != glyphsBitmapList.end() )
-		{
-			// Если уже есть то добавлять не нужно.
-			continue;
-		}
-
-		glyphBitmap.bitmap = new Bitmap();
-		if( GenerateGlyph(key, glyphBitmap) )
-		{
-			//glyphsBitmapList[glyphsUTF32[i]] = glyphBitmap;
-			glyphBitmap.key = key;
-			glyphsBitmapList.push_back(glyphBitmap);
-		}
-		else
-		{
-			LOG_WARNING("Невозможно загрузить глиф %i", key);
-			glyphBitmap.bitmap->Free();
-			delete glyphBitmap.bitmap;
-			glyphBitmap.bitmap = nullptr;
-		}
-
+	if(!(library && face && glyphAtlas))
+	{
+		return false;
 	}
 
-	return true;
-}
-
-bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap &glyphBitmap)
-{
-
-	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, glyphNumber ), FT_LOAD_DEFAULT ))
+	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, utf32glyph ), FT_LOAD_DEFAULT ))
 	{
 		// Невозможно загрузить глиф.
 		return false;
@@ -240,101 +187,201 @@ bool Font::GenerateGlyph( unsigned int glyphNumber, GlyphBitmap &glyphBitmap)
 
 	FT_Bitmap &bitmap=bitmap_glyph->bitmap;
 
-
-	glyphBitmap.bitmap->Generate(Bitmap::FORMAT_RGBA, bitmap.width, bitmap.rows, 0x00000000);
+	Bitmap img(Bitmap::FORMAT_RGBA, gm::Size(bitmap.width, bitmap.rows));
 	unsigned int channelCount = GetChannelCount(Bitmap::FORMAT_RGBA);
-
-	byte *glyphImageData = glyphBitmap.bitmap->GetData();
+	glm::uint8 *imgData = img.GetData();
 
 	for(int j = 0; j < bitmap.rows; j++) 
 	{
-		for(int i=0; i < bitmap.width; i++)
+		for(int i = 0; i < bitmap.width; i++)
 		{
- 			glyphImageData[( bitmap.width * j + i ) * channelCount + channelCount - 1] 
- 				= bitmap.buffer[bitmap.width * ( bitmap.rows - j - 1) + i];
+			imgData[( bitmap.width * j + i ) * channelCount + channelCount - 1] 
+			= bitmap.buffer[bitmap.width * j + i];
 		}
 	}
-	
-	glyphBitmap.offsetDown = bitmap_glyph->top - bitmap.rows;
 
-	return true;
-}
+	std::string glyphName = fontName + "_" + ToString(utf32glyph);
 
-bool Font::GenerateOpenglGlyphs()
-{
-	unsigned int area = 0;
-	Bitmap *bitmap;
-
-	// Вычисляем площадь всех символов
-	for (auto i = glyphsBitmapList.begin(); i != glyphsBitmapList.end(); i++)
+	FontGlyphTexture fontGlyphTexture;
+	if(!glyphAtlas->Insert(img, glyphName))
 	{
-		bitmap = (*i).bitmap;
-		area += bitmap->GetHeight() * bitmap->GetWidth();
-	}
-
-	unsigned int sideAtlas = (unsigned int)(sqrt( float(area) ));
-	sideAtlas = next_p2( sideAtlas );
-
-	float diff = float(sideAtlas * sideAtlas) / float(area);
-	if( diff < 1.8f )
-		sideAtlas <<= 1;
-
-	if(!glyphAtlas.Create(Bitmap::FORMAT_RGBA, sideAtlas, sideAtlas))
-	{
-		LOG_ERROR("Шрифты. Текстурный атлас не создан.");
 		return false;
 	}
 
-	// Сортируем по убыванию площадей
-	glyphsBitmapList.sort();
+	fontGlyphTexture.rect = glyphAtlas->GetImagePos(glyphName);
 
-	iRect rect;
-	Bitmap *atlasBitmap = glyphAtlas.GetAtlas();
+	fontGlyphTexture.fontGlyph.width = bitmap.width;
+	fontGlyphTexture.fontGlyph.height = bitmap.rows;
+	fontGlyphTexture.fontGlyph.offsetDown = bitmap_glyph->top - bitmap.rows;
 
-	for (auto i = glyphsBitmapList.begin(); i != glyphsBitmapList.end(); i++)
-	{
-		if( !glyphAtlas.InsertImage( (*i).bitmap, rect ) ) 
-		{
-			LOG_WARNING("Не удалось загрузить глиф %i в атлас.", (*i).key);
-			delete (*i).bitmap;
-			(*i).bitmap = nullptr;
-			continue;
-		}
+	glyphsTextureMap[utf32glyph] = fontGlyphTexture;
 
-		FontTexture fontTexture;
-
-		fontTexture.width = (*i).bitmap->GetWidth();
-		fontTexture.height = (*i).bitmap->GetHeight();
-		fontTexture.offsetDown = (*i).offsetDown;
-
-		GenerateTextCoord(atlasBitmap, &rect, fontTexture.texture);
-
-		glyphsTextureMap[(*i).key] = fontTexture;
-
-		delete (*i).bitmap;
-		(*i).bitmap = nullptr;
-	}
-
-	// CreateAtlasOpenglTexture
-	unsigned int ogltexture = GenerateOpenglBitmap(*atlasBitmap, false, false);
-	for (auto i = glyphsTextureMap.begin(); i != glyphsTextureMap.end(); i++)
-	{
-		(*i).second.texture.textureId = ogltexture;
-	}
-
-	glyphsBitmapList.clear();
-	glyphAtlas.GetAtlas()->Save("atlas.png");
-
-	glyphAtlas.Remove();
 	return true;
 }
 
-FontTexture Font::GetGlyphTexture( unsigned int utf32glyph )
+bool Font::Create()
 {
-	if(glyphsTextureMap.count(utf32glyph) == 0)
+	if(!(library && face && glyphAtlas))
 	{
-		return glyphsTextureMap[0];
+		return false;
 	}
-	return glyphsTextureMap[utf32glyph];
+
+	gm::Size atlasSize = glyphAtlas->GetSize();
+
+	if(atlasSize.IsEmpty())
+	{
+		return false;
+	}
+
+	if(emptyGlyph.rect.IsAreaNull())
+	{
+		return false;
+	}
+
+	emptyGlyph.fontGlyph.u1 = float(emptyGlyph.rect.Left()) / float(atlasSize.width);
+	emptyGlyph.fontGlyph.v1 = float(emptyGlyph.rect.Bottom()) / float(atlasSize.height);
+	emptyGlyph.fontGlyph.u2 = float(emptyGlyph.rect.Right()) / float(atlasSize.width);
+	emptyGlyph.fontGlyph.v2 = float(emptyGlyph.rect.Top()) / float(atlasSize.height);
+
+	for(auto i = glyphsTextureMap.begin(); i != glyphsTextureMap.end(); i++)
+	{
+		FontGlyphTexture &fgt = (*i).second;
+		fgt.fontGlyph.u1 = float(fgt.rect.Left()) / float(atlasSize.width);
+		fgt.fontGlyph.v1 = float(fgt.rect.Bottom()) / float(atlasSize.height);
+		fgt.fontGlyph.u2 = float(fgt.rect.Right()) / float(atlasSize.width);
+		fgt.fontGlyph.v2 = float(fgt.rect.Top()) / float(atlasSize.height);
+	}
+
+	return true;
 }
 
+bool Font::GenerateEmptyGlyph()
+{
+
+	Bitmap img(Bitmap::FORMAT_RGBA, gm::Size(size, size));
+	unsigned int channelCount = GetChannelCount(Bitmap::FORMAT_RGBA);
+
+	glm::uint8 *glyphImageData = img.GetData();
+
+	unsigned int w = img.GetWidth();
+	unsigned int h = img.GetHeight();
+
+	for(unsigned int i = 0; i < w; i++)
+	{
+		glyphImageData[i * channelCount + channelCount - 1] = 255;
+		glyphImageData[(h - 1) * w * channelCount + i * channelCount + channelCount - 1] = 255;
+	}
+	for(unsigned int j = 0; j < h; j++)
+	{
+		glyphImageData[j * w * channelCount + channelCount - 1] = 255;
+		glyphImageData[j * w * channelCount + (w - 1) * channelCount + channelCount - 1] = 255;
+	}
+
+	std::string glyphName = fontName + "_" + "null";
+
+	if(glyphAtlas->GetImagePos(glyphName).IsEmpty())
+	{
+		if(!glyphAtlas->Insert(img, glyphName))
+		{
+			return false;
+		}
+	}
+
+	emptyGlyph.rect = glyphAtlas->GetImagePos(glyphName);
+
+	emptyGlyph.fontGlyph.width = size;
+	emptyGlyph.fontGlyph.height = size;
+	emptyGlyph.fontGlyph.offsetDown = 0;
+
+	return true;
+}
+
+const FontGlyph & Font::GetGlyph( unsigned int utf32glyph ) const
+{
+	auto i = glyphsTextureMap.find(utf32glyph);
+	if(i == glyphsTextureMap.end())
+	{
+		return emptyGlyph.fontGlyph;
+	}
+
+	return (*i).second.fontGlyph;
+}
+
+bool Font::Save( std::string dir /*= ""*/ ) const
+{
+	if(!(library && face && glyphAtlas))
+	{
+		LOG_WARNING("Не удалось сохранить шрифт %s.", fontName.c_str());
+		return false;
+	}
+
+	gm::Size atlasSize = glyphAtlas->GetSize();
+
+	if(atlasSize.IsEmpty() || emptyGlyph.rect.IsAreaNull())
+	{
+		LOG_WARNING("Не удалось сохранить шрифт %s.", fontName.c_str());
+		return false;
+	}
+
+
+	std::string fileDir = dir;
+	if(dir.size() > 0)
+		fileDir += "/";
+
+	std::ofstream configFile(fileDir + fontName + ".json");
+
+	Json::Value root;
+
+	root["FontName"] = fontName;
+	root["FileName"] = fileName;
+	root["Size"] = size;
+
+	root["EmptyGlyph"]["Rect"] = emptyGlyph.rect.Serialize();
+	root["EmptyGlyph"]["FontGlyph"]["u1"] = emptyGlyph.fontGlyph.u1;
+	root["EmptyGlyph"]["FontGlyph"]["v1"] = emptyGlyph.fontGlyph.v1;
+	root["EmptyGlyph"]["FontGlyph"]["u2"] = emptyGlyph.fontGlyph.u2;
+	root["EmptyGlyph"]["FontGlyph"]["v2"] = emptyGlyph.fontGlyph.v2;
+
+	root["EmptyGlyph"]["FontGlyph"]["width"] = emptyGlyph.fontGlyph.width;
+	root["EmptyGlyph"]["FontGlyph"]["height"] = emptyGlyph.fontGlyph.height;
+	root["EmptyGlyph"]["FontGlyph"]["offsetDown"] = emptyGlyph.fontGlyph.offsetDown;
+
+	unsigned int igtm = 0;
+	for(auto i = glyphsTextureMap.begin(); i != glyphsTextureMap.end(); i++)
+	{
+		const FontGlyphTexture &fgt = (*i).second;
+		root["GlyphsTextureMap"][igtm]["GlyphNumber"] = (*i).first;
+		root["GlyphsTextureMap"][igtm]["Rect"] = fgt.rect.Serialize();
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["u1"] = fgt.fontGlyph.u1;
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["v1"] = fgt.fontGlyph.v1;
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["u2"] = fgt.fontGlyph.u2;
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["v2"] = fgt.fontGlyph.v2;
+
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["width"] = fgt.fontGlyph.width;
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["height"] = fgt.fontGlyph.height;
+		root["GlyphsTextureMap"][igtm]["FontGlyph"]["offsetDown"] = fgt.fontGlyph.offsetDown;
+
+		igtm++;
+	}
+
+	configFile << root;
+	configFile.close();
+
+	return true;
+}
+
+bool Font::FindGlyph( unsigned int utf32glyph ) const
+{
+	auto i = glyphsTextureMap.find(utf32glyph);
+	if(i == glyphsTextureMap.end())
+	{
+		return false;
+	}
+
+	return true;
+}
+
+std::string Font::GetName() const
+{
+	return fontName;
+}

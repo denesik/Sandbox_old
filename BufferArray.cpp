@@ -6,7 +6,7 @@
 
 
 BufferArrayRoot::BufferArrayRoot()
-	: kReserve(1.5f)
+	: kReserve(1.5f), stride(0)
 {
 	vertexBuffer = nullptr;
 	indexBuffer = nullptr;

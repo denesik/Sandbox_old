@@ -103,7 +103,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Sector.h" />
     <ClInclude Include="Mouse.h" />
-    <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="Quad.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="TypeList.h" />
     <ClInclude Include="Vertex.h" />
@@ -125,7 +125,7 @@
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Sector.cpp" />
     <ClCompile Include="Mouse.cpp" />
-    <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="Quad.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="TypeList.cpp" />
     <ClCompile Include="Vertex.cpp" />

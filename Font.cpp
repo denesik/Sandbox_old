@@ -17,11 +17,10 @@ std::string ToString( const T& val )
 
 
 Font::Font(std::string _fileName, std::string _fontName, unsigned int _size, ImageAtlas *atlas)
+	: fileName(_fileName), fontName(_fontName)
 {
 	face = nullptr;
 	library = nullptr;
-	fileName = _fileName;
-	fontName = _fontName;
 	size = _size;
 	glyphAtlas = atlas;
 
@@ -54,11 +53,10 @@ Font::Font(std::string _fileName, std::string _fontName, unsigned int _size, Ima
 }
 
 Font::Font( std::string configFileName, ImageAtlas *atlas )
+	: fileName(""), fontName("")
 {
 	face = nullptr;
 	library = nullptr;
-	fileName = "";
-	fontName = "";
 	size = 0;
 	glyphAtlas = atlas;
 

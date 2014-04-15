@@ -358,9 +358,9 @@ Bitmap::Bitmap( std::string fileName )
 #pragma warning(pop)
 
 Bitmap::Bitmap( const Bitmap &bitmap )
+	: size(bitmap.size)
 {
 	format = bitmap.format;
-	size = bitmap.size;
 	stride = bitmap.stride;
 	isAlpha = bitmap.isAlpha;
 
@@ -550,12 +550,12 @@ void Bitmap::Resize( const gm::Size &_size, const gm::Color &color /*= gm::Color
 		}
 }
 
-Bitmap::PixelFormat Bitmap::GetFormat()
+Bitmap::PixelFormat Bitmap::GetFormat() const
 {
 	return format;
 }
 
-glm::uint8 * Bitmap::GetData()
+glm::uint8 * Bitmap::GetData() const
 {
 	return data;
 }

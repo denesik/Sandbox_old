@@ -90,7 +90,7 @@ namespace gm
 		return x != p.x || y != p.y;
 	}
 
-	const Point& Point::operator=( const Point& p )
+	Point& Point::operator=( const Point& p )
 	{
 		x = p.x;
 		y = p.y;
@@ -136,7 +136,7 @@ namespace gm
 		return width == _width && height == _height;
 	}
 
-	const Size& Size::operator=( const Size& s )
+	Size& Size::operator=( const Size& s )
 	{
 		width = s.width;
 		height = s.height;
@@ -392,7 +392,7 @@ namespace gm
 		return color32 == c.color32;
 	}
 
-	const Color& Color::operator=( const Color& c )
+	Color& Color::operator=( const Color& c )
 	{
 		color32 = c.color32;
 		return *this;

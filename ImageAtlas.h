@@ -59,6 +59,8 @@ private:
 
 	void ResizeAtlas(const gm::Size &newSize);
 
+	ImageAtlas(const ImageAtlas& atlas){};
+
 };
 
 

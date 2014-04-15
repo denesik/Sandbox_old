@@ -5,12 +5,10 @@
 #include <reader.h>
 
 ImageAtlas::ImageAtlas( std::string name, Bitmap::PixelFormat _format, int _indent, const gm::Size &_maxSize, const gm::Size &initSize )
+	: atlasName(name), atlasSize(initSize), maxSize(_maxSize)
 {
-	atlasName = name;
 	format = _format;
 	indent = _indent;
-	maxSize = _maxSize;
-	atlasSize = initSize;
 	atlasImage = nullptr;
 
 	gm::Size boxSize = initSize;
@@ -29,8 +27,8 @@ ImageAtlas::ImageAtlas( std::string name, Bitmap::PixelFormat _format, int _inde
 }
 
 ImageAtlas::ImageAtlas( std::string fileName )
+	: atlasName("")
 {
-	atlasName = "";
 	format = Bitmap::FORMAT_NULL;
 	indent = 0;
 	atlasImage = nullptr;
@@ -40,7 +38,6 @@ ImageAtlas::ImageAtlas( std::string fileName )
 	if (!configFile.is_open()) 
 	{
 		LOG_WARNING("Не корректный формат атласа %s.", fileName);
-		ImageAtlas(fileName, Bitmap::FORMAT_RGBA, 0, gm::Size(1024, 1024));
 		return;
 	}
 
@@ -52,7 +49,6 @@ ImageAtlas::ImageAtlas( std::string fileName )
 	{
 		LOG_WARNING("Загрузка атласа. Ошибка в структуре конфигурационного файла %s. %s", fileName, reader.getFormatedErrorMessages());
 		configFile.close();
-		ImageAtlas(fileName, Bitmap::FORMAT_RGBA, 0, gm::Size(1024, 1024));
 		return;
 	}
 

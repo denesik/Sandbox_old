@@ -1,5 +1,5 @@
 #include "TypeList.h"
-
+/*
 void TypeListTest()
 {
 	typedef TYPELIST_4(int, float, double, char) List4;
@@ -40,3 +40,5 @@ void TypeListTest()
 
 	CompareType<CList1, CList2>::value;
 }
+
+*/

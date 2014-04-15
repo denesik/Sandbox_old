@@ -53,7 +53,7 @@ namespace gm
 		::Json::Value Serialize() const;
 		void UnSerialize(const ::Json::Value &val);
 
-		 const Point& operator=(const Point& p);
+		 Point& operator=(const Point& p);
 
 		// Смещает точку Point на заданное значение Size.
 		 const Point operator+(const Size& s) const;
@@ -90,7 +90,7 @@ namespace gm
 		::Json::Value Serialize() const;
 		void UnSerialize(const ::Json::Value &val);
 
-		const Size& operator=(const Size& s);
+		Size& operator=(const Size& s);
 
 		const Size operator+(const Size& s) const;
 
@@ -185,7 +185,7 @@ namespace gm
 
 		 bool Equals(const Color &c) const;
 
-		 const Color& operator=(const Color& c);
+		 Color& operator=(const Color& c);
 
 		 const bool operator==(const Color& c) const;
 

@@ -51,7 +51,7 @@ public:
 	gm::Color GetPixel(const gm::Point &pos) const;
 	void SetPixel(const gm::Point &pos, const gm::Color &color);
 	
-	PixelFormat GetFormat();
+	PixelFormat GetFormat() const;
 
 	// Вставляем битмап
 	gm::Rectangle Insert(const Bitmap &bitmap, const gm::Point &pos = gm::Point());
@@ -62,7 +62,7 @@ public:
 	// Изменяем размер битмапа. Новый размер равен size
 	void Resize(const gm::Size &size, const gm::Color &color = gm::Color());
 
-	glm::uint8 *GetData();
+	glm::uint8 *GetData() const;
 };
 
 #endif // Bitmap_h__

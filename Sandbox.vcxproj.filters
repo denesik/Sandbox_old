@@ -57,9 +57,6 @@
     <ClInclude Include="Cube.h">
       <Filter>Рендер\Геометрия</Filter>
     </ClInclude>
-    <ClInclude Include="Rectangle.h">
-      <Filter>Рендер\Геометрия</Filter>
-    </ClInclude>
     <ClInclude Include="FPSCounter.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
@@ -83,6 +80,9 @@
     </ClInclude>
     <ClInclude Include="Font.h">
       <Filter>Рендер</Filter>
+    </ClInclude>
+    <ClInclude Include="Quad.h">
+      <Filter>Рендер\Геометрия</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -116,9 +116,6 @@
     <ClCompile Include="Cube.cpp">
       <Filter>Рендер\Геометрия</Filter>
     </ClCompile>
-    <ClCompile Include="Rectangle.cpp">
-      <Filter>Рендер\Геометрия</Filter>
-    </ClCompile>
     <ClCompile Include="FPSCounter.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
@@ -145,6 +142,9 @@
     </ClCompile>
     <ClCompile Include="Font.cpp">
       <Filter>Рендер</Filter>
+    </ClCompile>
+    <ClCompile Include="Quad.cpp">
+      <Filter>Рендер\Геометрия</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

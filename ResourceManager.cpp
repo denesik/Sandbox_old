@@ -8,9 +8,8 @@
 
 
 ResourceManager::ResourceManager(void)
+	: fontsConfig("fonts/fonts.json")
 {
-	fontsConfig = "fonts/fonts.json";
-
 	fontAtlas = nullptr;
 }
 

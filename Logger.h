@@ -70,11 +70,13 @@ class Logger;
 
 class LoggerDestroyer
 {
-private:
-	Logger* p_instance;
 public:    
+	LoggerDestroyer()
+	: p_instance(nullptr) {};
 	~LoggerDestroyer();
 	void initialize( Logger* p );
+private:
+	Logger* p_instance;
 };
 
 class Logger

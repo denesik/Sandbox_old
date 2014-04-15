@@ -12,7 +12,7 @@
 #include <gtc/matrix_transform.hpp>
 #include "Keyboard.h"
 #include "Mouse.h"
-#include "Rectangle.h"
+#include "Quad.h"
 
 #include "Logger.h"
 #include "utf8.h"
@@ -137,6 +137,8 @@ Game::Game(void)
 	height = 600;
 	fullscreen = false;
 	render = nullptr;
+	window = nullptr;
+	texture = 0;
 
 }
 
@@ -240,8 +242,6 @@ std::string ToString( const T& val )
 int Game::Run()
 {
 
-	TypeListTest();
-
 	if(!Initialize()) 
 	{
 		LOG_INFO("Инициализация завершилась с ошибками.");
@@ -290,8 +290,7 @@ int Game::Run()
 	// назначаем текстуру на активный текстурный юнит
 	glBindTexture(GL_TEXTURE_2D, 1);
 
-	GLint textureLocation = -1;
-	textureLocation = glGetUniformLocation(programID, "colorTexture");
+	GLint textureLocation = glGetUniformLocation(programID, "colorTexture");
 
 
 	float const speed = 0.05f;
@@ -306,8 +305,6 @@ int Game::Run()
 // 	testText.SetText("tessst1");
 
 
-
-	float *test1 = new float[20 * 10000];
 
 	while(Running && !glfwWindowShouldClose(window)) 
 	{

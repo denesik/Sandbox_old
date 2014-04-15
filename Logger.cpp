@@ -25,6 +25,7 @@ void LoggerDestroyer::initialize( Logger* p )
 	p_instance = p; 
 }
 
+
 Logger& Logger::getInstance() 
 {
 	if(!p_instance)     

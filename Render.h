@@ -15,6 +15,14 @@ struct Texture
 {
 	unsigned int id;
 	gm::Size size;
+
+	Texture()
+		: id(0), size()
+	{};
+	Texture(unsigned int _id, const gm::Size &_size)
+		: id(_id), size(_size)
+	{};
+
 };
 
 std::shared_ptr<Texture> CreateTexture(const Bitmap &bitmap, bool smoothing);

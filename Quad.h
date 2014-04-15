@@ -1,5 +1,5 @@
-// #ifndef Rectangle_h__
-// #define Rectangle_h__
+// #ifndef Quad_h__
+// #define Quad_h__
 // 
 // #include "GameMath.h"
 // #include "Render.h"
@@ -95,4 +95,4 @@
 // };
 // 
 // 
-// #endif // Rectangle_h__
+// #endif // Quad_h__

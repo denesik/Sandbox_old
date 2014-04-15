@@ -371,7 +371,7 @@ void ImageAtlas::Clear()
 
 }
 
-gm::Rectangle ImageAtlas::GetImagePos( std::string name )
+gm::Rectangle ImageAtlas::GetImagePos( std::string name ) const
 {
 	auto it = atlasMap.find(name);
 	if(it != atlasMap.end())

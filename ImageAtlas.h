@@ -44,7 +44,7 @@ public:
 	void Clear();
 
 	// Вернуть позицию картинки в атласе
-	gm::Rectangle GetImagePos(std::string name);
+	gm::Rectangle GetImagePos(std::string name) const;
 
 	Bitmap *GetBitmap();
 	const gm::Size &GetSize() const;

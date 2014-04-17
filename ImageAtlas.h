@@ -51,7 +51,6 @@ public:
 
 	std::string GetName() const;
 
-	//Texture1 GetTexture();
 private:
 	void CreateEmptyBox(ElasticBox &box, gm::Rectangle &insertRect);
 	void PushEmptyBox(ElasticBox *box);

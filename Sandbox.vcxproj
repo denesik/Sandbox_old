@@ -89,6 +89,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap.h" />
+    <ClInclude Include="BlockStatic.h" />
     <ClInclude Include="BufferArray.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
@@ -99,6 +100,7 @@
     <ClInclude Include="ImageAtlas.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Recognition.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Sector.h" />
@@ -110,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bitmap.cpp" />
+    <ClCompile Include="BlockStatic.cpp" />
     <ClCompile Include="BufferArray.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cube.cpp" />

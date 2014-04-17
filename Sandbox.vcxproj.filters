@@ -84,6 +84,12 @@
     <ClInclude Include="Quad.h">
       <Filter>Рендер\Геометрия</Filter>
     </ClInclude>
+    <ClInclude Include="BlockStatic.h">
+      <Filter>Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Рендер</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -145,6 +151,9 @@
     </ClCompile>
     <ClCompile Include="Quad.cpp">
       <Filter>Рендер\Геометрия</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockStatic.cpp">
+      <Filter>Level</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

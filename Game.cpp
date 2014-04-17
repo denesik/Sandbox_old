@@ -225,10 +225,7 @@ bool Game::Initialize()
 
 void Game::LoadContent()
 {
-/*	if(Font::GetInstance()->Create("font.json"))
-	{
-		LOG_INFO("Шрифты Загружены.");
-	}*/
+
 }
 
 template< typename T >
@@ -262,12 +259,13 @@ int Game::Run()
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
 
 
-
+	/*
 	ResourceManager rc;
 	rc.LoadFont("Default");
 	rc.LoadFont("Mini");
 	rc.LoadFont("1");
 	rc.CreateFonts();
+	*/
 
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "shaders/t2.vs", "shaders/t2.fs" );
@@ -281,37 +279,28 @@ int Game::Run()
 	glm::mat4 MVP = camera.CalculateMatrix() * model;
 
 
-	
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// делаем активным текстурный юнит 0
 	glActiveTexture(GL_TEXTURE1);
 	// назначаем текстуру на активный текстурный юнит
-	glBindTexture(GL_TEXTURE_2D, 1);
+//	glBindTexture(GL_TEXTURE_2D, 1);
 
 	GLint textureLocation = glGetUniformLocation(programID, "colorTexture");
-
 
 	float const speed = 0.05f;
 
 	FPSCounter fps;
-// 
-// 	GraphicText fpsText;
-// 	fpsText.SetPos(vec3(10, 10, -1));
-// 
-// 	GraphicText testText;
-// 	testText.SetPos(vec3(500, 500, -1));
-// 	testText.SetText("tessst1");
 
-
+	Sector *sector = new Sector;
+	sector->LoadContent();
 
 	while(Running && !glfwWindowShouldClose(window)) 
 	{
 		
 		fps.Update();
 		auto a = ToString(fps.GetCount()) + "=-+";
-//		fpsText.SetText(a);
 		glfwSetWindowTitle(window, a.c_str());
 
 		// Clear the screen
@@ -367,19 +356,20 @@ int Game::Run()
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
 
-		glBindTexture(GL_TEXTURE_2D, 1);
+		//glBindTexture(GL_TEXTURE_2D, 1);
 //		map.Draw();
+		sector->CreateGeometry();
+		sector->Draw();
 
-		MVP = render->GetOrthoProjection();
+//		MVP = render->GetOrthoProjection();
 
-		// Use our shader
+/*		// Use our shader
 		glUseProgram(programID);
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(textureLocation, 1);
 		
-
-		
-
+*/
+	
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
@@ -387,7 +377,7 @@ int Game::Run()
 
 	}
 
-	//delete buffer;
+	delete sector;
 
 	glDeleteProgram(programID);
 

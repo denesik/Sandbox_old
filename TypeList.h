@@ -147,7 +147,7 @@ public:
 	typedef TypeList<Head, L2> Result;
 };
 
-/*
+
 // ѕроверка на наличие дубликатов в списке
 template <class TList> struct CheckDublicates;
 
@@ -159,7 +159,7 @@ struct CheckDublicates
 		value = CompareType<TList, NoDublicates<TList>::Result>::value ? 0 : 1
 	};
 };
-*/
+
 
 void TypeListTest();
 

@@ -5,8 +5,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <vector>
 
-
-std::shared_ptr<Texture> CreateTexture( const Bitmap &bitmap, bool smoothing )
+Texture CreateTexture( const Bitmap &bitmap, bool smoothing, bool mipmap )
 {
 
 	unsigned int glBitmap = 0;
@@ -42,7 +41,7 @@ std::shared_ptr<Texture> CreateTexture( const Bitmap &bitmap, bool smoothing )
 	default:
 		{
 			//LOG(LOG_WARNING, "Generate GLBitmap. Не поддерживаемый тип цвета.");
-			return nullptr;
+			return Texture();
 		}
 	}
 
@@ -51,14 +50,28 @@ std::shared_ptr<Texture> CreateTexture( const Bitmap &bitmap, bool smoothing )
 	glBindTexture(GL_TEXTURE_2D, glBitmap);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, smoothing ? GL_LINEAR : GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, smoothing ? GL_LINEAR : GL_NEAREST);
+
+	if(mipmap)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, smoothing ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+	}
+	else
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, smoothing ? GL_LINEAR : GL_NEAREST);
+	}
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // выравнивание
 
 	glTexImage2D(GL_TEXTURE_2D, 0, colorType, bitmap.GetWidth(), bitmap.GetHeight(), 0, colorType, GL_UNSIGNED_BYTE, bitmap.GetData());
 	OPENGL_CHECK_ERRORS();
 	
-	return std::make_shared<Texture>(glBitmap, bitmap.GetSize());
+	if(mipmap)
+	{
+		glGenerateMipmap(GL_TEXTURE_2D);
+		OPENGL_CHECK_ERRORS();
+	}
+
+	return Texture(glBitmap, bitmap.GetSize());
 }
 
 

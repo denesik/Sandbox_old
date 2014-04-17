@@ -7,7 +7,6 @@
 #include <vector>
 #include "BufferArray.h"
 #include "Bitmap.h"
-#include <memory>
 
 using namespace glm;
 
@@ -25,7 +24,7 @@ struct Texture
 
 };
 
-std::shared_ptr<Texture> CreateTexture(const Bitmap &bitmap, bool smoothing);
+Texture CreateTexture(const Bitmap &bitmap, bool smoothing, bool mipmap);
 
 class Render
 {

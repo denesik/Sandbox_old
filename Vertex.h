@@ -109,9 +109,8 @@ struct Color
 };
 
 
-typedef TYPELIST_3(Vertex, TextCoord, Color) VTC;
-typedef TYPELIST_3(Vertex, Color, TextCoord) VCT;
-typedef TYPELIST_2(Vertex, TextCoord) VT;
+typedef TYPELIST_3(Vertex, TextCoord, Color) V3T2C4;
+typedef TYPELIST_2(Vertex, TextCoord) V3T2;
 
 
 

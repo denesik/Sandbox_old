@@ -1,28 +1,5 @@
 #include "Cube.h"
 
-#define VERTEXCOUNT 24
-#define INDEXCOUNT 36
-
-static const float __vertexPositions[VERTEXCOUNT][3] = 
-{	// по часовой стрелке
-	{-0.5, -0.5, -0.5}, {-0.5,  0.5, -0.5}, { 0.5,  0.5, -0.5}, { 0.5, -0.5, -0.5}, // front
-	{ 0.5, -0.5,  0.5}, { 0.5,  0.5,  0.5}, {-0.5,  0.5,  0.5}, {-0.5, -0.5,  0.5}, // back
-	{-0.5,  0.5, -0.5}, {-0.5,  0.5,  0.5}, { 0.5,  0.5,  0.5}, { 0.5,  0.5, -0.5}, // top
-	{-0.5, -0.5,  0.5}, {-0.5, -0.5, -0.5}, { 0.5, -0.5, -0.5}, { 0.5, -0.5,  0.5}, // bottom
-	{-0.5, -0.5,  0.5}, {-0.5,  0.5,  0.5}, {-0.5,  0.5, -0.5}, {-0.5, -0.5, -0.5}, // left
-	{ 0.5, -0.5, -0.5}, { 0.5,  0.5, -0.5}, { 0.5,  0.5,  0.5}, { 0.5, -0.5,  0.5}  // right
-};
-
-static const uint32_t __vertexIndex[INDEXCOUNT] = 
-{
-	0, 3, 2,  2, 1, 0,  // front
-	4, 7, 6,  6, 5, 4,  // back
-	8,11, 10, 10,9, 8,  // top
-	12,15,14, 14,13,12, // bottom
-	16,19,18, 18,17,16, // left
-	20,23,22, 22,21,20  // right
-};
-
 Cube::Cube(void)
 {
 	x = 0.0f;
@@ -69,4 +46,14 @@ void Cube::SetTextureAllSide( const ImageAtlas &atlas, std::string texture )
 		textureCoord[i * 4 + 3][0] = u2;
 		textureCoord[i * 4 + 3][1] = v1;
 	}
+}
+
+void Cube::SetTexture( Texture tex )
+{
+	texture = tex;
+}
+
+Texture & Cube::GetTexture()
+{
+	return texture;
 }
